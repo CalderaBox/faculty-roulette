@@ -358,18 +358,11 @@ select {
 
 .choices button {
   display: grid;
-  grid-template-columns: 1fr auto;
   gap: 12px;
   width: 100%;
   margin: 0;
   padding: 13px 14px;
   text-align: left;
-}
-
-.choices small {
-  color: var(--muted);
-  font-size: 12px;
-  text-align: right;
 }
 
 .choices .aftermath-card {
@@ -429,14 +422,6 @@ select {
 .finale-card p {
   margin: 0;
   line-height: 1.95;
-}
-
-.finale-bridge {
-  padding: 14px 16px;
-  border-left: 3px solid rgba(242, 193, 93, .78);
-  background: rgba(255, 255, 255, .035);
-  color: #e7dfd0;
-  font-size: 16px;
 }
 
 .finale-text {
@@ -642,12 +627,6 @@ select {
 .choice-btn strong {
   font-size: 15px;
   line-height: 1.7;
-}
-
-.choice-btn small {
-  color: var(--muted);
-  font-size: 12px;
-  letter-spacing: .03em;
 }
 
 .chip {

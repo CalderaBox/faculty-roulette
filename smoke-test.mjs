@@ -60,6 +60,25 @@ class FakeElement {
   }
 }
 
+function textOnly(value) {
+  return String(value || "").replace(/<[^>]+>/g, "");
+}
+
+function storySentences(value) {
+  return textOnly(value)
+    .split(/[。！？!?]+/)
+    .map((item) => item.replace(/\s+/g, " ").trim())
+    .filter((item) => item.length >= 18);
+}
+
+function duplicateSentences(value) {
+  const counts = new Map();
+  for (const sentence of storySentences(value)) {
+    counts.set(sentence, (counts.get(sentence) || 0) + 1);
+  }
+  return [...counts.entries()].filter(([, count]) => count > 1);
+}
+
 const ids = [
   "profile",
   "mode",
@@ -144,7 +163,8 @@ const aftermathReport = debug.getAftermathPoolReport();
 if (aftermathReport.totalChoices < 100) throw new Error("Aftermath pool report is missing choices.");
 if (aftermathReport.min < 5) throw new Error("Every choice should expose several bound aftermath variants.");
 if (aftermathReport.underFour.length) throw new Error("Some choices have too few bound aftermath variants.");
-if (aftermathReport.minChars < 120) throw new Error("Every aftermath variant should read as a fuller creepy story beat.");
+if (aftermathReport.minChars < 30) throw new Error("Every aftermath variant should still read as a story beat.");
+if (aftermathReport.avgChars > 150) throw new Error("Aftermath variants should stay shorter than the previous long-form version.");
 if (aftermathReport.shortAftermaths.length) throw new Error("Some choices still have too-short aftermath variants.");
 
 const endingDossierReport = debug.getEndingDossierReport();
@@ -152,7 +172,8 @@ if (endingDossierReport.total !== 108) throw new Error("Ending dossier table sho
 if (endingDossierReport.uniqueTitles !== 108) throw new Error("Every ending dossier should have a unique weird-tale title.");
 if (endingDossierReport.uniqueTexts !== 108) throw new Error("Every ending dossier should have unique story text.");
 if (endingDossierReport.missingCases.length) throw new Error("Some ending dossier cases are missing bespoke text.");
-if (endingDossierReport.minTextLength < 180) throw new Error("Ending dossier text should be substantial enough to read as a story.");
+if (endingDossierReport.duplicateSentences.length) throw new Error("Ending dossiers should not repeat full sentences.");
+if (endingDossierReport.minTextLength < 35) throw new Error("Ending dossier text should still contain a specific story beat.");
 
 let snapshot = debug.start("paper", "standard", 1111);
 if (snapshot.currentSceneId !== "paper_intro") throw new Error("Paper profile should start from its own intro scene.");
@@ -162,6 +183,9 @@ if (snapshot.currentSceneId !== "teaching_intro") throw new Error("Teaching prof
 
 const firstBranch = debug.start("paper", "standard", 1200);
 if (firstBranch.currentChoices.length < 2) throw new Error("Paper intro should expose multiple choices.");
+if (/<small>|[+-]\d/.test(firstBranch.choicesHtml)) {
+  throw new Error("Choice buttons should not show stat preview annotations.");
+}
 let afterChoice = debug.choose(0);
 if (!afterChoice.awaitingContinue) throw new Error("Choice should first render an aftermath continuation state.");
 if (!/aftermath-card/.test(elements.get("choices").children[0]?.className || "")) {
@@ -215,11 +239,44 @@ if (/你第一次注意到学院夜里|共享盘里出现|打印机开始优先�
   throw new Error("Timeline should not append generic transition beats to each story paragraph.");
 }
 if (!/第\d{3}号怪谈/.test(snapshot.endingTitle)) throw new Error("Deep dossier-style ending title did not render.");
-if (!/档案返修处|预审雨棚|共享盘地下河|指标标本室|会议回声井|预算折叠层|仪器养殖场|引用香火台|伦理镜像库|招聘回廊|署名迁徙带|绩效天象馆/.test(snapshot.choicesHtml)) {
-  throw new Error("Choice-area final story should include a deep archive family ending.");
-}
+if (!snapshot.endingText || snapshot.endingText.length < 120) throw new Error("Final dossier should include substantial route-aware story text.");
 if (/diag-pill|diagnosis-card|textarea|Faculty Roulette 里走到了档案/.test(snapshot.timelineHtml + snapshot.choicesHtml)) {
   throw new Error("Final story should not render diagnostic chips or share text.");
+}
+const fullStoryText = [
+  ...snapshot.history.map((entry) => `${entry.sceneText}${entry.aftermath}`),
+  snapshot.endingTitle,
+  snapshot.endingText
+].join("");
+const repeatedStorySentences = duplicateSentences(fullStoryText);
+if (repeatedStorySentences.length) {
+  throw new Error(`A single run should not repeat full story sentences: ${repeatedStorySentences[0][0]}`);
+}
+
+for (const [profile, mode, nextSeed] of [
+  ["balanced", "publish", 4100],
+  ["paper", "standard", 4101],
+  ["grant", "publish", 4102],
+  ["teaching", "standard", 4103],
+  ["stealth", "publish", 4104]
+]) {
+  let trial = debug.start(profile, mode, nextSeed);
+  let trialSafety = 50;
+  while (!trial.finished && trialSafety > 0) {
+    trial = debug.choose(trialSafety % Math.max(1, trial.currentChoices.length));
+    if (!trial.finished) trial = debug.continue();
+    trialSafety -= 1;
+  }
+  if (!trial.finished) throw new Error(`Sample ${profile} run did not finish.`);
+  const trialText = [
+    ...trial.history.map((entry) => `${entry.sceneText}${entry.aftermath}`),
+    trial.endingTitle,
+    trial.endingText
+  ].join("");
+  const trialRepeats = duplicateSentences(trialText);
+  if (trialRepeats.length) {
+    throw new Error(`Sample ${profile} run repeated a full story sentence: ${trialRepeats[0][0]}`);
+  }
 }
 
 console.log("Faculty Roulette smoke test passed.");

@@ -237,17 +237,6 @@ const aftermathDeepenersByTone = {
   ]
 };
 
-const aftermathEchoes = [
-  ({ sceneTitle }) => `后来，${sceneTitle}被走廊复述成另一个版本：你明明没有到场，却在每个版本里都负责按下最后一个确认键。`,
-  ({ action }) => `午夜时，电脑又弹出一条撤回提示，撤回对象不是文件，而是你对“${action}”仍然属于自己的理解。`,
-  ({ sceneTag }) => `再过几天，${sceneTag}的门牌下面多了一行很小的字：本处所有偶然均已通过流程确认，请勿擅自醒来。`,
-  ({ profile }) => `你把这事讲给另一位${profile}听，对方只点点头，说他上周也经历过，只是轮到他的版本里你是旁白。`,
-  ({ sceneTitle, action }) => `最后，${sceneTitle}在档案系统里生成了一个新附件，标题平平无奇：关于“${action}”曾短暂像个人选择的情况说明。`,
-  ({ sceneTag }) => `第二天清晨，${sceneTag}的打印机吐出一页空白纸，页脚却写着：本页已充分表达，建议不要继续追问。`,
-  ({ action }) => `更麻烦的是，“${action}”从此学会自己出现在会议纪要里，每次都比你本人提前十分钟入席。`,
-  ({ sceneTitle }) => `你以为这只是${sceneTitle}的一次尾声，结果保洁阿姨从桌底扫出半张日程表，上面排满了你尚未经历的善后。`
-];
-
 const endingFamilies = [
   {
     name: "镜面评审走廊",
@@ -2709,12 +2698,6 @@ function formatDelta(delta) {
     .join(" / ");
 }
 
-function formatChoicePreview(choice) {
-  const scaled = scaleDelta(choice.delta || {});
-  const summary = cleanDelta(scaled);
-  return Object.keys(summary).length ? formatDelta(summary) : "剧情推进";
-}
-
 function routeWeight(tone) {
   return state.routeWeights[tone] || 0;
 }
@@ -3007,15 +2990,10 @@ function pickAftermathDeepener(choice, context, index) {
   return templates[index % templates.length](context);
 }
 
-function pickAftermathEcho(context, index) {
-  return aftermathEchoes[index % aftermathEchoes.length](context);
-}
-
 function deepenAftermath(baseText, choice, context, index) {
-  const base = cleanSentence(baseText);
-  const deepener = pickAftermathDeepener(choice, context, index);
-  const echo = pickAftermathEcho(context, index);
-  return `${base}。${deepener}${echo}`;
+  const base = cleanSentence(String(baseText || "").split(/[。！？!?]/)[0]);
+  const deepener = cleanSentence(pickAftermathDeepener(choice, context, index).split(/[。！？!?]/)[0]);
+  return `${base}。${deepener}`;
 }
 
 function buildAftermathPool(choice, scene = state.current) {
@@ -3154,7 +3132,7 @@ function buildEndingNarrative() {
   const routeThread = buildRouteThread(profile.digest);
   const archive = String(profile.archiveNumber).padStart(3, "0");
   const title = `第${archive}号怪谈：${dossier.title}`;
-  const text = `你最终抵达${profile.family.name}，档案侧签写着“${profile.fate.name}”。${profile.family.setup}${profile.family.mapping}${dossier.text}${profile.fate.turn}${routeThread}${routeText}`;
+  const text = `${dossier.text}${routeThread}${routeText}`;
 
   return {
     title,
@@ -3224,14 +3202,12 @@ function renderChoices() {
   elements.choices.innerHTML = "";
 
   if (state.finished && state.ending) {
-    const entry = state.history[state.history.length - 1];
     const card = document.createElement("article");
     card.className = "finale-card";
     card.setAttribute("aria-live", "polite");
     card.innerHTML = `
       <span class="finale-kicker">最终档案</span>
       <h3>${state.ending.title}</h3>
-      ${entry ? `<p class="finale-bridge">${entry.aftermath}</p>` : ""}
       <p class="finale-text">${state.ending.text}</p>
       <div class="finale-actions">
         <button type="button" class="finale-restart">再开一局</button>
@@ -3267,7 +3243,6 @@ function renderChoices() {
     button.className = "choice-btn";
     button.innerHTML = `
       <strong>${choice.text}</strong>
-      <small>${formatChoicePreview(choice)}</small>
     `;
     button.addEventListener("click", () => applyChoice(index));
     elements.choices.appendChild(button);
@@ -3349,6 +3324,7 @@ function snapshot() {
       turn: entry.turn,
       sceneId: entry.sceneId,
       title: entry.title,
+      sceneText: entry.sceneText,
       choiceText: entry.choiceText,
       aftermath: entry.aftermath
     })),
@@ -3356,6 +3332,7 @@ function snapshot() {
     flags: [...state.storyFlags],
     ghostFlags: [...state.ghostFlags],
     endingTitle: state.ending?.title || "",
+    endingText: state.ending?.text || "",
     choicesHtml,
     timelineHtml: elements.timeline?.innerHTML || ""
   };
@@ -3371,7 +3348,9 @@ function aftermathPoolReport() {
         title: scene.title,
         choiceText: choice.text,
         count: pool.length,
-        minChars: Math.min(...pool.map((item) => item.length))
+        minChars: Math.min(...pool.map((item) => item.length)),
+        maxChars: Math.max(...pool.map((item) => item.length)),
+        totalChars: pool.reduce((sum, item) => sum + item.length, 0)
       });
     }
   }
@@ -3381,9 +3360,34 @@ function aftermathPoolReport() {
     min: Math.min(...items.map((item) => item.count)),
     max: Math.max(...items.map((item) => item.count)),
     minChars: Math.min(...items.map((item) => item.minChars)),
+    maxChars: Math.max(...items.map((item) => item.maxChars)),
+    avgChars: Math.round(
+      items.reduce((sum, item) => sum + item.totalChars, 0) /
+      Math.max(1, items.reduce((sum, item) => sum + item.count, 0))
+    ),
     underFour: items.filter((item) => item.count < 4),
-    shortAftermaths: items.filter((item) => item.minChars < 120)
+    shortAftermaths: items.filter((item) => item.minChars < 30)
   };
+}
+
+function storySentences(text) {
+  return String(text || "")
+    .replace(/<[^>]+>/g, "")
+    .split(/[。！？!?]+/)
+    .map((item) => item.replace(/\s+/g, " ").trim())
+    .filter((item) => item.length >= 8);
+}
+
+function duplicateSentencesFrom(texts) {
+  const counts = new Map();
+  for (const text of texts) {
+    for (const sentence of storySentences(text)) {
+      counts.set(sentence, (counts.get(sentence) || 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .filter(([, count]) => count > 1)
+    .map(([sentence, count]) => ({ sentence, count }));
 }
 
 function endingDossierReport() {
@@ -3395,10 +3399,8 @@ function endingDossierReport() {
       const archiveNumber = familyIndex * deepEndingFates.length + fateIndex + 1;
       const archive = String(archiveNumber).padStart(3, "0");
       const dossier = buildEndingDossier(familyIndex, fateIndex);
-      const family = deepEndingFamilies[familyIndex];
-      const fate = deepEndingFates[fateIndex];
       const title = `第${archive}号怪谈：${dossier.title}`;
-      const text = `${family.setup}${family.mapping}${dossier.text}${fate.turn}`;
+      const text = dossier.text;
 
       if (!endingDossierCases[familyIndex]?.[fateIndex]) {
         missingCases.push(archiveNumber);
@@ -3419,6 +3421,7 @@ function endingDossierReport() {
     uniqueTexts: new Set(items.map((item) => item.text)).size,
     minTextLength: Math.min(...items.map((item) => item.textLength)),
     missingCases,
+    duplicateSentences: duplicateSentencesFrom(items.map((item) => `${item.title}。${item.text}`)),
     duplicateTitles: items
       .filter((item, index) => items.findIndex((candidate) => candidate.title === item.title) !== index)
       .map((item) => item.title)
