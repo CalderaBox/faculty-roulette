@@ -14,6 +14,7 @@ class FakeElement {
     };
     this.className = "";
     this.value = "";
+    this.attributes = {};
     this._innerHTML = "";
     this._textContent = "";
   }
@@ -39,6 +40,10 @@ class FakeElement {
 
   addEventListener(type, fn) {
     this.listeners[type] = fn;
+  }
+
+  setAttribute(name, value) {
+    this.attributes[name] = String(value);
   }
 
   append(...nodes) {
@@ -145,6 +150,12 @@ if (!/aftermath-card/.test(elements.get("choices").children[0]?.className || "")
 const aftermathCardHtml = elements.get("choices").children[0]?._innerHTML || "";
 if (/你第一次注意到学院夜里|共享盘里出现|打印机开始优先输出/.test(aftermathCardHtml)) {
   throw new Error("Aftermath card should not show generic transition beats as extra story prompts.");
+}
+if (/aftermath-kicker|点这里/.test(aftermathCardHtml)) {
+  throw new Error("Aftermath card should expose only one clear continuation affordance.");
+}
+if (!/aftermath-cta/.test(aftermathCardHtml)) {
+  throw new Error("Aftermath card should render a single continuation CTA.");
 }
 const branchA = debug.continue().currentSceneId;
 debug.start("paper", "standard", 1200);

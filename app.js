@@ -3045,10 +3045,10 @@ function renderChoices() {
 
     const button = document.createElement("button");
     button.className = "aftermath-card";
+    button.setAttribute("aria-label", state.pendingFinish ? "封存这一轮" : "翻到下一幕");
     button.innerHTML = `
-      <span class="aftermath-kicker">这一页继续往下写</span>
       <p>${entry.aftermath}</p>
-      <small>${state.pendingFinish ? "点这里封存这一轮" : "点这里翻到下一幕"}</small>
+      <span class="aftermath-cta">${state.pendingFinish ? "封存这一轮" : "翻到下一幕"}</span>
     `;
     button.addEventListener("click", continueStory);
     elements.choices.appendChild(button);

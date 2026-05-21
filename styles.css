@@ -396,6 +396,7 @@ select {
     linear-gradient(135deg, rgba(242, 193, 93, .14), transparent 48%),
     linear-gradient(315deg, rgba(122, 184, 255, .1), transparent 40%),
     #151a20;
+  text-align: left;
 }
 
 .choices .aftermath-card:hover {
@@ -406,14 +407,6 @@ select {
     #171d24;
 }
 
-.aftermath-kicker {
-  color: var(--gold);
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-
 .choices .aftermath-card p {
   margin: 0;
   color: #e7dfd0;
@@ -421,9 +414,17 @@ select {
   line-height: 1.95;
 }
 
-.choices .aftermath-card small {
-  color: var(--gold);
-  text-align: left;
+.aftermath-cta {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 13px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: #151006;
+  font-size: 13px;
+  font-weight: 900;
 }
 
 .story-panel {
