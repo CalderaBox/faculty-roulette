@@ -15,6 +15,7 @@ Playable zero-dependency prototype.
 - Action points and long-term project slots
 - Budget and energy economy with project risk
 - Absurd semester rules that mutate choice outcomes
+- Project-specific story arcs and hidden routes
 - Six-stat survival model
 - Campus bestiary discoveries
 - Achievements, timeline, crisis radar, diagnosis card, endings, and share text

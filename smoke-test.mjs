@@ -115,6 +115,10 @@ if (/闈|涓|鎴|鍩|瀛|绋|�/.test(html + app)) throw new Error("Detected mo
 
 vm.runInNewContext(app, context);
 elements.get("startBtn").listeners.click();
+for (let i = 0; i < 3; i += 1) {
+  context.investProject("paper");
+}
+if (!elements.get("projectBoard").innerHTML.includes("已完成")) throw new Error("Project completion did not render.");
 
 for (let i = 0; i < 6; i += 1) {
   const choice = elements.get("choices").children[0];

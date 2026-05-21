@@ -179,6 +179,61 @@ const projectTemplates = [
   }
 ];
 
+const chainEvents = [
+  {
+    id: "paper-preprint",
+    tag: "Paper Arc",
+    risk: "high",
+    unlock: (s) => s.projects.some((item) => item.id === "paper" && item.completeDone),
+    title: "你的预印本开始在圈内乱窜",
+    text: "有人在群里转发了你的预印本。赞美和误解一起涌来，你突然意识到自己真的把东西发出去了。",
+    choices: [
+      { text: "立刻补一版说明文档", delta: { paper: 8, health: -3, luck: 2 }, flag: "paper_clarity", log: "你用一夜换来了少一点误读。", memo: "被看见并不总是纯收益。" },
+      { text: "保持沉默，观察它自行传播", delta: { luck: 7, service: -2, paper: 3 }, flag: "paper_wave", log: "讨论开始自行繁殖，方向也开始失控。", memo: "传播和理解从来不是同一件事。" },
+      { text: "干脆顺势做一个公开演讲", delta: { teaching: 6, paper: 5, health: -4 }, flag: "paper_stage", log: "你发现自己也许不仅在写论文，也在塑造一个位置。", memo: "台前的你和文稿里的你并不完全相同。" }
+    ]
+  },
+  {
+    id: "grant-program-officer",
+    tag: "Grant Arc",
+    risk: "high",
+    unlock: (s) => s.projects.some((item) => item.id === "grant" && item.completeDone),
+    title: "项目官在会后叫住了你",
+    text: "她说你的方向有趣，但问了一个你最怕被问到的问题：如果只给你一半资源，你还做什么？",
+    choices: [
+      { text: "砍掉野心，保住主轴", delta: { grant: 10, paper: -2, luck: 1 }, flag: "grant_core", log: "你第一次觉得克制也可以很锋利。", memo: "不是所有放弃都算妥协。" },
+      { text: "赌一把完整蓝图", delta: { grant: 12, health: -5, luck: -2 }, flag: "grant_gamble", log: "你在逻辑上站住了，但心跳没有。", memo: "宏图的代价往往由肉身支付。" },
+      { text: "把学生培养写成核心价值", delta: { teaching: 5, grant: 7, service: 2 }, flag: "grant_people", log: "她点头的那一下比任何模板都重要。", memo: "有时候人本身就是项目的理由。" }
+    ]
+  },
+  {
+    id: "teaching-course-fork",
+    tag: "Teaching Arc",
+    risk: "medium",
+    unlock: (s) => s.projects.some((item) => item.id === "teaching" && item.completeDone),
+    title: "学生把你的课程二创了",
+    text: "有人把你讲过的一套框架做成了可视化小工具，还在学院群里火了。你要决定这算不算你的成果。",
+    choices: [
+      { text: "公开夸学生，把 spotlight 给出去", delta: { teaching: 9, luck: 4, paper: -1 }, flag: "teaching_generous", log: "学生第一次真切地感到自己被看见。", memo: "位置让出去，有时会换回更大的位置。" },
+      { text: "把它纳入你的课程品牌", delta: { teaching: 7, service: 3, luck: -2 }, flag: "teaching_brand", log: "你的课程开始像一个可识别的名字。", memo: "品牌感和控制欲常常共生。" },
+      { text: "顺势写成教学论文", delta: { teaching: 4, paper: 8, health: -2 }, flag: "teaching_publish", log: "你把课堂里的火花压成了可引用格式。", memo: "好教学有时也能变成研究对象。" }
+    ]
+  },
+  {
+    id: "boundary-lightweight",
+    tag: "Boundary Arc",
+    risk: "medium",
+    unlock: (s) => s.projects.some((item) => item.id === "boundary" && item.completeDone),
+    title: "那封“轻量级任务”邮件又来了",
+    text: "这次你比上次更早看穿了它，但拒绝的代价也更真实。你知道自己正在测试新的边界系统。",
+    choices: [
+      { text: "明确列出可接受范围", delta: { health: 8, service: -4, luck: 2 }, flag: "boundary_clean", log: "你第一次在不内疚的情况下说了不。", memo: "清晰不是攻击，清晰只是清晰。" },
+      { text: "接受，但要求交换资源", delta: { service: 5, budget: 0, luck: 4 }, flag: "boundary_trade", log: "你把任务谈成了一笔交易，而不是献祭。", memo: "边界不是墙，也可以是价格表。" },
+      { text: "转化成制度建议", delta: { service: 7, health: -2, teaching: 2 }, flag: "boundary_system", log: "问题没有消失，但它第一次被写进了系统。", memo: "把个体问题转成制度语言，是另一种抵抗。" }
+    ]
+  }
+];
+
 const events = [
   {
     tag: "Reviewer #2",
@@ -304,7 +359,8 @@ const achievementRules = [
   { id: "bestiary", label: "传说目击者", test: (s) => s.myths.size >= 3 },
   { id: "builder", label: "长期主义者", test: (s) => s.projects.filter((item) => item.completeDone).length >= 2 },
   { id: "firewall", label: "拒绝轻量级", test: (s) => s.projects.some((item) => item.id === "boundary" && item.completeDone) },
-  { id: "lean", label: "精益存活", test: (s) => s.finished && s.budget >= 3 && s.energy >= 2 }
+  { id: "lean", label: "精益存活", test: (s) => s.finished && s.budget >= 3 && s.energy >= 2 },
+  { id: "story", label: "剧情穿透者", test: (s) => s.storyFlags.size >= 3 }
 ];
 
 const defaultMaxSemester = 6;
@@ -441,6 +497,8 @@ function startGame() {
     history: [],
     achievements: new Set(),
     myths: new Set(),
+    storyFlags: new Set(),
+    chainSeen: new Set(),
     projects: projectTemplates.map((project) => ({ ...project, progress: 0, completeDone: false })),
     actionsLeft: actionBudget[els.mode.value],
     budget: economyBudget[els.mode.value].budget,
@@ -461,6 +519,12 @@ function startGame() {
 }
 
 function pickEvent() {
+  const unlockedChains = chainEvents.filter((event) => event.unlock(state) && !state.chainSeen.has(event.id));
+  if (unlockedChains.length > 0) {
+    const chainEvent = unlockedChains[Math.floor(seededRandom() * unlockedChains.length)];
+    state.chainSeen.add(chainEvent.id);
+    return chainEvent;
+  }
   if (state.used.length === events.length) state.used = [];
   const available = events.map((_, index) => index).filter(index => !state.used.includes(index));
   const index = available[Math.floor(seededRandom() * available.length)];
@@ -507,6 +571,7 @@ function applyChoice(index) {
   const delta = scaleDelta(choice.delta);
   const before = { ...state.stats };
   addDelta(state.stats, delta);
+  if (choice.flag) state.storyFlags.add(choice.flag);
   const swing = Object.keys(delta).reduce((sum, key) => sum + Math.abs(state.stats[key] - before[key]), 0);
   state.history.push({
     semester: state.semester,
@@ -578,6 +643,9 @@ function getTotal() {
 function getRank() {
   if (!state) return "未入职";
   const total = getTotal();
+  if (state.storyFlags.has("paper_stage") && state.storyFlags.has("grant_people") && state.storyFlags.has("boundary_clean")) {
+    return "学院传说型青椒";
+  }
   if (state.stats.health < 20) return "濒危 PI";
   if (state.stats.paper > 78 && state.stats.grant > 68) return "高压上岸型 PI";
   if (state.stats.teaching > 78 && state.stats.health > 45) return "口碑型老师";
@@ -601,7 +669,9 @@ function finishGame() {
   const rank = getRank();
   const total = getTotal();
   let text = "你没有成为传说，但你保住了研究、教学和一点点生活。";
-  if (state.stats.health < 20) {
+  if (state.storyFlags.has("paper_stage") && state.storyFlags.has("grant_people") && state.storyFlags.has("boundary_clean")) {
+    text = "你没有顺从系统，也没有单纯逃离它。你把研究、学生和边界织成了一条自己的路，于是人们开始用你的名字描述某种罕见姿态。";
+  } else if (state.stats.health < 20) {
     text = "成果还在增长，但你开始怀疑自己是不是也应该进入仪器共享平台预约维护。";
   } else if (state.stats.paper > 78 && state.stats.grant > 68) {
     text = "论文和基金都站住了，代价是你现在听到 deadline 会自动握拳。";
@@ -620,7 +690,8 @@ function finishGame() {
   updateAchievements();
   const unlocked = achievementRules.filter((item) => state.achievements.has(item.id)).map((item) => item.label);
   const completedProjects = state.projects.filter((item) => item.completeDone).map((item) => item.name);
-  const share = `我在《青椒轮盘 Faculty Roulette》里获得结局：${rank}。\n论文${state.stats.paper} / 基金${state.stats.grant} / 教学${state.stats.teaching} / 服务${state.stats.service} / 健康${state.stats.health} / 运气${state.stats.luck}\n宇宙：${state.mood.name} / ${state.mode.label}\n成就：${unlocked.length ? unlocked.join("、") : "暂无，但仍然活着"}`;
+  const route = [...state.storyFlags].slice(0, 4).join("、");
+  const share = `我在《青椒轮盘 Faculty Roulette》里获得结局：${rank}。\n论文${state.stats.paper} / 基金${state.stats.grant} / 教学${state.stats.teaching} / 服务${state.stats.service} / 健康${state.stats.health} / 运气${state.stats.luck}\n宇宙：${state.mood.name} / ${state.mode.label}\n路线：${route || "普通幸存路线"}\n成就：${unlocked.length ? unlocked.join("、") : "暂无，但仍然活着"}`;
   els.endingTitle.textContent = rank;
   els.endingText.textContent = text;
   const unlockedMyths = bestiary.filter((item) => state.myths.has(item.id)).map((item) => item.name);
@@ -632,6 +703,7 @@ function finishGame() {
       <dt>主要症状</dt><dd>${state.mood.name}，${state.mode.label}</dd>
       <dt>目击传说</dt><dd>${unlockedMyths.length ? unlockedMyths.join("、") : "暂未目击，但墙里有声音"}</dd>
       <dt>完成项目</dt><dd>${completedProjects.length ? completedProjects.join("、") : "没有完成项目，但积累了很多解释"}</dd>
+      <dt>剧情路径</dt><dd>${route || "普通幸存路线"}</dd>
       <dt>建议处方</dt><dd>${state.stats.health < 35 ? "先睡觉，再讨论宏大问题" : "保留边界，谨慎答应“轻量级”任务"}</dd>
     </dl>
   `;
