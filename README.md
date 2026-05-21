@@ -23,7 +23,6 @@ Playable zero-dependency prototype.
 - Escalating academic horror storyline with branching endings
 - 108 generated academic horror dossiers with deeper institutional satire endings
 - One continuous story dossier that carries the full sequence of scenes, decisions, aftermaths, and result
-- Absurd semester rules that mutate choice outcomes
 - Story-focused reading layout with a single continuous narrative record
 - Mid-run story arcs, hidden routes, and profile-dependent branches
 - Six-stat survival model

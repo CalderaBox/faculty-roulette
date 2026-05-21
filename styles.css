@@ -354,17 +354,6 @@ select {
   line-height: 1.9;
 }
 
-.rule-strip {
-  margin-top: 16px;
-  padding: 12px 13px;
-  border: 1px dashed rgba(242, 193, 93, .45);
-  border-radius: 8px;
-  color: var(--gold);
-  background: rgba(242, 193, 93, .07);
-  font-size: 14px;
-  line-height: 1.55;
-}
-
 .choices {
   display: grid;
   gap: 10px;

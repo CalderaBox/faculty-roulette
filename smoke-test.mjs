@@ -77,7 +77,6 @@ const ids = [
   "eventRisk",
   "eventTitle",
   "eventText",
-  "activeRule",
   "choices",
   "timeline",
   "resultBox",
@@ -107,6 +106,12 @@ if (html.includes('id="stats"')) throw new Error("Large stat grid should be remo
 if (html.includes("剧情余波")) throw new Error("The explicit aftermath label should be removed.");
 if (html.includes('id="memoText"')) throw new Error("Separate aftermath memo panel should be removed.");
 if (html.includes("terminal") || html.includes('id="log"')) throw new Error("Visible system log should be removed.");
+if (html.includes("rule-strip") || html.includes('id="activeRule"') || html.includes("本学期特殊规则")) {
+  throw new Error("Visible special-rule strip should be removed from the story surface.");
+}
+if (/const absurdRules|function applyRule|function nextRule/.test(app)) {
+  throw new Error("Special-rule system should not add hidden, unexplained outcome changes.");
+}
 if (/buildDeepAftermath|const stage = stageAftermaths/.test(app)) {
   throw new Error("Choice aftermaths should not be stitched to unrelated stage-level snippets.");
 }

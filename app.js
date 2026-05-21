@@ -53,22 +53,19 @@ const modeSettings = {
     label: "标准学术天气",
     turns: 14,
     multiplier: 1,
-    bonus: {},
-    rule: "系统仍然假装自己只是流程，但流程已经学会挑人了。"
+    bonus: {}
   },
   publish: {
     label: "非升即走模式",
     turns: 15,
     multiplier: 1.15,
-    bonus: { paper: 4, grant: 4, health: -8, luck: -2 },
-    rule: "收益更甜，副作用更尖。怪谈尤其喜欢在这一档成熟。"
+    bonus: { paper: 4, grant: 4, health: -8, luck: -2 }
   },
   humane: {
     label: "理想学院模式",
     turns: 13,
     multiplier: 0.88,
-    bonus: { health: 10, luck: 6, service: -2 },
-    rule: "仍然荒诞，但至少没人会把二十件事说成轻量级支持。"
+    bonus: { health: 10, luck: 6, service: -2 }
   }
 };
 
@@ -79,99 +76,6 @@ const moods = [
   { name: "服务性降雪", spin: 209, bonus: { service: 1 } },
   { name: "健康预警", spin: 270, bonus: { health: -1, luck: 1 } },
   { name: "走廊回声", spin: 331, bonus: { luck: 1 } }
-];
-
-const absurdRules = [
-  {
-    id: "reply-all",
-    label: "本学期特殊规则：凡是看起来像“确认一下”的事情，都会额外抄送给未来的你。",
-    apply(choice) {
-      const delta = {};
-      if (hasTone(choice, "official") || hasTone(choice, "service")) {
-        addDelta(delta, { service: 1, health: -1 });
-      }
-      return delta;
-    }
-  },
-  {
-    id: "deadline-fog",
-    label: "本学期特殊规则：所有截止日期都往前走半步，只有疲劳留在原地。",
-    apply(choice) {
-      const delta = {};
-      if (hasTone(choice, "paper")) {
-        addDelta(delta, { paper: 1, health: -1 });
-      }
-      if (hasTone(choice, "grant")) {
-        addDelta(delta, { grant: 1, health: -1 });
-      }
-      return delta;
-    }
-  },
-  {
-    id: "quiet-hall",
-    label: "本学期特殊规则：走廊里说得越少，系统越容易误判你已经同意。",
-    apply(choice) {
-      const delta = {};
-      if (hasTone(choice, "hide")) {
-        addDelta(delta, { luck: 1 });
-      }
-      if (hasTone(choice, "question")) {
-        addDelta(delta, { service: -1, luck: 1 });
-      }
-      return delta;
-    }
-  },
-  {
-    id: "kindness-tax",
-    label: "本学期特殊规则：所有善意都会被算作额外工时，但学院依旧称之为自然发生。",
-    apply(choice) {
-      const delta = {};
-      if (hasTone(choice, "care") || hasTone(choice, "service")) {
-        addDelta(delta, { health: -1, teaching: 1 });
-      }
-      return delta;
-    }
-  },
-  {
-    id: "budget-tide",
-    label: "本学期特殊规则：预算像潮水一样涨落，只有表格知道退潮时谁还站在岸上。",
-    apply(choice) {
-      const delta = {};
-      if (hasTone(choice, "grant") || hasTone(choice, "official")) {
-        addDelta(delta, { grant: 1 });
-      }
-      return delta;
-    }
-  },
-  {
-    id: "class-echo",
-    label: "本学期特殊规则：课堂会替你记住说过的话，哪怕那堂课后来并不承认自己存在。",
-    apply(choice) {
-      const delta = {};
-      if (hasTone(choice, "teaching") || hasTone(choice, "care")) {
-        addDelta(delta, { teaching: 1, luck: 1 });
-      }
-      return delta;
-    }
-  },
-  {
-    id: "mirror-hour",
-    label: "本学期特殊规则：晚上九点后做出的决定，会先在玻璃里完成一次。",
-    apply(choice) {
-      const delta = {};
-      if (hasTone(choice, "follow") || hasTone(choice, "hide")) {
-        addDelta(delta, { luck: 1 });
-      }
-      return delta;
-    }
-  },
-  {
-    id: "small-task",
-    label: "本学期特殊规则：凡被称作“小事”的请求，默认会拿走一格健康。",
-    apply() {
-      return { health: -1 };
-    }
-  }
 ];
 
 const stageAftermaths = [
@@ -2447,7 +2351,6 @@ const elements = {
   eventRisk: byId("eventRisk"),
   eventTitle: byId("eventTitle"),
   eventText: byId("eventText"),
-  activeRule: byId("activeRule"),
   choices: byId("choices"),
   timeline: byId("timeline"),
   resultBox: byId("resultBox"),
@@ -2467,7 +2370,6 @@ const state = {
   maxTurns: modeSettings.standard.turns,
   stats: cloneStats(profiles.balanced),
   mood: moods[0],
-  rule: absurdRules[0],
   current: null,
   currentChoices: [],
   storyFlags: new Set(),
@@ -2560,14 +2462,6 @@ function scaleDelta(delta) {
 
 function clamp(value, min = 0, max = 100) {
   return Math.max(min, Math.min(max, value));
-}
-
-function hasTone(choice, tone) {
-  return Array.isArray(choice.tones) && choice.tones.includes(tone);
-}
-
-function applyRule(choice) {
-  return state.rule ? state.rule.apply(choice, state) || {} : {};
 }
 
 function moodDelta() {
@@ -2804,11 +2698,6 @@ function pickScene() {
   return fallback.length ? weightedPick(fallback) : null;
 }
 
-function nextRule() {
-  const pool = absurdRules.filter((rule) => rule.id !== state.rule?.id);
-  state.rule = pick(pool.length ? pool : absurdRules);
-}
-
 function nextMood() {
   const pool = moods.filter((item) => item.name !== state.mood?.name);
   state.mood = pick(pool.length ? pool : moods);
@@ -2845,7 +2734,6 @@ function startGame(profileOverride, modeOverride) {
 
   state.queue.push(introSceneByProfile[state.profile]);
   nextMood();
-  nextRule();
   drawEvent();
 }
 
@@ -2920,9 +2808,8 @@ function applyChoice(index) {
   if (!choice) return;
 
   const scaledDelta = scaleDelta(choice.delta || {});
-  const ruleDelta = cleanDelta(applyRule(choice));
   const weatherDelta = cleanDelta(moodDelta());
-  const finalDelta = cleanDelta(mergeDeltas(scaledDelta, ruleDelta, weatherDelta));
+  const finalDelta = cleanDelta(mergeDeltas(scaledDelta, weatherDelta));
   const aftermath = pickAftermath(choice);
 
   applyStats(finalDelta);
@@ -2940,7 +2827,6 @@ function applyChoice(index) {
     choiceText: choice.text,
     aftermath,
     mood: state.mood.name,
-    ruleLabel: state.rule.label,
     deltaText: Object.keys(finalDelta).length ? formatDelta(finalDelta) : "无直接数值变化"
   };
 
@@ -2965,7 +2851,6 @@ function continueStory() {
 
   state.turn += 1;
   nextMood();
-  nextRule();
   drawEvent();
 }
 
@@ -3155,9 +3040,6 @@ function renderEvent() {
     elements.eventRisk.textContent = `risk: ${state.current.risk}`;
     elements.eventTitle.textContent = state.current.title;
     elements.eventText.textContent = state.current.text;
-    elements.activeRule.textContent = state.awaitingContinue
-      ? "纸面暂时安静下来，下一页还没有翻开。"
-      : state.rule.label;
     return;
   }
 
@@ -3167,9 +3049,6 @@ function renderEvent() {
   elements.eventText.textContent = state.finished
     ? "这一轮的完整经历已经封存到下方档案里。"
     : "选择开局风格，然后开始你的学术怪谈历程。";
-  elements.activeRule.textContent = state.started
-    ? modeSettings[state.mode].rule
-    : "本学期特殊规则：尚未生成。";
 }
 
 function renderHeader() {
