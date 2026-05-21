@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>青椒轮盘 | Faculty Roulette</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Faculty Roulette</p>
+        <h1>青椒轮盘</h1>
+        <p class="lead">一款早期学术人生存模拟器。你有六个学期，几篇论文，一点点健康，以及随时会坍塌的日程表。</p>
+      </div>
+      <div class="console" aria-label="terminal preview">
+        <div class="console-bar"><span></span><span></span><span></span></div>
+        <pre id="log">booting tenure-track survival kernel...
+loading grant anxiety...
+loading reviewer #2...
+ready.</pre>
+      </div>
+    </section>
+
+    <section class="game-shell">
+      <aside class="panel profile-panel">
+        <h2>角色档案</h2>
+        <label for="profile">开局风格</label>
+        <select id="profile">
+          <option value="balanced">均衡型青椒</option>
+          <option value="paper">论文冲刺型</option>
+          <option value="grant">基金焦虑型</option>
+          <option value="teaching">教学口碑型</option>
+        </select>
+        <button id="startBtn" class="primary">开始新一轮</button>
+        <button id="restartBtn" class="ghost">重开</button>
+        <p class="hint">目标不是赢，是带着一点尊严活到第六学期末。</p>
+      </aside>
+
+      <section class="panel board">
+        <div class="board-head">
+          <div>
+            <span class="label">当前学期</span>
+            <strong id="semester">-</strong>
+          </div>
+          <div>
+            <span class="label">状态</span>
+            <strong id="status">等待开局</strong>
+          </div>
+        </div>
+
+        <div class="stats" id="stats"></div>
+
+        <article class="event-card" id="eventCard">
+          <p class="card-kicker">事件卡</p>
+          <h2 id="eventTitle">尚未抽卡</h2>
+          <p id="eventText">选择开局风格，然后开始你的青椒生存实验。</p>
+          <div id="choices" class="choices"></div>
+        </article>
+
+        <div class="result-box" id="resultBox" hidden>
+          <h2 id="endingTitle"></h2>
+          <p id="endingText"></p>
+          <textarea id="shareText" readonly></textarea>
+          <button id="copyBtn" class="primary">复制结局文本</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>

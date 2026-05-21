@@ -1,0 +1,11 @@
+AI_Doc/
+AGENTS.md
+PROJECT.md
+.env
+.DS_Store
+Thumbs.db
+*.zip
+*.7z
+*.rar
+node_modules/
+dist/
