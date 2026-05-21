@@ -147,6 +147,13 @@ if (aftermathReport.underFour.length) throw new Error("Some choices have too few
 if (aftermathReport.minChars < 120) throw new Error("Every aftermath variant should read as a fuller creepy story beat.");
 if (aftermathReport.shortAftermaths.length) throw new Error("Some choices still have too-short aftermath variants.");
 
+const endingDossierReport = debug.getEndingDossierReport();
+if (endingDossierReport.total !== 108) throw new Error("Ending dossier table should contain exactly 108 results.");
+if (endingDossierReport.uniqueTitles !== 108) throw new Error("Every ending dossier should have a unique weird-tale title.");
+if (endingDossierReport.uniqueTexts !== 108) throw new Error("Every ending dossier should have unique story text.");
+if (endingDossierReport.missingCases.length) throw new Error("Some ending dossier cases are missing bespoke text.");
+if (endingDossierReport.minTextLength < 180) throw new Error("Ending dossier text should be substantial enough to read as a story.");
+
 let snapshot = debug.start("paper", "standard", 1111);
 if (snapshot.currentSceneId !== "paper_intro") throw new Error("Paper profile should start from its own intro scene.");
 

@@ -21,7 +21,7 @@ Playable zero-dependency prototype.
 - Developer-style log/terminal UI removed so the page stays focused on the story
 - Roulette-style event draw
 - Escalating academic horror storyline with branching endings
-- 108 generated academic horror dossiers with deeper institutional satire endings
+- 108 bespoke academic horror dossiers, each with its own weird-tale title and route-aware ending text
 - One continuous story dossier that carries the full sequence of scenes, decisions, aftermaths, and result
 - Story-focused reading layout with a single continuous narrative record
 - Mid-run story arcs, hidden routes, and profile-dependent branches
