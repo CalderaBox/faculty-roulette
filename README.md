@@ -15,12 +15,15 @@ Playable zero-dependency prototype.
 - A larger branching scene pool where previous choices change which scenes can appear next
 - The same choice can produce different creepy aftermath variants under different seeds
 - Longer story runs with scene-by-scene progression on every choice
+- Richer aftermath prose adapted from the earlier haunted-academia version
+- Choices now pause on a prominent aftermath passage before the next scene appears
+- Developer-style log/terminal UI removed so the page stays focused on the story
 - Roulette-style event draw
 - Escalating academic horror storyline with branching endings
-- 108 generated academic horror dossiers based on route combinations
-- Full end-of-run dossier that replays the complete sequence of scenes, choices, and aftermaths
+- 108 generated academic horror dossiers with deeper institutional satire endings
+- One continuous story dossier that carries the full sequence of scenes, decisions, aftermaths, and result
 - Absurd semester rules that mutate choice outcomes
-- Story-focused reading layout with a larger timeline and aftermath record
+- Story-focused reading layout with a single continuous narrative record
 - Mid-run story arcs, hidden routes, and profile-dependent branches
 - Six-stat survival model
 - Timeline, crisis radar, diagnosis card, endings, and share text

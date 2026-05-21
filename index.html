@@ -32,12 +32,6 @@
           </div>
           <div class="needle" aria-hidden="true"></div>
         </div>
-        <div class="terminal" aria-label="system log">
-          <div class="terminal-bar"><span></span><span></span><span></span></div>
-          <pre id="log">faculty-survival.log
-system idle
-choose a profile to begin</pre>
-        </div>
       </section>
     </section>
 
@@ -87,27 +81,6 @@ choose a profile to begin</pre>
       </aside>
 
       <section class="panel board" aria-live="polite">
-        <div class="board-head board-head-story">
-          <div>
-            <span class="label">当前学期</span>
-            <strong id="semester">-</strong>
-          </div>
-          <div>
-            <span class="label">系统状态</span>
-            <strong id="status">等待开局</strong>
-          </div>
-          <div>
-            <span class="label">本轮天气</span>
-            <strong id="mood">尚未抽取</strong>
-          </div>
-          <div>
-            <span class="label">当前连锁</span>
-            <strong id="combo">尚未形成</strong>
-          </div>
-        </div>
-
-        <div class="stats" id="stats"></div>
-
         <article class="event-card event-card-story" id="eventCard">
           <div class="event-meta">
             <span id="eventTag">事件卡</span>
@@ -119,20 +92,10 @@ choose a profile to begin</pre>
           <div id="choices" class="choices"></div>
         </article>
 
-        <section class="after-panel story-focus">
-          <div class="memo story-memo">
-            <span>剧情余波</span>
-            <p id="memoText">同样的选择，不一定会把你送往同样的地方。</p>
-          </div>
-          <div class="trajectory" id="trajectory" aria-label="semester trajectory"></div>
-        </section>
-
         <section class="story-panel" aria-label="story timeline">
           <div class="section-head story-section-head">
-            <span>Story Record</span>
-            <strong>事件时间线</strong>
+            <strong>完整历程</strong>
           </div>
-          <p class="story-copy">你看到的不只是分数变化，而是每个场景如何被你上一道选择悄悄改写。越往后看，学院越像在主动参与叙事。</p>
           <ol id="timeline" class="timeline"></ol>
         </section>
 
@@ -141,14 +104,6 @@ choose a profile to begin</pre>
           <h2 id="endingTitle"></h2>
           <p id="endingText" class="ending-intro"></p>
           <div id="diagnosisCard" class="diagnosis-card"></div>
-
-          <section class="ending-story-wrap" aria-label="full story archive">
-            <div class="section-head story-section-head">
-              <span>Full Dossier</span>
-              <strong>完整历程</strong>
-            </div>
-            <div id="endingStory" class="ending-story"></div>
-          </section>
 
           <textarea id="shareText" readonly></textarea>
           <button id="copyBtn" class="primary">复制结局文本</button>

@@ -174,6 +174,84 @@ const absurdRules = [
   }
 ];
 
+const storyProgressions = [
+  "你第一次注意到学院夜里会比白天多出一条走廊。",
+  "共享盘里出现了一个以你命名、但你从未创建过的文件夹。",
+  "打印机开始优先输出与你有关、却尚未发生的材料。",
+  "有人在会议上引用了你没讲过的话，而所有人都觉得那很正常。",
+  "第七层的灯第一次在你离开后才亮起。",
+  "你开始分不清哪些数据是结果，哪些数据是在等你成为结果。",
+  "学生、同事和系统逐渐各自记住了不同版本的你。",
+  "你发现最可怕的不是异常本身，而是异常越来越高效。",
+  "所有证据都开始互相印证，只有现实版本显得越来越单薄。",
+  "你已经能提前猜到下一次怪事会从哪个介质里钻出来。",
+  "学院像一台会自我修补的机器，而你正在它的修补日志里。",
+  "到最后，你意识到自己经历的不是事故，而是一套完整且正在运行的叙事。"
+];
+
+const stageAftermaths = [
+  [
+    "你把材料带回办公室后，它自己从骑缝章里长出第二页，内容是三个月后财务处会退回一笔你还没申请到的经费。第二天财务老师路过，顺手问你那份盖好章的版本能不能也抄送她一份。",
+    "复印件在凌晨两点悄悄把页脚改成了“内部流转件”，连订书钉位置都比你常用的更熟练。次日系秘书看了一眼，说你终于学会按学院格式做人了。",
+    "你关上抽屉以后，抽屉自己从里面锁死了。保卫处来了三个人研究半天，最后给出的解释是“老楼有记忆”，然后把这句写进了维修单。"
+  ],
+  [
+    "你把数据接进论文后，图表漂亮得像提前做过宣传。第二天合作者夸你终于学会讲故事，而你开始怀疑故事是不是先于实验出生。",
+    "旧硬盘里除了数据，还有一份被删到只剩标题的组会纪要，标题写着“请未来的你别再重跑这一组”。机器没声音，但讽刺意味已经很完整。",
+    "你重装完系统，桌面干净得像刚入职那天。唯一没被删掉的是回收站里的进度条，它一直显示“正在恢复学院默认配置”。"
+  ],
+  [
+    "回信发出去三分钟，发件箱里多了一封你写给下个月自己的提醒：七楼的灯不是用来照明，是用来点名。系统很贴心，已经帮你加了星标。",
+    "同事说她只收到一个空附件，但附件大小显示 14MB。她随口开玩笑问你是不是把 tenure 的原件发来了，办公室里刚好停电了一次。",
+    "你走到七楼尽头，发现那盏灯照着一排空工位，每个工位上都摆着一杯已经凉透的咖啡。门牌写着“青年人才支持区”，但门锁只认凌晨三点之后的脚步声。"
+  ],
+  [
+    "你承认那段发言像你之后，学院开始更爱请你参会，因为“你终于愿意稳定输出观点”。只是你越来越分不清，是你在开会，还是纪要先替你发过言。",
+    "你要求修正纪要，秘书很快回了最新版。新版删掉了那段发言，却顺手补上了你没参加过的鼓掌环节，逻辑上甚至更自洽了一点。",
+    "你把纪要里的句子写进提案后，评审意见罕见地只提了一条：建议申请人保持这种成熟口吻。你第一次意识到，最会写提案的也许不是你，而是那个替你发言的记录员。"
+  ],
+  [
+    "你签完字，桌上的钢笔自动滚回了原位，像一场流程闭环。离开地下层时，电梯镜子里那个更成功的你还在整理你的领带，手法比你本人老练得多。",
+    "你拒绝签字走出去，次日邮箱里出现一封未署名 congratulation，祝贺你继续保留了不稳定版本的职业生涯。附件是一张体检预约单，时间已经替你选好。",
+    "你把 offer 折成纸船带走后，它在洗手池里绕着下水口转了半小时没沉。午后院长突然问你要不要考虑承担一个“更适合长期发展的额外角色”，语气像在发第二份录取通知。"
+  ],
+  [
+    "你照着未来批评提前修稿，果然躲过了那个错误，却顺手犯了一个更高级的新错。审稿系统像很满意，第二轮意见只回了四个字：继续成长。",
+    "你追查那篇不存在的论文，最后在数据库死角里发现一页作者说明：通讯作者待系统生成。你笑了一下，因为这比很多真实论文还诚实。",
+    "你把那条引文贴在桌前之后，它每天都多一条边注，像有人在远程带教。最离谱的是边注里开始提醒你少喝咖啡，口吻像一位终于看不下去的审稿人。"
+  ],
+  [
+    "你顺着学生的话继续追问，她把白板结构一笔不差地画了出来，连你梦里没记住的箭头都画对了。组里没人觉得奇怪，只夸这次组会终于有效率了。",
+    "学生交来的记录最后一页写着“本纪要经两位导师确认”，另一位导师栏里是你的名字，但笔迹明显比你休息得更充分。你开始怀疑睡眠是不是一种共同作者机制。",
+    "你纠正说昨晚没有组会，学生愣了两秒，反过来问你是不是最近太累。她语气非常礼貌，像在给一位记忆衰退的 PI 留最后体面。"
+  ],
+  [
+    "你把讣告锁进抽屉继续工作，当晚抽屉里传来纸张自行翻页的细响。第二天它被打印成了学院主页样式，只差发布日期和鲜花图片。",
+    "你逐段核对讣告履历，发现其中两篇代表作还没写，但摘要已经比你常用的风格克制许多。你不得不承认，那份文风像一个更会过同行评审的你。",
+    "你把讣告改成个人陈述后，文本居然更通顺了。招聘系统那天晚上自动给你推送了三个职位，像是认为你终于学会了正确介绍自己的消失方式。"
+  ],
+  [
+    "你照着新地图走了一圈，走回来的时候楼层数和出发时不一样。保洁阿姨却很自然地告诉你，老楼一直有弹性，尤其到年底评估季。",
+    "你把地图发群里求证，群里每个人看到的版本都不一样。最先回复的人说这很正常，学院本来就按经费等级分配现实。",
+    "你开始保存每天的地图变化，第九天后文件自己学会命名，把今天的版本标成“可申报空间”。你第一次见到建筑学和行政学在深夜如此团结。"
+  ],
+  [
+    "你反复听那段答辩录音，发现那道陌生声音专挑最尴尬的问题先说出来，像提前帮整个房间节省了时间。第二天学院通知你担任新的答辩秘书，说你最近很懂流程。",
+    "你把录音做成文本，文本在转写完成后多出一列“系统建议提问”。列名非常体面，内容却像一个读过所有隐性规则的幽灵顾问。",
+    "你删掉那段声音后重新导出视频，画面里每个人都慢了半拍，只有空白椅子正好同步。你忽然理解了什么叫会议质量控制。"
+  ],
+  [
+    "系统把你分配成自己论文的审稿人，你认真写了第一条意见，提交时页面提示：感谢你继续维护本刊学术标准。你从没想过自省还能按件收费。",
+    "你试图申诉冲突回避，编辑部回信极快：经核查，审稿人与你观点高度一致，风险可控。文字温柔得像一把已经写好模板的刀。",
+    "你披着匿名身份给自己放行，接收邮件却写着“感谢作者兼评审兼后续争议处理联系人”。三合一的效率让你第一次真切感到现代学术工业的流畅。"
+  ],
+  [
+    "你走进七楼那间亮着灯的房间，看到桌上放着一套已经积灰的工牌，姓名是你，照片也是你，只是眼神比你更习惯流程。门后的日历停在你尚未经历的某个聘期节点。",
+    "你把那张积灰工牌翻过来，背面写着“本岗位负责替系统解释系统”。回身时楼道里传来掌声，但整层楼的门牌都还是空白的。",
+    "你没有进去，只把门缝拍了张照。第二天照片自动进了学院宣传素材库，分类名称叫“青年教师风采候选”，构图比你亲自拍的更像正式结局。"
+  ]
+];
+
 const endingFamilies = [
   {
     name: "镜面评审走廊",
@@ -263,6 +341,138 @@ const endingFates = [
     text: "你确实走出去了一部分，但另一部分继续留在系统里按时开会、改稿、回邮件，并且做得很专业。"
   }
 ];
+
+const deepEndingFamilies = [
+  {
+    name: "档案返修处",
+    title: "被修订的履历",
+    setup: "后来你发现学院真正稳定运作的不是制度，而是档案。每份简历、纪要和推荐表都会在夜里互相校对，直到把人修成适合归档的版本。",
+    mapping: "白天大家称之为流程完善，夜里它更像一门文书炼金术：先删去犹豫，再补上成果，最后盖章说你一直如此。"
+  },
+  {
+    name: "预审雨棚",
+    title: "永远在门口",
+    setup: "你被留在一座巨大的预审雨棚下面，所有申请都能往前走半步，却始终不正式进门。每扇门后都有人探头说只差一个附件。",
+    mapping: "学院很爱这种气候，因为人在等待时最配合，像一封永远写在“待完善”状态里的邮件。"
+  },
+  {
+    name: "共享盘地下河",
+    title: "文件自己会游泳",
+    setup: "你逐渐明白，共享盘不是存储空间，而是一条地下河。课题、提案、截图和传闻都会顺流漂移，最后在某个最合适的领导讲话里靠岸。",
+    mapping: "谁先创建文件并不重要，重要的是谁在涨水那天刚好站在汇报室里。"
+  },
+  {
+    name: "指标标本室",
+    title: "活体考核样本",
+    setup: "学院把所有人都做成指标标本，钉在透明柜里，柜门上写着可量化、可比较、可复现。你偶尔怀疑自己是不是也有编号，只是平时看不见。",
+    mapping: "好处是每个人看起来都非常客观，坏处是客观到后来连呼吸都像一条可以横向对比的数据。"
+  },
+  {
+    name: "会议回声井",
+    title: "发言先于本人",
+    setup: "你坠入一口专门回收会议用语的深井，任何观点只要掉进去两次，就会以更稳妥、更可引用的形式弹回来，顺便挂上你的名字。",
+    mapping: "这口井最擅长做的不是讨论，而是把所有活人训练成纪要风格。"
+  },
+  {
+    name: "预算折叠层",
+    title: "经费的几何学",
+    setup: "你闯进预算折叠层之后，钱不再按金额存在，而按表格结构存在。一个数字只要放进正确单元格，就能比现实先获得合理性。",
+    mapping: "财务从不说这叫怪谈，他们更喜欢说这是口径统一。"
+  },
+  {
+    name: "仪器养殖场",
+    title: "数据反向饲养人",
+    setup: "你看见仪器像一排静静进食的动物，吃进去的是样品，吐出来的是职业命运。偶尔它们也吐出人没做过、但制度很需要的数据。",
+    mapping: "实验室于是有了新的默契：结果不一定来自实验，但一定要来自机器。"
+  },
+  {
+    name: "引用香火台",
+    title: "被供奉的脚注",
+    setup: "你把论文和引文摆上香火台之后，才知道引用不只是学术关系，也是一种供奉秩序。被引用得越多，越像被很多看不见的手合力塑形。",
+    mapping: "最灵验的往往不是最好的文章，而是最先学会自己给自己烧香的那类。"
+  },
+  {
+    name: "伦理镜像库",
+    title: "合规的影子",
+    setup: "伦理镜像库里保存着每个项目更合规、更得体、也更不像人的版本。你有时会进去借一点口径，再假装那一直是你的原话。",
+    mapping: "这地方让一切都显得合法，代价只是现实要往旁边稍微挪一挪。"
+  },
+  {
+    name: "招聘回廊",
+    title: "岗位会认人",
+    setup: "在招聘回廊里，职位并不是空着等人，而是先挑中一种性格，再慢慢长出对应的人。你走过时，墙上很多门牌都会轻轻亮一下。",
+    mapping: "所以大家总说岗位匹配，其实更像门锁先学会了谁的脚步声。"
+  },
+  {
+    name: "署名迁徙带",
+    title: "名字有自己的路线",
+    setup: "你来到署名迁徙带后才知道，名字并不总跟着人走。它们会顺着课题、项目、群聊和会议嘉宾名单迁徙，落在最需要体面的地方。",
+    mapping: "署名秩序因此像一种候鸟学，只是每年都有人突然发现自己没飞到该去的表格里。"
+  },
+  {
+    name: "绩效天象馆",
+    title: "天气就是考核",
+    setup: "绩效天象馆把学院所有天气都解释成考核。晴天叫窗口期，阴天叫爬坡期，闪电则是新的专项通知。",
+    mapping: "人在这种气候里待久了，会误以为自己真的只是某张年度图表上的一片云。"
+  }
+];
+
+const deepEndingFates = [
+  {
+    name: "借壳批复",
+    turn: "最后系统给了你一份极为体面的批复，但批复同意的不是你本人，而是你在流程里留下的那个更听话的壳。你继续上班、开会、带学生，直到有一天门禁识别你的速度快得像已经认识你很多年。"
+  },
+  {
+    name: "空白返修",
+    turn: "你拿到的结局是一张空白返修单，学院什么都没说，只在每个栏位预先打了勾。你于是学会一边补材料，一边猜测自己究竟是在完善项目，还是在完善可被项目使用的人形。"
+  },
+  {
+    name: "自动挂名",
+    turn: "后来很多成果上都会自动出现你的名字，像系统终于决定替你节约社交能耗。麻烦在于，你也开始在自己没做过的工作里看见熟悉的文风，仿佛名字比本人更早学会了合作。"
+  },
+  {
+    name: "走廊 tenure",
+    turn: "你没有拿到正式房间，却在一条长期不过期的走廊里安顿下来。每次有人路过都会向你点头，像默认你就是某种制度缓冲层的常驻讲解员。"
+  },
+  {
+    name: "指标超生",
+    turn: "你的指标后来开始自己繁殖，一个项目生出三个附件，一条成果拆成五项贡献，一份汇报长出七个版本。大家都夸你产能稳定，只有你知道那更像一场数据多胞胎现象。"
+  },
+  {
+    name: "预算转世",
+    turn: "那些没批下来的经费并没有真的消失，它们只是转世成别的口径重新回来。你逐渐学会从差旅、设备和劳务的缝里辨认同一笔钱的前世今生。"
+  },
+  {
+    name: "教学显灵",
+    turn: "有一学期课堂突然变得异常灵验，你随口讲的例子都会在期末变成学生报告、社团项目和学院新闻。直到某次你半开玩笑说别让七楼亮灯，整栋楼真的安静了一周。"
+  },
+  {
+    name: "审稿回魂",
+    turn: "你最终变成了一位极受欢迎的匿名评审，因为所有意见都准确、克制、还带一点人情味。奇怪的是，你后来读到其中几条时，总能想起自己曾在哪个深夜被它们提前使用过。"
+  },
+  {
+    name: "系统续命",
+    turn: "最离奇的结局是，学院靠你续了一口命。不是靠你的论文、基金或教学，而是靠你在异常发生时总能第一时间配合解释，于是整套系统比去年更健康地活了下来。"
+  }
+];
+
+const routeEchoes = {
+  future_mail: "那些来自未来的邮件后来总在你需要表态前先到一步，像一位很懂流程、也很懂催促的快递员。",
+  paper_push: "论文线没有结束，只是学会了把自己拆成返修、引用、署名和沉默的多个副本，分别在不同系统里等你。",
+  grant_chase: "经费并没有真的批下或消失，它只是换成更合适的口径，继续从预算表边缘向你招手。",
+  service_more: "被你顺手接下的事务长出细小根系，把会议、纪要和人情连接成一张看起来很温柔的网。",
+  teaching_mask: "课堂后来保存了另一个版本的你：更会解释、更少犹豫，也更容易被排进下一轮课表。",
+  student_care: "学生记住的你和系统记住的你并不完全一致，这差异后来成了最难归档、也最像人的部分。",
+  follow_echo: "你追过的每一道回声都没有消失，它们只是学会在你转身后用更正式的格式继续发言。",
+  question_system: "你问过的问题没有获得答案，却逐渐变成新的表单项，供后来的人勾选“已知悉”。",
+  hide: "你试过低调绕开异常，但学院显然也把低调当成一种可识别风格，并且识别得很准。",
+  official: "所有礼貌都被系统稳稳接住，转手折成一张更便于流转的纸。",
+  burnout: "疲惫没有被浪费，它被记录成一种稳定投入，甚至在总结材料里显得颇有韧性。",
+  health_patch: "你争取到的休息最终没有写进成果，却让某几个尚未坍塌的上午继续保持原形。",
+  duplicate_you: "另一个版本的你仍在楼里活动，负责完成那些你以为已经拒绝、但系统认为只是延期的事情。",
+  budget_tuned: "那些被你对齐的小数点从此像一排安静的门牌，指向经费真正愿意承认的现实。",
+  void_pages: "空白页并不空，只是把内容延迟到更适合归档的时间出现。"
+};
 
 const scenePool = [
   {
@@ -2201,15 +2411,11 @@ const elements = {
   eventText: byId("eventText"),
   activeRule: byId("activeRule"),
   choices: byId("choices"),
-  memoText: byId("memoText"),
-  trajectory: byId("trajectory"),
   timeline: byId("timeline"),
-  log: byId("log"),
   resultBox: byId("resultBox"),
   endingTitle: byId("endingTitle"),
   endingText: byId("endingText"),
   diagnosisCard: byId("diagnosisCard"),
-  endingStory: byId("endingStory"),
   shareText: byId("shareText"),
   copyBtn: byId("copyBtn")
 };
@@ -2233,8 +2439,9 @@ const state = {
   history: [],
   routeWeights: {},
   routeSignature: [],
-  logLines: ["faculty-survival.log", "system idle", "choose a profile to begin"],
   latestMemo: "同样的选择，不一定会把你送往同样的地方。",
+  awaitingContinue: false,
+  pendingFinish: false,
   ending: null,
   started: false,
   finished: false
@@ -2355,11 +2562,6 @@ function formatChoicePreview(choice) {
   const scaled = scaleDelta(choice.delta || {});
   const summary = cleanDelta(scaled);
   return Object.keys(summary).length ? formatDelta(summary) : "剧情推进";
-}
-
-function pushLog(line) {
-  state.logLines.push(line);
-  state.logLines = state.logLines.slice(-9);
 }
 
 function routeWeight(tone) {
@@ -2594,12 +2796,9 @@ function startGame(profileOverride, modeOverride) {
   state.history = [];
   state.routeWeights = {};
   state.routeSignature = [];
-  state.logLines = [
-    "faculty-survival.log",
-    `profile: ${profileLabels[state.profile]}`,
-    `mode: ${modeSettings[state.mode].label}`
-  ];
   state.latestMemo = "同样的选择，不一定会把你送往同样的地方。";
+  state.awaitingContinue = false;
+  state.pendingFinish = false;
   state.ending = null;
   state.started = true;
   state.finished = false;
@@ -2617,6 +2816,9 @@ function drawEvent() {
     render();
     return;
   }
+
+  state.awaitingContinue = false;
+  state.pendingFinish = false;
 
   if (state.turn > state.maxTurns) {
     finishGame();
@@ -2639,12 +2841,17 @@ function pickAftermath(choice) {
   return pick(choice.aftermaths || ["这一选项很快长出了一层你没要求的后果。"]);
 }
 
-function pickLog(choice) {
-  return pick(choice.logs || ["log: anomaly advanced one step"]);
+function buildDeepAftermath(choice, index, baseAftermath) {
+  const stage = stageAftermaths[(state.turn - 1) % stageAftermaths.length] || [];
+  const stageText = stage[index % stage.length] || pick(stage.flat());
+  if (!baseAftermath || baseAftermath === stageText) {
+    return stageText;
+  }
+  return `${baseAftermath}${stageText}`;
 }
 
 function applyChoice(index) {
-  if (!state.current || state.finished) return;
+  if (!state.current || state.finished || state.awaitingContinue) return;
   const choice = state.currentChoices[index];
   if (!choice) return;
 
@@ -2652,14 +2859,14 @@ function applyChoice(index) {
   const ruleDelta = cleanDelta(applyRule(choice));
   const weatherDelta = cleanDelta(moodDelta());
   const finalDelta = cleanDelta(mergeDeltas(scaledDelta, ruleDelta, weatherDelta));
-  const aftermath = pickAftermath(choice);
-  const logLine = pickLog(choice);
+  const baseAftermath = pickAftermath(choice);
+  const aftermath = buildDeepAftermath(choice, index, baseAftermath);
+  const beat = storyProgressions[(state.turn - 1) % storyProgressions.length];
 
   applyStats(finalDelta);
   noteRoute(choice);
   addFlags(choice.flags);
   queueScene(choice);
-  pushLog(logLine);
 
   const historyEntry = {
     turn: state.turn,
@@ -2669,8 +2876,8 @@ function applyChoice(index) {
     risk: state.current.risk,
     sceneText: state.current.text,
     choiceText: choice.text,
+    beat,
     aftermath,
-    logLine,
     mood: state.mood.name,
     ruleLabel: state.rule.label,
     deltaText: Object.keys(finalDelta).length ? formatDelta(finalDelta) : "无直接数值变化"
@@ -2678,8 +2885,19 @@ function applyChoice(index) {
 
   state.history.push(historyEntry);
   state.latestMemo = aftermath;
+  state.awaitingContinue = true;
+  state.pendingFinish = state.history.length >= state.maxTurns;
 
-  if (state.history.length >= state.maxTurns) {
+  render();
+}
+
+function continueStory() {
+  if (!state.awaitingContinue || state.finished) return;
+
+  state.awaitingContinue = false;
+
+  if (state.pendingFinish) {
+    state.pendingFinish = false;
     finishGame();
     return;
   }
@@ -2704,32 +2922,45 @@ function buildEndingProfile() {
   const familyIndex = (
     hashString(
       `${state.profile}|${digest.join("-")}|${state.history[0]?.sceneId || ""}|${ghost}`
-    ) % endingFamilies.length
+    ) % deepEndingFamilies.length
   );
   const fateIndex = (
     hashString(
       `${totalScore()}|${getCrisisScore()}|${state.history.length}|${digest.join("-")}`
-    ) % endingFates.length
+    ) % deepEndingFates.length
   );
-  const archiveNumber = familyIndex * endingFates.length + fateIndex + 1;
+  const archiveNumber = familyIndex * deepEndingFates.length + fateIndex + 1;
   return {
-    family: endingFamilies[familyIndex],
-    fate: endingFates[fateIndex],
+    family: deepEndingFamilies[familyIndex],
+    fate: deepEndingFates[fateIndex],
     archiveNumber
   };
 }
 
+function buildRouteEcho() {
+  const flags = [...state.storyFlags].slice(-5);
+  const echoes = flags
+    .map((flag) => routeEchoes[flag])
+    .filter(Boolean)
+    .slice(-3);
+
+  if (!echoes.length) {
+    return "真正麻烦的是，学院后来把这一切统称为“情况已掌握”，仿佛命运只是一类可以归档的问题。";
+  }
+
+  return echoes.join("");
+}
+
 function buildEndingNarrative() {
   const profile = buildEndingProfile();
-  const digest = routeDigest();
   const crisis = crisisLabel();
-  const topStat = Object.entries(state.stats).sort((a, b) => b[1] - a[1])[0][0];
-  const topLabel = statLabels[topStat];
-  const intro = `档案 ${String(profile.archiveNumber).padStart(3, "0")} / 108 最终把你归入“${profile.family.name}”。你这一局最明显的路线是 ${digest.join(" / ")}，最后留在纸面上的最高指标是 ${topLabel}。`;
-  const outro = `${profile.family.text}${profile.fate.text} 风险分区目前显示为 ${crisis}，这意味着故事并没有否认你的努力，它只是坚持把努力也写进怪谈。`;
+  const routeText = buildRouteEcho();
+  const archive = String(profile.archiveNumber).padStart(3, "0");
+  const title = `第${archive}号怪谈：${profile.family.name}·${profile.fate.name}`;
+  const text = `${profile.family.setup}${profile.family.mapping}${profile.fate.turn}${routeText}`;
 
   const diagnosis = [
-    `<div class="diag-pill">档案号 ${String(profile.archiveNumber).padStart(3, "0")} / 108</div>`,
+    `<div class="diag-pill">档案号 ${archive} / 108</div>`,
     `<div class="diag-pill">开局 ${profileLabels[state.profile]}</div>`,
     `<div class="diag-pill">宇宙 ${modeSettings[state.mode].label}</div>`,
     `<div class="diag-pill">主路线 ${getComboLabel()}</div>`,
@@ -2738,9 +2969,8 @@ function buildEndingNarrative() {
   ].join("");
 
   return {
-    title: `${profile.family.name} · ${profile.fate.name}`,
-    intro,
-    outro,
+    title,
+    text,
     diagnosis,
     archiveNumber: profile.archiveNumber
   };
@@ -2751,7 +2981,6 @@ function finishGame() {
   state.current = null;
   state.currentChoices = [];
   state.ending = buildEndingNarrative();
-  pushLog(`log: dossier ${String(state.ending.archiveNumber).padStart(3, "0")} sealed`);
   render();
 }
 
@@ -2767,69 +2996,35 @@ function renderStats() {
     .join("");
 }
 
-function renderTrajectory() {
-  if (!elements.trajectory) return;
-  if (!state.history.length && !state.started) {
-    elements.trajectory.innerHTML = `<span class="chip idle">等待故事开始</span>`;
-    return;
-  }
-
-  const steps = state.history
-    .map(
-      (entry) => `<span class="chip">S${entry.turn} · ${entry.title}</span>`
-    )
-    .join("");
-
-  const current = state.current
-    ? `<span class="chip active">S${state.turn} · ${state.current.title}</span>`
-    : `<span class="chip final">故事已归档</span>`;
-
-  elements.trajectory.innerHTML = steps + current;
-}
-
 function renderTimeline() {
   if (!elements.timeline) return;
 
   if (!state.history.length) {
     elements.timeline.innerHTML = `
-      <li class="timeline-step idle">
-        <div class="timeline-scene">尚未开始</div>
-        <p class="timeline-context">选择一种开局风格。不同的开局会把你带进完全不同的场景链里。</p>
+      <li class="story-thread idle">
+        <p class="story-paragraph">选择一种开局风格。不同的开局会把你带进不同的场景链里，而学院会在你做完第一件小事之后，才慢慢显出它真正的叙事习惯。</p>
       </li>
     `;
     return;
   }
 
-  elements.timeline.innerHTML = state.history
-    .map(
-      (entry) => `
-        <li class="timeline-step">
-          <div class="timeline-scene">S${entry.turn} · ${entry.title}</div>
-          <p class="timeline-context">${entry.sceneText}</p>
-          <p class="timeline-choice"><strong>你的选择：</strong>${entry.choiceText}</p>
-          <p class="timeline-beat">${entry.aftermath}</p>
-          <p class="timeline-after">${entry.deltaText} · ${entry.ruleLabel}</p>
-        </li>
-      `
-    )
-    .join("");
-}
+  const paragraphs = state.history.map((entry) => `
+    <p class="story-paragraph">
+      <span class="story-marker">S${entry.turn} · ${entry.title}</span>
+      ${entry.sceneText}你决定${entry.choiceText.replace(/[。！？]$/, "")}。${entry.beat}${entry.aftermath}
+    </p>
+  `);
 
-function renderEndingStory() {
-  if (!elements.endingStory) return;
-  elements.endingStory.innerHTML = state.history
-    .map(
-      (entry) => `
-        <article class="ending-scene">
-          <div class="timeline-scene">S${entry.turn} · ${entry.title}</div>
-          <p class="timeline-context">${entry.sceneText}</p>
-          <p class="timeline-choice-line"><strong>你当时：</strong>${entry.choiceText}</p>
-          <p class="timeline-beat">${entry.aftermath}</p>
-          <p class="timeline-after">${entry.deltaText}</p>
-        </article>
-      `
-    )
-    .join("");
+  if (state.finished && state.ending) {
+    paragraphs.push(`
+      <p class="story-paragraph finale">
+        <span class="story-marker">归档 · ${state.ending.title}</span>
+        ${state.ending.text}
+      </p>
+    `);
+  }
+
+  elements.timeline.innerHTML = `<li class="story-thread">${paragraphs.join("")}</li>`;
 }
 
 function buildShareText() {
@@ -2846,6 +3041,23 @@ function buildShareText() {
 function renderChoices() {
   if (!elements.choices) return;
   elements.choices.innerHTML = "";
+
+  if (state.awaitingContinue) {
+    const entry = state.history[state.history.length - 1];
+    if (!entry) return;
+
+    const button = document.createElement("button");
+    button.className = "aftermath-card";
+    button.innerHTML = `
+      <span class="aftermath-kicker">下一页已经写好</span>
+      <strong>${entry.beat}</strong>
+      <p>${entry.aftermath}</p>
+      <small>${state.pendingFinish ? "点这里封存这一轮" : "点这里翻到下一幕"}</small>
+    `;
+    button.addEventListener("click", continueStory);
+    elements.choices.appendChild(button);
+    return;
+  }
 
   if (!state.current || state.finished) {
     return;
@@ -2869,8 +3081,9 @@ function renderEvent() {
     elements.eventRisk.textContent = `risk: ${state.current.risk}`;
     elements.eventTitle.textContent = state.current.title;
     elements.eventText.textContent = state.current.text;
-    elements.activeRule.textContent = state.rule.label;
-    elements.memoText.textContent = state.latestMemo;
+    elements.activeRule.textContent = state.awaitingContinue
+      ? "纸面暂时安静下来，下一页还没有翻开。"
+      : state.rule.label;
     return;
   }
 
@@ -2883,21 +3096,23 @@ function renderEvent() {
   elements.activeRule.textContent = state.started
     ? modeSettings[state.mode].rule
     : "本学期特殊规则：尚未生成。";
-  elements.memoText.textContent = state.latestMemo;
 }
 
 function renderHeader() {
   elements.rank.textContent = getRankLabel();
   elements.crisis.textContent = crisisLabel();
-  elements.semester.textContent = state.started ? `S${state.turn}/${state.maxTurns}` : "-";
-  elements.status.textContent = statusLabel();
-  elements.mood.textContent = state.started ? state.mood.name : "尚未抽取";
-  elements.combo.textContent = getComboLabel();
-}
-
-function renderLog() {
-  if (!elements.log) return;
-  elements.log.textContent = state.logLines.join("\n");
+  if (elements.semester) {
+    elements.semester.textContent = state.started ? `S${state.turn}/${state.maxTurns}` : "-";
+  }
+  if (elements.status) {
+    elements.status.textContent = statusLabel();
+  }
+  if (elements.mood) {
+    elements.mood.textContent = state.started ? state.mood.name : "尚未抽取";
+  }
+  if (elements.combo) {
+    elements.combo.textContent = getComboLabel();
+  }
 }
 
 function renderResult() {
@@ -2911,20 +3126,17 @@ function renderResult() {
 
   elements.resultBox.hidden = false;
   elements.endingTitle.textContent = state.ending.title;
-  elements.endingText.textContent = `${state.ending.intro} ${state.ending.outro}`;
+  elements.endingText.textContent = state.ending.text;
   elements.diagnosisCard.innerHTML = state.ending.diagnosis;
-  renderEndingStory();
   elements.shareText.value = buildShareText();
 }
 
 function render() {
   renderHeader();
   renderStats();
-  renderTrajectory();
   renderTimeline();
   renderEvent();
   renderChoices();
-  renderLog();
   renderResult();
 }
 
@@ -2958,6 +3170,8 @@ function snapshot() {
     currentTitle: state.current?.title || null,
     currentChoices: state.currentChoices.map((choice) => choice.text),
     memo: state.latestMemo,
+    awaitingContinue: state.awaitingContinue,
+    pendingFinish: state.pendingFinish,
     historyLength: state.history.length,
     historyTitles: state.history.map((entry) => entry.title),
     history: state.history.map((entry) => ({
@@ -2973,7 +3187,6 @@ function snapshot() {
     endingTitle: elements.endingTitle?.textContent || "",
     diagnosisHtml: elements.diagnosisCard?.innerHTML || "",
     timelineHtml: elements.timeline?.innerHTML || "",
-    endingStoryHtml: elements.endingStory?.innerHTML || "",
     shareText: elements.shareText?.value || ""
   };
 }
@@ -3017,6 +3230,10 @@ root.__facultyRouletteDebug = {
   },
   choose(index = 0) {
     applyChoice(index);
+    return snapshot();
+  },
+  continue() {
+    continueStory();
     return snapshot();
   },
   getState() {
