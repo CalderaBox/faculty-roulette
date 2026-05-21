@@ -177,6 +177,8 @@ const endingDossierReport = debug.getEndingDossierReport();
 if (endingDossierReport.total !== 108) throw new Error("Ending dossier table should contain exactly 108 results.");
 if (endingDossierReport.uniqueTitles !== 108) throw new Error("Every ending dossier should have a unique weird-tale title.");
 if (endingDossierReport.uniqueTexts !== 108) throw new Error("Every ending dossier should have unique story text.");
+if (endingDossierReport.uniqueTitleOpenings < 100) throw new Error("Ending dossier titles should not feel like one repeated naming template.");
+if (endingDossierReport.uniqueTextOpenings < 100) throw new Error("Ending dossier prose should start with varied images and situations.");
 if (endingDossierReport.missingCases.length) throw new Error("Some ending dossier cases are missing bespoke text.");
 if (endingDossierReport.duplicateSentences.length) throw new Error("Ending dossiers should not repeat full sentences.");
 if (endingDossierReport.minTextLength < 35) throw new Error("Ending dossier text should still contain a specific story beat.");
