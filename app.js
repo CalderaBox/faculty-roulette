@@ -47,21 +47,21 @@ const profiles = {
 const modeSettings = {
   standard: {
     label: "标准学术天气",
-    semesters: 6,
+    semesters: 12,
     multiplier: 1,
     bonus: {},
     rule: "普通难度。系统不友善，但还没有完全拟人化。"
   },
   publish: {
     label: "非升即走模式",
-    semesters: 7,
+    semesters: 14,
     multiplier: 1.18,
     bonus: { paper: 4, grant: 4, health: -10, luck: -4 },
     rule: "高压难度。正收益更甜，负收益更疼，结局更戏剧化。"
   },
   humane: {
     label: "理想学院模式",
-    semesters: 5,
+    semesters: 10,
     multiplier: .82,
     bonus: { health: 10, luck: 6, service: -3 },
     rule: "温柔难度。仍有荒诞，但至少有人记得你是人。"
@@ -299,6 +299,97 @@ const hauntingEvents = [
       { text: "拒绝签字，带着现有一切离开", delta: { health: -4, paper: 5, grant: 5 }, ghost: "walked_out", log: "你离开时身后有人轻轻说：那就继续活成未完成稿。", memo: "拒绝答案，往往意味着接受开放结局。" },
       { text: "把桌上的 offer 折成纸船带走", delta: { luck: 6, paper: 4, service: -3 }, ghost: "folded_offer", log: "纸船在洗手池里自己漂了很久，没有沉。", memo: "怪谈最怕的，也许是被你改写成别的用途。" }
     ]
+  },
+  {
+    id: "haunt-citation",
+    tag: "Citation",
+    risk: "haunting",
+    stage: 6,
+    title: "你被一篇还没写出的论文引用了",
+    text: "数据库里突然出现一条引用记录，引用的是你尚未完成的文章，而且精准批评了你下一版才会犯的错误。",
+    choices: [
+      { text: "照着批评提前修正", delta: { paper: 8, luck: 4, health: -2 }, ghost: "future_citation", log: "你第一次在错误发生前就改掉了它。", memo: "当批评来自未来时，谦逊会变得很奇怪。" },
+      { text: "追查这篇不存在的论文", delta: { grant: 4, luck: 6, service: -2 }, ghost: "citation_hunt", log: "索引页尽头有一个空白作者栏，只写着你的工号。", memo: "有些引用不是在文献里生成的。" },
+      { text: "把它打印出来贴在桌前", delta: { teaching: 3, health: -1, paper: 5 }, ghost: "citation_altar", log: "纸张边缘每天都会多一行批注。", memo: "把异常变成工作流，是一种危险的适应。" }
+    ]
+  },
+  {
+    id: "haunt-student",
+    tag: "Student Dream",
+    risk: "haunting",
+    stage: 7,
+    title: "学生讲述了你没有做过的组会",
+    text: "学生说昨晚的组会很有收获，还复述了你根本没讲过的话。更糟的是，那段话和你最近反复做的梦一字不差。",
+    choices: [
+      { text: "顺着她的话继续追问", delta: { teaching: 7, luck: 4, health: -3 }, ghost: "dream_meeting", log: "她画出的白板结构，和你梦里的一模一样。", memo: "梦一旦被第二个人证实，就不再只是梦。" },
+      { text: "让她把记忆写下来", delta: { paper: 4, teaching: 4, service: 1 }, ghost: "written_dream", log: "她交来的记录最后一页，是你从未见过的签名。", memo: "书面材料会让怪谈显得更像证据。" },
+      { text: "严肃纠正：昨晚没有组会", delta: { health: 2, luck: -4, teaching: -2 }, ghost: "denied_meeting", log: "她沉默了几秒，问你是不是最近太累。", memo: "当只有你记得现实版本时，现实会变得很孤单。" }
+    ]
+  },
+  {
+    id: "haunt-printer",
+    tag: "Printer",
+    risk: "haunting",
+    stage: 8,
+    title: "打印机吐出了一份你的讣告",
+    text: "你只是想打项目预算，打印机却连着吐出三页排版很正式的讣告。上面的研究方向、论文数量和追悼会流程都精准得令人不适。",
+    choices: [
+      { text: "把它锁进抽屉继续工作", delta: { grant: 6, health: -4, luck: 2 }, ghost: "locked_obit", log: "抽屉从里面传来纸张缓慢折叠的声音。", memo: "有些文件被归档后才开始活动。" },
+      { text: "逐段核对其中的履历", delta: { paper: 6, service: 2, health: -2 }, ghost: "read_obit", log: "你发现里面有两篇论文连标题都还没想好。", memo: "最令人害怕的不是死亡，而是文风。" },
+      { text: "把它改成自己的个人陈述", delta: { luck: 5, paper: 5, service: -2 }, ghost: "rewrote_obit", log: "你改得越认真，那份文本就越像真的在等你。", memo: "把讣告改成自述，也许是最过分的一种反抗。" }
+    ]
+  },
+  {
+    id: "haunt-map",
+    tag: "Map",
+    risk: "haunting",
+    stage: 9,
+    title: "校园地图每晚都会少一层楼",
+    text: "教学楼平面图开始在深夜更新。先是少了一层，再是多出一段走廊，最后你的办公室被标在了“暂不开放区域”。",
+    choices: [
+      { text: "照着新地图去走一遍", delta: { health: -5, luck: 6, teaching: 2 }, ghost: "walked_map", log: "你走到尽头时，看见了写着自己名字的临时门牌。", memo: "地图不是用来描述空间的，它也可以分配空间。" },
+      { text: "把地图发到群里求证", delta: { service: 4, luck: -3, teaching: 1 }, ghost: "shared_map", log: "别人看到的版本和你的完全不同。", memo: "共享并不总意味着共识。" },
+      { text: "偷偷保存每天的变化", delta: { paper: 4, grant: 2, luck: 4 }, ghost: "saved_map", log: "第九天后，地图开始主动给文件命名。", memo: "记录异常，本身也会被异常记录。" }
+    ]
+  },
+  {
+    id: "haunt-voice",
+    tag: "Voice",
+    risk: "haunting",
+    stage: 10,
+    title: "答辩录像里出现了不属于任何人的声音",
+    text: "你回看学生答辩录像，发现提问环节里混进了一道声音。它既不像你，也不像任何老师，却提前说出了答辩人下一页的标题。",
+    choices: [
+      { text: "把整段音轨拆出来分析", delta: { paper: 5, luck: 5, health: -3 }, ghost: "isolated_voice", log: "频谱图里有一列峰值刚好拼出你的姓名首字母。", memo: "声音在被看见之后会变得更具体。" },
+      { text: "问学生是否也听见了", delta: { teaching: 6, health: -1, luck: 2 }, ghost: "shared_voice", log: "学生说她以为那是你给的提示。", memo: "怪谈有时通过教学完成传播。" },
+      { text: "直接删掉那一分钟录像", delta: { health: 2, luck: -5, service: 1 }, ghost: "deleted_voice", log: "第二天备份盘里多出了三份同名文件。", memo: "删除对声音的效果，比对纸张更差。" }
+    ]
+  },
+  {
+    id: "haunt-review",
+    tag: "Review",
+    risk: "haunting",
+    stage: 11,
+    title: "审稿系统把你列成了自己的审稿人",
+    text: "投稿系统自动给你发来审稿邀请，稿件作者是你，审稿人也是你。附件里的匿名意见充满了你从未承认过、但全都属实的批评。",
+    choices: [
+      { text: "认真审这篇‘自己的稿子’", delta: { paper: 9, health: -4, luck: 3 }, ghost: "self_review", log: "你写出了最诚实的一份审稿意见，也最像遗书。", memo: "匿名之后，人会比平时更像自己。" },
+      { text: "接受意见，但拒绝继续投稿", delta: { health: 5, paper: -2, luck: 1 }, ghost: "withheld_paper", log: "你第一次觉得不发表也是一种结局。", memo: "撤回有时不是退缩，而是止血。" },
+      { text: "把审稿意见发给未来的自己", delta: { luck: 6, service: -1, paper: 4 }, ghost: "mailed_review", log: "发送成功后，收件箱里少了一封旧邮件。", memo: "当时间开始收发自己时，顺序就不再稳定。" }
+    ]
+  },
+  {
+    id: "haunt-finalroom",
+    tag: "Threshold",
+    risk: "haunting",
+    stage: 12,
+    title: "你终于看见了第七层真正亮灯的房间",
+    text: "学年最后一夜，你顺着所有异常留下的坐标来到第七层尽头。那间房里摆着你的工位、你的杯子、你的未改完稿件，只是灰尘说明它已经被使用很多年了。",
+    choices: [
+      { text: "坐下，把未改完的稿继续改完", delta: { paper: 10, luck: 4, health: -4 }, ghost: "sat_down", log: "你坐下那一刻，整栋楼像终于校准到了某个版本。", memo: "完成稿件不一定意味着完成你自己。" },
+      { text: "带走杯子和草稿，转身离开", delta: { health: 4, luck: 5, service: -2 }, ghost: "carried_back", log: "你走出房间时，门牌上的名字慢慢淡掉了。", memo: "带走证物，有时就是拒绝被收录。" },
+      { text: "关灯，把门反锁", delta: { health: 2, grant: 4, luck: 6 }, ghost: "locked_room", log: "灯灭之后，楼里每一扇窗都映出了你的背影。", memo: "结束一个入口，不代表你关掉了整栋楼。" }
+    ]
   }
 ];
 
@@ -431,9 +522,24 @@ const achievementRules = [
   { id: "story", label: "剧情穿透者", test: (s) => s.storyFlags.size >= 3 }
 ];
 
-const defaultMaxSemester = 6;
+const defaultMaxSemester = 12;
 let state = null;
 let seed = Date.now() % 100000;
+
+const storyProgressions = [
+  "你第一次注意到学院夜里会比白天多出一条走廊。",
+  "共享盘里出现了一个以你命名、但你从未创建过的文件夹。",
+  "打印机开始优先输出与你有关、却尚未发生的材料。",
+  "有人在会议上引用了你没讲过的话，而所有人都觉得那很正常。",
+  "第七层的灯第一次在你离开后才亮起。",
+  "你开始分不清哪些数据是结果，哪些数据是在等你成为结果。",
+  "学生、同事和系统逐渐各自记住了不同版本的你。",
+  "你发现最可怕的不是异常本身，而是异常越来越高效。",
+  "所有证据都开始互相印证，只有现实版本显得越来越单薄。",
+  "你已经能提前猜到下一次怪事会从哪个介质里钻出来。",
+  "学院像一台会自我修补的机器，而你正在它的修补日志里。",
+  "到最后，你意识到自己经历的不是事故，而是一套完整且正在运行的叙事。"
+];
 
 const els = {
   profile: document.querySelector("#profile"),
@@ -654,7 +760,8 @@ function applyChoice(index) {
     tag: state.current.tag,
     choice: choice.text,
     swing,
-    delta
+    delta,
+    beat: storyProgressions[Math.min(state.semester - 1, storyProgressions.length - 1)]
   });
   updateAchievements();
   state.log.unshift(`S${state.semester} ${state.current.tag}: ${choice.log}`);
@@ -890,7 +997,7 @@ function renderTimeline() {
     els.timeline.innerHTML = "<li>等待第一张事件卡落地。</li>";
     return;
   }
-  els.timeline.innerHTML = state.history.map((item) => `<li>S${item.semester} · ${item.tag} · ${item.choice}</li>`).join("");
+  els.timeline.innerHTML = state.history.map((item) => `<li>S${item.semester} · ${item.tag} · ${item.choice}<br>${item.beat}</li>`).join("");
 }
 
 function renderBestiary() {

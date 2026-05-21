@@ -11,10 +11,12 @@ Playable zero-dependency prototype.
 - Five faculty archetypes
 - Three universe intensity modes
 - Daily seed and random seed runs
+- 10-14 story nodes depending on mode
 - Roulette-style event draw
 - Action points and long-term project slots
 - Budget and energy economy with project risk
 - Escalating academic horror storyline with branching endings
+- Every choice advances the horror timeline explicitly
 - Absurd semester rules that mutate choice outcomes
 - Project-specific story arcs and hidden routes
 - Six-stat survival model

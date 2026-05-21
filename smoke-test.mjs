@@ -120,7 +120,7 @@ for (let i = 0; i < 3; i += 1) {
 }
 if (!elements.get("projectBoard").innerHTML.includes("已完成")) throw new Error("Project completion did not render.");
 
-for (let i = 0; i < 6; i += 1) {
+for (let i = 0; i < 12; i += 1) {
   const choice = elements.get("choices").children[0];
   if (!choice || !choice.listeners.click) throw new Error(`Missing choice button at semester ${i + 1}.`);
   choice.listeners.click();
@@ -129,7 +129,7 @@ for (let i = 0; i < 6; i += 1) {
 if (elements.get("status").textContent !== "结局生成") throw new Error("Game did not reach ending state.");
 if (!elements.get("shareText").value.includes("青椒轮盘")) throw new Error("Share text is incomplete.");
 if (!/stat/.test(elements.get("stats").innerHTML)) throw new Error("Stats did not render.");
-if (!/S6/.test(elements.get("trajectory").innerHTML)) throw new Error("Trajectory did not render.");
+if (!/S12/.test(elements.get("trajectory").innerHTML)) throw new Error("Trajectory did not render.");
 if (!/project-card/.test(elements.get("projectBoard").innerHTML)) throw new Error("Project board did not render.");
 if (!elements.get("economy").textContent.includes("/")) throw new Error("Economy status did not render.");
 if (!/chip/.test(elements.get("achievements").innerHTML)) throw new Error("Achievements did not render.");
