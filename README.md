@@ -17,6 +17,8 @@ Playable zero-dependency prototype.
 - Budget and energy economy with project risk
 - Escalating academic horror storyline with branching endings
 - Every choice advances the horror timeline explicitly
+- 108 generated academic horror dossiers based on choice path combinations
+- Post-choice aftermath text that keeps pushing the story forward
 - Absurd semester rules that mutate choice outcomes
 - Project-specific story arcs and hidden routes
 - Six-stat survival model

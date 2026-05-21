@@ -110,15 +110,15 @@ const context = {
 const html = fs.readFileSync(new URL("index.html", root), "utf8");
 const app = fs.readFileSync(new URL("app.js", root), "utf8");
 
-if (!html.includes("青椒轮盘")) throw new Error("HTML title copy is missing.");
-if (/闈|涓|鎴|鍩|瀛|绋|�/.test(html + app)) throw new Error("Detected mojibake in public files.");
+if (!html.includes("Faculty Roulette")) throw new Error("HTML title copy is missing.");
+if (/闂坾娑搢閹磡閸﹟鐎泑缁媩锟?/.test(html + app)) throw new Error("Detected mojibake in public files.");
 
 vm.runInNewContext(app, context);
 elements.get("startBtn").listeners.click();
 for (let i = 0; i < 3; i += 1) {
   context.investProject("paper");
 }
-if (!elements.get("projectBoard").innerHTML.includes("已完成")) throw new Error("Project completion did not render.");
+if (!/complete/.test(elements.get("projectBoard").innerHTML)) throw new Error("Project completion did not render.");
 
 for (let i = 0; i < 12; i += 1) {
   const choice = elements.get("choices").children[0];
@@ -126,8 +126,8 @@ for (let i = 0; i < 12; i += 1) {
   choice.listeners.click();
 }
 
-if (elements.get("status").textContent !== "结局生成") throw new Error("Game did not reach ending state.");
-if (!elements.get("shareText").value.includes("青椒轮盘")) throw new Error("Share text is incomplete.");
+if (elements.get("resultBox").hidden) throw new Error("Game did not reach ending state.");
+if (!elements.get("shareText").value.includes("Faculty Roulette")) throw new Error("Share text is incomplete.");
 if (!/stat/.test(elements.get("stats").innerHTML)) throw new Error("Stats did not render.");
 if (!/S12/.test(elements.get("trajectory").innerHTML)) throw new Error("Trajectory did not render.");
 if (!/project-card/.test(elements.get("projectBoard").innerHTML)) throw new Error("Project board did not render.");
@@ -135,6 +135,7 @@ if (!elements.get("economy").textContent.includes("/")) throw new Error("Economy
 if (!/chip/.test(elements.get("achievements").innerHTML)) throw new Error("Achievements did not render.");
 if (!/S1/.test(elements.get("timeline").innerHTML)) throw new Error("Timeline did not render.");
 if (!/myth/.test(elements.get("bestiary").innerHTML)) throw new Error("Bestiary did not render.");
-if (!elements.get("diagnosisCard").innerHTML.includes("学术荒诞诊断书")) throw new Error("Diagnosis card did not render.");
+if (!/108/.test(elements.get("diagnosisCard").innerHTML)) throw new Error("108-ending archive marker did not render.");
+if (!elements.get("endingTitle").textContent.includes("第")) throw new Error("Ending dossier title did not render.");
 
 console.log("Faculty Roulette smoke test passed.");
