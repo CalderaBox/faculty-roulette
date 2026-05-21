@@ -26,7 +26,7 @@ Playable zero-dependency prototype.
 - Story-focused reading layout with a single continuous narrative record
 - Mid-run story arcs, hidden routes, and profile-dependent branches
 - Six-stat survival model
-- Timeline, crisis radar, diagnosis card, endings, and share text
+- Continuous story timeline and dossier-style endings
 
 ## Run
 

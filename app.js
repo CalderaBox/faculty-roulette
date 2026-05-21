@@ -2352,13 +2352,7 @@ const elements = {
   eventTitle: byId("eventTitle"),
   eventText: byId("eventText"),
   choices: byId("choices"),
-  timeline: byId("timeline"),
-  resultBox: byId("resultBox"),
-  endingTitle: byId("endingTitle"),
-  endingText: byId("endingText"),
-  diagnosisCard: byId("diagnosisCard"),
-  shareText: byId("shareText"),
-  copyBtn: byId("copyBtn")
+  timeline: byId("timeline")
 };
 
 let seed = 246810;
@@ -2899,25 +2893,14 @@ function buildRouteEcho() {
 
 function buildEndingNarrative() {
   const profile = buildEndingProfile();
-  const crisis = crisisLabel();
   const routeText = buildRouteEcho();
   const archive = String(profile.archiveNumber).padStart(3, "0");
   const title = `第${archive}号怪谈：${profile.family.name}·${profile.fate.name}`;
   const text = `${profile.family.setup}${profile.family.mapping}${profile.fate.turn}${routeText}`;
 
-  const diagnosis = [
-    `<div class="diag-pill">档案号 ${archive} / 108</div>`,
-    `<div class="diag-pill">开局 ${profileLabels[state.profile]}</div>`,
-    `<div class="diag-pill">宇宙 ${modeSettings[state.mode].label}</div>`,
-    `<div class="diag-pill">主路线 ${getComboLabel()}</div>`,
-    `<div class="diag-pill">怪谈痕迹 ${state.ghostFlags.size}</div>`,
-    `<div class="diag-pill">风险 ${crisis}</div>`
-  ].join("");
-
   return {
     title,
     text,
-    diagnosis,
     archiveNumber: profile.archiveNumber
   };
 }
@@ -2985,17 +2968,6 @@ function renderTimeline() {
   }
 
   elements.timeline.innerHTML = `<li class="story-thread">${paragraphs.join("")}</li>`;
-}
-
-function buildShareText() {
-  if (!state.ending) return "";
-  return [
-    `我在 Faculty Roulette 里走到了档案 ${String(state.ending.archiveNumber).padStart(3, "0")} / 108：${state.ending.title}`,
-    `开局：${profileLabels[state.profile]}`,
-    `宇宙：${modeSettings[state.mode].label}`,
-    `主路线：${getComboLabel()}`,
-    `最后一句：${state.latestMemo}`
-  ].join("\n");
 }
 
 function renderChoices() {
@@ -3068,47 +3040,18 @@ function renderHeader() {
   }
 }
 
-function renderResult() {
-  if (!elements.resultBox) return;
-
-  if (!state.finished || !state.ending) {
-    elements.resultBox.hidden = true;
-    elements.shareText.value = "";
-    return;
-  }
-
-  elements.resultBox.hidden = false;
-  elements.endingTitle.textContent = state.ending.title;
-  elements.endingText.textContent = state.ending.text;
-  elements.diagnosisCard.innerHTML = state.ending.diagnosis;
-  elements.shareText.value = buildShareText();
-}
-
 function render() {
   renderHeader();
   renderStats();
   renderTimeline();
   renderEvent();
   renderChoices();
-  renderResult();
 }
 
 function updateProfileNote() {
   if (!elements.profileNote) return;
   const profile = elements.profile?.value || "balanced";
   elements.profileNote.textContent = profileNotes[profile];
-}
-
-async function copyShareText() {
-  if (!elements.shareText?.value) return;
-  try {
-    await navigator.clipboard.writeText(elements.shareText.value);
-    state.latestMemo = "结局文本已复制。它现在可以去别人的聊天窗口里继续上班。";
-    renderEvent();
-  } catch {
-    state.latestMemo = "复制失败，但文本还在下面。今天可能是剪贴板在闹怪谈。";
-    renderEvent();
-  }
 }
 
 function snapshot() {
@@ -3137,10 +3080,8 @@ function snapshot() {
     queue: [...state.queue],
     flags: [...state.storyFlags],
     ghostFlags: [...state.ghostFlags],
-    endingTitle: elements.endingTitle?.textContent || "",
-    diagnosisHtml: elements.diagnosisCard?.innerHTML || "",
-    timelineHtml: elements.timeline?.innerHTML || "",
-    shareText: elements.shareText?.value || ""
+    endingTitle: state.ending?.title || "",
+    timelineHtml: elements.timeline?.innerHTML || ""
   };
 }
 
@@ -3181,7 +3122,6 @@ elements.dailySeedBtn?.addEventListener("click", () => {
   useDailySeed();
   startGame(elements.profile?.value, elements.mode?.value);
 });
-elements.copyBtn?.addEventListener("click", copyShareText);
 
 updateProfileNote();
 updateSeedLabel();

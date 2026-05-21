@@ -79,12 +79,7 @@ const ids = [
   "eventText",
   "choices",
   "timeline",
-  "resultBox",
-  "endingTitle",
-  "endingText",
-  "diagnosisCard",
-  "shareText",
-  "copyBtn"
+  "endingTitle"
 ];
 
 const elements = new Map(ids.map((id) => [id, new FakeElement(id)]));
@@ -106,6 +101,9 @@ if (html.includes('id="stats"')) throw new Error("Large stat grid should be remo
 if (html.includes("剧情余波")) throw new Error("The explicit aftermath label should be removed.");
 if (html.includes('id="memoText"')) throw new Error("Separate aftermath memo panel should be removed.");
 if (html.includes("terminal") || html.includes('id="log"')) throw new Error("Visible system log should be removed.");
+if (html.includes('id="resultBox"') || html.includes('id="diagnosisCard"') || html.includes('id="shareText"') || html.includes("复制结局文本")) {
+  throw new Error("Diagnostic/share result panel should be removed from the page.");
+}
 if (html.includes("rule-strip") || html.includes('id="activeRule"') || html.includes("本学期特殊规则")) {
   throw new Error("Visible special-rule strip should be removed from the story surface.");
 }
@@ -206,7 +204,8 @@ if (!/第\d{3}号怪谈/.test(snapshot.endingTitle)) throw new Error("Deep dossi
 if (!/档案返修处|预审雨棚|共享盘地下河|指标标本室|会议回声井|预算折叠层|仪器养殖场|引用香火台|伦理镜像库|招聘回廊|署名迁徙带|绩效天象馆/.test(snapshot.timelineHtml)) {
   throw new Error("Final story should include a deep archive family ending.");
 }
-if (!/108/.test(snapshot.diagnosisHtml)) throw new Error("108-ending archive marker did not render.");
-if (!snapshot.shareText.includes("Faculty Roulette")) throw new Error("Share text is incomplete.");
+if (/diag-pill|diagnosis-card|textarea|Faculty Roulette 里走到了档案/.test(snapshot.timelineHtml)) {
+  throw new Error("Final story should not render diagnostic chips or share text.");
+}
 
 console.log("Faculty Roulette smoke test passed.");
