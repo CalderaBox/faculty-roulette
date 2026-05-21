@@ -234,6 +234,74 @@ const chainEvents = [
   }
 ];
 
+const hauntingEvents = [
+  {
+    id: "haunt-folder",
+    tag: "Archive",
+    risk: "haunting",
+    stage: 1,
+    title: "档案室里多出了一份你的材料",
+    text: "深夜去档案室找旧表格时，你在最下层抽屉里看到一份写着你名字的材料。封面日期是明年，里面夹着还没发生过的审稿意见。",
+    choices: [
+      { text: "把材料整份带走", delta: { luck: 5, health: -3, paper: 4 }, ghost: "future_file", log: "你把未来塞进了背包，回程路上一直觉得它在变重。", memo: "有些信息不是给现在的你准备的。" },
+      { text: "只抄下最关键的一页", delta: { paper: 6, health: -1, service: -1 }, ghost: "copied_margin", log: "你带走了一页复印件，原件却像从未存在过。", memo: "怪谈也会做版本控制。" },
+      { text: "关上抽屉，当作没看见", delta: { health: 3, luck: -4 }, ghost: "closed_drawer", log: "你关上抽屉时听到里面有纸张自行翻页。", memo: "拒绝知道，不等于事情会停下。" }
+    ]
+  },
+  {
+    id: "haunt-dataset",
+    tag: "Instrument",
+    risk: "haunting",
+    stage: 2,
+    title: "仪器吐出了一份没人做过的数据",
+    text: "凌晨的仪器在无人操作时自动导出了一组极其漂亮的数据。文件作者署名是一个三年前离开的学生，而你确信她从没做过这个实验。",
+    choices: [
+      { text: "把它接进当前论文", delta: { paper: 10, luck: 3, health: -5 }, ghost: "borrowed_data", log: "数据完美得过分，你开始害怕它真的成立。", memo: "最顺手的结果往往最不干净。" },
+      { text: "沿着作者名去查旧硬盘", delta: { paper: 4, grant: 3, luck: 5 }, ghost: "old_disk", log: "你找到了一块旧硬盘，里面日期全部比系统时间早一天。", memo: "硬盘不会说话，但时间戳会。" },
+      { text: "立刻删掉并重装系统", delta: { health: 2, luck: -5, service: 2 }, ghost: "purge_run", log: "你删掉了文件，第二天它出现在共享盘里。", memo: "技术性的删除，对怪谈不总是有效。" }
+    ]
+  },
+  {
+    id: "haunt-mail",
+    tag: "Mailbox",
+    risk: "haunting",
+    stage: 3,
+    title: "你收到了自己明天发出的邮件",
+    text: "凌晨 3:14，一封来自你自己的邮件出现在收件箱。发送时间是明天，正文只有一句话：不要让第七层亮灯。",
+    choices: [
+      { text: "回复这封邮件", delta: { service: 1, luck: 7, health: -2 }, ghost: "replied_future", log: "你收到自动回执：谢谢，你已经回复过了。", memo: "通信一旦闭环，时间就会开始打结。" },
+      { text: "转发给最信任的同事", delta: { teaching: 2, health: 1, luck: -3 }, ghost: "shared_mail", log: "同事说她没看到正文，只有一个空白附件。", memo: "不是所有证据都愿意被第二个人看见。" },
+      { text: "带着它上七楼看看", delta: { health: -6, luck: 4, paper: 2 }, ghost: "visited_floor", log: "七楼整层都黑着，只有尽头那盏灯像在等你。", memo: "有些楼层平时存在，深夜才真正开放。" }
+    ]
+  },
+  {
+    id: "haunt-minutes",
+    tag: "Minutes",
+    risk: "haunting",
+    stage: 4,
+    title: "会议纪要记录了你没参加过的发言",
+    text: "学院发来的会议纪要里，详细记录了你那天根本不在场时说过的话。更糟的是，那些发言比你平时更锋利，也更像你真正想说的。",
+    choices: [
+      { text: "承认那就是你会说的话", delta: { service: 5, health: -3, luck: 4 }, ghost: "owned_minutes", log: "你开始怀疑，平时开会的那个你是不是才是影子。", memo: "怪谈有时不是制造另一个你，而是替你更诚实。" },
+      { text: "要求学院更正纪要", delta: { service: -3, health: 2, luck: -2 }, ghost: "corrected_minutes", log: "秘书回信说：已按你当时原意修正。", memo: "当系统非常确定你出现过时，辩解会显得很薄。" },
+      { text: "把纪要里的观点写进真实提案", delta: { grant: 8, paper: 3, health: -2 }, ghost: "used_minutes", log: "提案忽然完整了，像那份纪要一直在替你打草稿。", memo: "偷用幽灵版本的自己，后果通常不会立刻出现。" }
+    ]
+  },
+  {
+    id: "haunt-basement",
+    tag: "Basement",
+    risk: "haunting",
+    stage: 5,
+    title: "地下层办公室里坐着一个已经上岸的你",
+    text: "学期末，你顺着匿名打印出的平面图走到地下层尽头。那间不存在于楼层示意里的办公室里，坐着一个明显更成功、也更安静的你。他把一份署好名的 offer 推到桌上，说只要你承认哪一份经历才是真的。",
+    choices: [
+      { text: "签字，换取那份平稳人生", delta: { luck: 10, health: 6, teaching: -6 }, ghost: "signed_offer", log: "你签完字后，对方笑了一下，像把某种职责还给了你。", memo: "每一种稳定都在别处留下了欠条。" },
+      { text: "拒绝签字，带着现有一切离开", delta: { health: -4, paper: 5, grant: 5 }, ghost: "walked_out", log: "你离开时身后有人轻轻说：那就继续活成未完成稿。", memo: "拒绝答案，往往意味着接受开放结局。" },
+      { text: "把桌上的 offer 折成纸船带走", delta: { luck: 6, paper: 4, service: -3 }, ghost: "folded_offer", log: "纸船在洗手池里自己漂了很久，没有沉。", memo: "怪谈最怕的，也许是被你改写成别的用途。" }
+    ]
+  }
+];
+
 const events = [
   {
     tag: "Reviewer #2",
@@ -499,6 +567,8 @@ function startGame() {
     myths: new Set(),
     storyFlags: new Set(),
     chainSeen: new Set(),
+    hauntSeen: new Set(),
+    ghostFlags: [],
     projects: projectTemplates.map((project) => ({ ...project, progress: 0, completeDone: false })),
     actionsLeft: actionBudget[els.mode.value],
     budget: economyBudget[els.mode.value].budget,
@@ -519,6 +589,11 @@ function startGame() {
 }
 
 function pickEvent() {
+  const hauntEvent = hauntingEvents.find((event) => event.stage === state.semester && !state.hauntSeen.has(event.id));
+  if (hauntEvent) {
+    state.hauntSeen.add(hauntEvent.id);
+    return hauntEvent;
+  }
   const unlockedChains = chainEvents.filter((event) => event.unlock(state) && !state.chainSeen.has(event.id));
   if (unlockedChains.length > 0) {
     const chainEvent = unlockedChains[Math.floor(seededRandom() * unlockedChains.length)];
@@ -572,6 +647,7 @@ function applyChoice(index) {
   const before = { ...state.stats };
   addDelta(state.stats, delta);
   if (choice.flag) state.storyFlags.add(choice.flag);
+  if (choice.ghost) state.ghostFlags.push(choice.ghost);
   const swing = Object.keys(delta).reduce((sum, key) => sum + Math.abs(state.stats[key] - before[key]), 0);
   state.history.push({
     semester: state.semester,
@@ -640,6 +716,33 @@ function getTotal() {
   return s.paper + s.grant + s.teaching + s.service + s.health + s.luck;
 }
 
+function buildHauntingEnding() {
+  const ghosts = state.ghostFlags;
+  const has = (flag) => ghosts.includes(flag);
+
+  if (has("signed_offer") && has("future_file")) {
+    return "你后来确实上岸了。办公室更大，窗外更亮，学生也更优秀。只是每年新生入职季，你都会在档案系统里看到一个尚未出现的年轻人名字，而那份材料总需要你亲自签收。你终于明白，地下层办公室不是给人离开的，而是给系统挑选下一位见证者的。";
+  }
+
+  if (has("walked_out") && has("visited_floor") && has("owned_minutes")) {
+    return "你没有接受那份 offer。此后很长时间，七楼尽头那盏灯仍会在深夜亮起，像在确认你是否还留在这条时间线上。你开始把那些没参加过的会议、没做过的实验、没发出的邮件都写进真实作品里。奇怪的是，它们发表得异常顺利，仿佛另一个你终于学会把稿件递给真正活着的这个版本。";
+  }
+
+  if (has("folded_offer") && has("old_disk") && has("used_minutes")) {
+    return "你把 offer 折成纸船后，很多东西开始以纸的形状回到你身边。会议纪要会自己翻页，旧硬盘里会长出新文件，办公室洗手池偶尔漂着写有你署名的摘要。你没有再试图解释这一切，而是开始记录。几年后，别人把你的记录当成一种新的研究方法，而只有你知道，那其实只是怪谈愿意留下的引用格式。";
+  }
+
+  if (ghosts.length >= 4) {
+    return "后来你已经很难说清，究竟是你在做研究，还是研究这套系统在通过你留下自己的证词。你见过未来材料、无人生成的数据、来自明天的邮件、替你发言的纪要，还有地下层那位安静得过分的成功版本。学期结束时，真正留下来的不是任何一篇论文，而是一条你不得不承认的事实：学院里有些成果不是被生产出来的，而是被召唤出来的。";
+  }
+
+  if (ghosts.length >= 2) {
+    return "你没能完全看清那条怪谈是从哪一层楼开始的，但它确实沿着实验记录、共享盘、会议纪要和邮件系统慢慢爬进了你的日常。等你回过神时，最可怕的已经不是异常本身，而是你发现自己开始依赖它给出的提示。";
+  }
+
+  return "学期结束后，异常像潮水一样暂时退了下去。你依然会在某些深夜想起那封来自明天的邮件，或者那份印着你名字的未来材料。你没有证据，也没有办法解释，但你知道有东西在学院里留下了坐标，而你只是暂时从它的视线里走开。";
+}
+
 function getRank() {
   if (!state) return "未入职";
   const total = getTotal();
@@ -668,23 +771,23 @@ function finishGame() {
 
   const rank = getRank();
   const total = getTotal();
-  let text = "你没有成为传说，但你保住了研究、教学和一点点生活。";
+  let text = buildHauntingEnding();
   if (state.storyFlags.has("paper_stage") && state.storyFlags.has("grant_people") && state.storyFlags.has("boundary_clean")) {
-    text = "你没有顺从系统，也没有单纯逃离它。你把研究、学生和边界织成了一条自己的路，于是人们开始用你的名字描述某种罕见姿态。";
+    text = `${text} 与此同时，你没有顺从系统，也没有单纯逃离它。你把研究、学生和边界织成了一条自己的路，于是人们开始用你的名字描述某种罕见姿态。`;
   } else if (state.stats.health < 20) {
-    text = "成果还在增长，但你开始怀疑自己是不是也应该进入仪器共享平台预约维护。";
+    text = `${text} 只是到了最后，你已经分不清自己更需要的是休息，还是维护。`;
   } else if (state.stats.paper > 78 && state.stats.grant > 68) {
-    text = "论文和基金都站住了，代价是你现在听到 deadline 会自动握拳。";
+    text = `${text} 论文和基金都站住了，代价是你现在听到 deadline 会自动握拳。`;
   } else if (state.stats.teaching > 78) {
-    text = "你可能暂时没有最亮的指标，但学生真的记得你讲过什么。";
+    text = `${text} 但学生确实记得你讲过什么，也记得你某次说过“不要让第七层亮灯”。`;
   } else if (state.stats.luck > 76) {
-    text = "你在多个不该过关的地方过关了。请谨慎使用这份好运。";
+    text = `${text} 你在多个不该过关的地方过关了。请谨慎使用这份好运。`;
   } else if (state.mode === modeSettings.publish && total > 390) {
-    text = "你没有让高压系统变温柔，但你学会了在它露出牙齿时保持站立。";
+    text = `${text} 你没有让高压系统变温柔，但你学会了在它露出牙齿时保持站立。`;
   } else if (state.mode === modeSettings.humane && state.stats.health > 70) {
-    text = "传说中存在一种学院：事情仍然很多，但人不会被当成可替换耗材。你短暂抵达过那里。";
+    text = `${text} 传说中存在一种学院：事情仍然很多，但人不会被当成可替换耗材。你短暂抵达过那里。`;
   } else if (total < 275) {
-    text = "这不是失败，只是你的学术操作系统需要重启。";
+    text = `${text} 这不是失败，只是你的学术操作系统需要重启。`;
   }
 
   updateAchievements();
@@ -704,6 +807,7 @@ function finishGame() {
       <dt>目击传说</dt><dd>${unlockedMyths.length ? unlockedMyths.join("、") : "暂未目击，但墙里有声音"}</dd>
       <dt>完成项目</dt><dd>${completedProjects.length ? completedProjects.join("、") : "没有完成项目，但积累了很多解释"}</dd>
       <dt>剧情路径</dt><dd>${route || "普通幸存路线"}</dd>
+      <dt>怪谈阶段</dt><dd>${state.ghostFlags.length} / ${hauntingEvents.length}</dd>
       <dt>建议处方</dt><dd>${state.stats.health < 35 ? "先睡觉，再讨论宏大问题" : "保留边界，谨慎答应“轻量级”任务"}</dd>
     </dl>
   `;
