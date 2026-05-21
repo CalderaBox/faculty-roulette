@@ -2826,15 +2826,6 @@ function pickAftermath(choice) {
   return pick(choice.aftermaths || ["这一选项很快长出了一层你没要求的后果。"]);
 }
 
-function buildDeepAftermath(choice, index, baseAftermath) {
-  const stage = stageAftermaths[(state.turn - 1) % stageAftermaths.length] || [];
-  const stageText = stage[index % stage.length] || pick(stage.flat());
-  if (!baseAftermath || baseAftermath === stageText) {
-    return stageText;
-  }
-  return `${baseAftermath}${stageText}`;
-}
-
 function applyChoice(index) {
   if (!state.current || state.finished || state.awaitingContinue) return;
   const choice = state.currentChoices[index];
@@ -2844,8 +2835,7 @@ function applyChoice(index) {
   const ruleDelta = cleanDelta(applyRule(choice));
   const weatherDelta = cleanDelta(moodDelta());
   const finalDelta = cleanDelta(mergeDeltas(scaledDelta, ruleDelta, weatherDelta));
-  const baseAftermath = pickAftermath(choice);
-  const aftermath = buildDeepAftermath(choice, index, baseAftermath);
+  const aftermath = pickAftermath(choice);
 
   applyStats(finalDelta);
   noteRoute(choice);
