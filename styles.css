@@ -358,7 +358,7 @@ select {
 
 .board-head {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -513,6 +513,82 @@ select {
   border-color: var(--gold);
 }
 
+.dossier-grid {
+  display: grid;
+  grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.dossier {
+  min-height: 134px;
+  padding: 14px;
+  border: 1px solid rgba(246, 241, 232, .1);
+  border-radius: 8px;
+  background: #11161b;
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.section-head span {
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.section-head strong {
+  font-size: 15px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 6px 9px;
+  border: 1px solid rgba(246, 241, 232, .14);
+  border-radius: 999px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, .03);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.chip.unlocked {
+  color: #08100b;
+  border-color: var(--green);
+  background: var(--green);
+}
+
+.timeline {
+  display: grid;
+  gap: 7px;
+  max-height: 156px;
+  margin: 0;
+  padding-left: 22px;
+  overflow: auto;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.timeline li::marker {
+  color: var(--gold);
+  font-weight: 900;
+}
+
 .result-box {
   margin-top: 14px;
   padding: 22px;
@@ -560,7 +636,8 @@ textarea {
   .hero-actions,
   .board-head,
   .stats,
-  .after-panel {
+  .after-panel,
+  .dossier-grid {
     grid-template-columns: 1fr;
   }
 

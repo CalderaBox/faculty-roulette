@@ -32,6 +32,30 @@ const profiles = {
   stealth: { paper: 44, grant: 40, teaching: 48, service: 30, health: 78, luck: 62 }
 };
 
+const modeSettings = {
+  standard: {
+    label: "标准学术天气",
+    semesters: 6,
+    multiplier: 1,
+    bonus: {},
+    rule: "普通难度。系统不友善，但还没有完全拟人化。"
+  },
+  publish: {
+    label: "非升即走模式",
+    semesters: 7,
+    multiplier: 1.18,
+    bonus: { paper: 4, grant: 4, health: -10, luck: -4 },
+    rule: "高压难度。正收益更甜，负收益更疼，结局更戏剧化。"
+  },
+  humane: {
+    label: "理想学院模式",
+    semesters: 5,
+    multiplier: .82,
+    bonus: { health: 10, luck: 6, service: -3 },
+    rule: "温柔难度。仍有荒诞，但至少有人记得你是人。"
+  }
+};
+
 const moods = [
   { name: "论文季风", spin: 25, bonus: { paper: 2 }, memo: "今天的空气里有返修味。" },
   { name: "基金低压槽", spin: 85, bonus: { grant: 2 }, memo: "预算表会膨胀，人的意志会收缩。" },
@@ -154,22 +178,37 @@ const events = [
   }
 ];
 
-const maxSemester = 6;
+const achievementRules = [
+  { id: "deadline", label: "23:58 提交", test: (s) => s.stats.grant >= 76 },
+  { id: "teacher", label: "有人真的听懂了", test: (s) => s.stats.teaching >= 78 },
+  { id: "paper", label: "返修免疫", test: (s) => s.stats.paper >= 80 },
+  { id: "boundaries", label: "边界感练习生", test: (s) => s.stats.service <= 32 && s.stats.health >= 55 },
+  { id: "burnout", label: "咖啡不是睡眠", test: (s) => s.stats.health <= 28 },
+  { id: "lucky", label: "宇宙偏心", test: (s) => s.stats.luck >= 78 },
+  { id: "balanced", label: "六边形小而稳", test: (s) => Math.min(...Object.values(s.stats)) >= 48 },
+  { id: "chaos", label: "系统边缘漫游", test: (s) => s.history.some((item) => item.swing >= 22) }
+];
+
+const defaultMaxSemester = 6;
 let state = null;
 let seed = Date.now() % 100000;
 
 const els = {
   profile: document.querySelector("#profile"),
+  mode: document.querySelector("#mode"),
   profileNote: document.querySelector("#profileNote"),
   startBtn: document.querySelector("#startBtn"),
   startHeroBtn: document.querySelector("#startHeroBtn"),
   restartBtn: document.querySelector("#restartBtn"),
+  dailySeedBtn: document.querySelector("#dailySeedBtn"),
   seedBtn: document.querySelector("#seedBtn"),
   seedLabel: document.querySelector("#seedLabel"),
   rank: document.querySelector("#rank"),
+  crisis: document.querySelector("#crisis"),
   semester: document.querySelector("#semester"),
   status: document.querySelector("#status"),
   mood: document.querySelector("#mood"),
+  combo: document.querySelector("#combo"),
   stats: document.querySelector("#stats"),
   wheel: document.querySelector("#wheel"),
   eventTag: document.querySelector("#eventTag"),
@@ -179,6 +218,8 @@ const els = {
   choices: document.querySelector("#choices"),
   memoText: document.querySelector("#memoText"),
   trajectory: document.querySelector("#trajectory"),
+  achievements: document.querySelector("#achievements"),
+  timeline: document.querySelector("#timeline"),
   log: document.querySelector("#log"),
   resultBox: document.querySelector("#resultBox"),
   endingTitle: document.querySelector("#endingTitle"),
@@ -198,6 +239,14 @@ function reseed() {
   if (!state) {
     els.log.textContent = `faculty-survival.log\nuniverse reseeded\nseed FR-${String(seed).padStart(5, "0")}`;
   }
+}
+
+function useDailySeed() {
+  const today = new Date();
+  const stamp = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+  seed = stamp % 99999;
+  updateSeedLabel();
+  els.log.textContent = `faculty-survival.log\ndaily universe loaded\nseed FR-${String(seed).padStart(5, "0")}`;
 }
 
 function updateSeedLabel() {
@@ -220,27 +269,53 @@ function addDelta(target, delta) {
   });
 }
 
+function getMaxSemester() {
+  return state?.mode.semesters || defaultMaxSemester;
+}
+
+function scaleDelta(delta) {
+  const multiplier = state?.mode.multiplier || 1;
+  return Object.fromEntries(Object.entries(delta).map(([key, value]) => {
+    if (value === 0) return [key, 0];
+    const scaled = value < 0 ? value * multiplier : value * (2 - multiplier);
+    return [key, Math.trunc(scaled)];
+  }));
+}
+
+function getCrisisScore() {
+  if (!state) return 0;
+  const lowStats = Object.values(state.stats).filter((value) => value < 35).length * 12;
+  const healthRisk = Math.max(0, 45 - state.stats.health);
+  const luckRisk = Math.max(0, 35 - state.stats.luck) / 2;
+  return clamp(lowStats + healthRisk + luckRisk);
+}
+
 function profileName() {
   return els.profile.options[els.profile.selectedIndex].textContent;
 }
 
 function updateProfileNote() {
-  els.profileNote.textContent = profileNotes[els.profile.value];
+  const mode = modeSettings[els.mode.value];
+  els.profileNote.textContent = `${profileNotes[els.profile.value]} ${mode.rule}`;
 }
 
 function startGame() {
   const mood = moods[Math.floor(seededRandom() * moods.length)];
+  const mode = modeSettings[els.mode.value];
   const stats = { ...profiles[els.profile.value] };
   addDelta(stats, mood.bonus);
+  addDelta(stats, mode.bonus);
   state = {
     semester: 1,
     stats,
     used: [],
     history: [],
+    achievements: new Set(),
+    mode,
     mood,
     spin: mood.spin,
     log: [
-      `你以“${profileName()}”身份入职。`,
+      `你以“${profileName()}”身份入职，宇宙强度：${mode.label}。`,
       `本轮宇宙天气：${mood.name}。`
     ]
   };
@@ -260,7 +335,7 @@ function pickEvent() {
 
 function drawEvent() {
   if (!state) return;
-  if (state.semester > maxSemester || state.stats.health <= 0) {
+  if (state.semester > getMaxSemester() || state.stats.health <= 0) {
     finishGame();
     return;
   }
@@ -279,7 +354,7 @@ function drawEvent() {
     const label = document.createElement("span");
     const delta = document.createElement("small");
     label.textContent = choice.text;
-    delta.textContent = formatDelta(choice.delta);
+    delta.textContent = formatDelta(scaleDelta(choice.delta));
     button.append(label, delta);
     button.addEventListener("click", () => applyChoice(index));
     els.choices.appendChild(button);
@@ -289,19 +364,38 @@ function drawEvent() {
 
 function applyChoice(index) {
   const choice = state.current.choices[index];
+  const delta = scaleDelta(choice.delta);
   const before = { ...state.stats };
-  addDelta(state.stats, choice.delta);
-  const swing = Object.keys(choice.delta).reduce((sum, key) => sum + Math.abs(state.stats[key] - before[key]), 0);
+  addDelta(state.stats, delta);
+  const swing = Object.keys(delta).reduce((sum, key) => sum + Math.abs(state.stats[key] - before[key]), 0);
   state.history.push({
     semester: state.semester,
     tag: state.current.tag,
     choice: choice.text,
-    swing
+    swing,
+    delta
   });
+  updateAchievements();
   state.log.unshift(`S${state.semester} ${state.current.tag}: ${choice.log}`);
   els.memoText.textContent = choice.memo;
   state.semester += 1;
   drawEvent();
+}
+
+function updateAchievements() {
+  achievementRules.forEach((achievement) => {
+    if (achievement.test(state)) state.achievements.add(achievement.id);
+  });
+}
+
+function getCombo() {
+  if (!state || state.history.length < 2) return "尚未形成";
+  const recent = state.history.slice(-2);
+  if (recent.every((item) => item.tag === "Grant" || item.delta.grant > 0)) return "基金冲刺";
+  if (recent.every((item) => item.delta.paper > 0)) return "论文连击";
+  if (recent.every((item) => item.delta.health > 0)) return "健康回补";
+  if (recent.every((item) => item.swing >= 16)) return "高波动人生";
+  return `${recent.at(-1).tag} 余波`;
 }
 
 function getTotal() {
@@ -316,6 +410,8 @@ function getRank() {
   if (state.stats.paper > 78 && state.stats.grant > 68) return "高压上岸型 PI";
   if (state.stats.teaching > 78 && state.stats.health > 45) return "口碑型老师";
   if (state.stats.luck > 76) return "宇宙偏爱型青椒";
+  if (state.mode === modeSettings.publish && total > 390) return "高压驯兽师";
+  if (state.mode === modeSettings.humane && state.stats.health > 70) return "罕见正常人";
   if (total > 410) return "稀有稳定型青椒";
   if (total < 275) return "系统维护中";
   return "勉强优雅型青椒";
@@ -340,11 +436,17 @@ function finishGame() {
     text = "你可能暂时没有最亮的指标，但学生真的记得你讲过什么。";
   } else if (state.stats.luck > 76) {
     text = "你在多个不该过关的地方过关了。请谨慎使用这份好运。";
+  } else if (state.mode === modeSettings.publish && total > 390) {
+    text = "你没有让高压系统变温柔，但你学会了在它露出牙齿时保持站立。";
+  } else if (state.mode === modeSettings.humane && state.stats.health > 70) {
+    text = "传说中存在一种学院：事情仍然很多，但人不会被当成可替换耗材。你短暂抵达过那里。";
   } else if (total < 275) {
     text = "这不是失败，只是你的学术操作系统需要重启。";
   }
 
-  const share = `我在《青椒轮盘 Faculty Roulette》里获得结局：${rank}。\n论文${state.stats.paper} / 基金${state.stats.grant} / 教学${state.stats.teaching} / 服务${state.stats.service} / 健康${state.stats.health} / 运气${state.stats.luck}\n本轮宇宙：${state.mood.name}`;
+  updateAchievements();
+  const unlocked = achievementRules.filter((item) => state.achievements.has(item.id)).map((item) => item.label);
+  const share = `我在《青椒轮盘 Faculty Roulette》里获得结局：${rank}。\n论文${state.stats.paper} / 基金${state.stats.grant} / 教学${state.stats.teaching} / 服务${state.stats.service} / 健康${state.stats.health} / 运气${state.stats.luck}\n宇宙：${state.mood.name} / ${state.mode.label}\n成就：${unlocked.length ? unlocked.join("、") : "暂无，但仍然活着"}`;
   els.endingTitle.textContent = rank;
   els.endingText.textContent = text;
   els.shareText.value = share;
@@ -368,6 +470,7 @@ function renderStats() {
 
 function renderTrajectory() {
   const current = state ? state.semester : 0;
+  const maxSemester = getMaxSemester();
   els.trajectory.innerHTML = Array.from({ length: maxSemester }, (_, index) => {
     const step = index + 1;
     const done = state && step < current;
@@ -377,31 +480,62 @@ function renderTrajectory() {
   }).join("");
 }
 
+function renderAchievements() {
+  if (!state) {
+    els.achievements.innerHTML = achievementRules.slice(0, 4).map((item) => `<span class="chip">${item.label}</span>`).join("");
+    return;
+  }
+  els.achievements.innerHTML = achievementRules.map((item) => {
+    const unlocked = state.achievements.has(item.id);
+    return `<span class="chip ${unlocked ? "unlocked" : ""}">${unlocked ? "✓ " : ""}${item.label}</span>`;
+  }).join("");
+}
+
+function renderTimeline() {
+  if (!state || state.history.length === 0) {
+    els.timeline.innerHTML = "<li>等待第一张事件卡落地。</li>";
+    return;
+  }
+  els.timeline.innerHTML = state.history.map((item) => `<li>S${item.semester} · ${item.tag} · ${item.choice}</li>`).join("");
+}
+
 function render() {
   updateSeedLabel();
   if (!state) {
     els.semester.textContent = "-";
     els.status.textContent = "等待开局";
     els.mood.textContent = "尚未抽取";
+    els.combo.textContent = "尚未形成";
     els.rank.textContent = "未入职";
+    els.crisis.textContent = "--";
     renderStats();
     renderTrajectory();
+    renderAchievements();
+    renderTimeline();
     return;
   }
+  const maxSemester = getMaxSemester();
+  const crisis = getCrisisScore();
   els.semester.textContent = `${Math.min(state.semester, maxSemester)} / ${maxSemester}`;
   els.status.textContent = state.finished ? "结局生成" : state.stats.health <= 25 ? "健康预警" : state.stats.luck <= 25 ? "运气偏冷" : "勉强运转";
   els.mood.textContent = state.mood.name;
+  els.combo.textContent = getCombo();
   els.rank.textContent = getRank();
+  els.crisis.textContent = crisis >= 70 ? "红色" : crisis >= 40 ? "橙色" : "绿色";
   renderStats();
   renderTrajectory();
+  renderAchievements();
+  renderTimeline();
   els.log.textContent = ["faculty-survival.log", state.mood.memo, ...state.log.slice(0, 8)].join("\n");
 }
 
 els.profile.addEventListener("change", updateProfileNote);
+els.mode.addEventListener("change", updateProfileNote);
 els.startBtn.addEventListener("click", startGame);
 els.startHeroBtn.addEventListener("click", startGame);
 els.restartBtn.addEventListener("click", startGame);
 els.seedBtn.addEventListener("click", reseed);
+els.dailySeedBtn.addEventListener("click", useDailySeed);
 els.copyBtn.addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText(els.shareText.value);

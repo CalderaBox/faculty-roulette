@@ -4,7 +4,16 @@ Faculty Roulette is a small academic survival simulator. You start as a fresh fa
 
 ## Status
 
-Prototype.
+Playable zero-dependency prototype.
+
+## Features
+
+- Five faculty archetypes
+- Three universe intensity modes
+- Daily seed and random seed runs
+- Roulette-style event draw
+- Six-stat survival model
+- Achievements, timeline, crisis radar, endings, and share text
 
 ## Run
 

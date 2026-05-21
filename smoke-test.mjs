@@ -39,16 +39,20 @@ class FakeElement {
 
 const ids = [
   "profile",
+  "mode",
   "profileNote",
   "startBtn",
   "startHeroBtn",
   "restartBtn",
+  "dailySeedBtn",
   "seedBtn",
   "seedLabel",
   "rank",
+  "crisis",
   "semester",
   "status",
   "mood",
+  "combo",
   "stats",
   "wheel",
   "eventTag",
@@ -58,6 +62,8 @@ const ids = [
   "choices",
   "memoText",
   "trajectory",
+  "achievements",
+  "timeline",
   "log",
   "resultBox",
   "endingTitle",
@@ -68,6 +74,7 @@ const ids = [
 
 const elements = new Map(ids.map((id) => [id, new FakeElement(id)]));
 elements.get("profile").value = "balanced";
+elements.get("mode").value = "standard";
 const root = new URL("./", import.meta.url);
 
 const context = {
@@ -109,5 +116,7 @@ if (elements.get("status").textContent !== "结局生成") throw new Error("Game
 if (!elements.get("shareText").value.includes("青椒轮盘")) throw new Error("Share text is incomplete.");
 if (!/stat/.test(elements.get("stats").innerHTML)) throw new Error("Stats did not render.");
 if (!/S6/.test(elements.get("trajectory").innerHTML)) throw new Error("Trajectory did not render.");
+if (!/chip/.test(elements.get("achievements").innerHTML)) throw new Error("Achievements did not render.");
+if (!/S1/.test(elements.get("timeline").innerHTML)) throw new Error("Timeline did not render.");
 
 console.log("Faculty Roulette smoke test passed.");

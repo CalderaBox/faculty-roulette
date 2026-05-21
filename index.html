@@ -57,10 +57,18 @@ choose a profile to begin</pre>
           <option value="stealth">低调摸鱼型</option>
         </select>
 
+        <label for="mode">宇宙强度</label>
+        <select id="mode">
+          <option value="standard">标准学术天气</option>
+          <option value="publish">非升即走模式</option>
+          <option value="humane">理想学院模式</option>
+        </select>
+
         <div class="profile-note" id="profileNote"></div>
 
         <button id="startBtn" class="primary">新开一局</button>
         <button id="restartBtn" class="ghost">重开</button>
+        <button id="dailySeedBtn" class="ghost">今日宇宙</button>
 
         <div class="mini-board" aria-label="current identity">
           <div>
@@ -70,6 +78,10 @@ choose a profile to begin</pre>
           <div>
             <span>宇宙编号</span>
             <strong id="seedLabel">FR-000</strong>
+          </div>
+          <div>
+            <span>危机雷达</span>
+            <strong id="crisis">--</strong>
           </div>
         </div>
       </aside>
@@ -87,6 +99,10 @@ choose a profile to begin</pre>
           <div>
             <span class="label">本轮倾向</span>
             <strong id="mood">尚未抽取</strong>
+          </div>
+          <div>
+            <span class="label">当前连锁</span>
+            <strong id="combo">尚未形成</strong>
           </div>
         </div>
 
@@ -108,6 +124,23 @@ choose a profile to begin</pre>
             <p id="memoText">好的选择通常不是最爽的选择，最爽的选择通常会出现在周五 23:41。</p>
           </div>
           <div class="trajectory" id="trajectory" aria-label="semester trajectory"></div>
+        </section>
+
+        <section class=" dossier-grid" aria-label="run dossier">
+          <div class="dossier">
+            <div class="section-head">
+              <span>Achievements</span>
+              <strong>本局成就</strong>
+            </div>
+            <div id="achievements" class="chips"></div>
+          </div>
+          <div class="dossier">
+            <div class="section-head">
+              <span>Timeline</span>
+              <strong>事件时间线</strong>
+            </div>
+            <ol id="timeline" class="timeline"></ol>
+          </div>
         </section>
 
         <div class="result-box" id="resultBox" hidden>
