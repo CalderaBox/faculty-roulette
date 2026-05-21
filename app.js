@@ -174,21 +174,6 @@ const absurdRules = [
   }
 ];
 
-const storyProgressions = [
-  "你第一次注意到学院夜里会比白天多出一条走廊。",
-  "共享盘里出现了一个以你命名、但你从未创建过的文件夹。",
-  "打印机开始优先输出与你有关、却尚未发生的材料。",
-  "有人在会议上引用了你没讲过的话，而所有人都觉得那很正常。",
-  "第七层的灯第一次在你离开后才亮起。",
-  "你开始分不清哪些数据是结果，哪些数据是在等你成为结果。",
-  "学生、同事和系统逐渐各自记住了不同版本的你。",
-  "你发现最可怕的不是异常本身，而是异常越来越高效。",
-  "所有证据都开始互相印证，只有现实版本显得越来越单薄。",
-  "你已经能提前猜到下一次怪事会从哪个介质里钻出来。",
-  "学院像一台会自我修补的机器，而你正在它的修补日志里。",
-  "到最后，你意识到自己经历的不是事故，而是一套完整且正在运行的叙事。"
-];
-
 const stageAftermaths = [
   [
     "你把材料带回办公室后，它自己从骑缝章里长出第二页，内容是三个月后财务处会退回一笔你还没申请到的经费。第二天财务老师路过，顺手问你那份盖好章的版本能不能也抄送她一份。",
@@ -2861,7 +2846,6 @@ function applyChoice(index) {
   const finalDelta = cleanDelta(mergeDeltas(scaledDelta, ruleDelta, weatherDelta));
   const baseAftermath = pickAftermath(choice);
   const aftermath = buildDeepAftermath(choice, index, baseAftermath);
-  const beat = storyProgressions[(state.turn - 1) % storyProgressions.length];
 
   applyStats(finalDelta);
   noteRoute(choice);
@@ -2876,7 +2860,6 @@ function applyChoice(index) {
     risk: state.current.risk,
     sceneText: state.current.text,
     choiceText: choice.text,
-    beat,
     aftermath,
     mood: state.mood.name,
     ruleLabel: state.rule.label,
@@ -2984,6 +2967,20 @@ function finishGame() {
   render();
 }
 
+function cleanSentence(text) {
+  return String(text || "").trim().replace(/[。！？.!?]+$/, "");
+}
+
+function buildStoryTurn(entry) {
+  const sceneText = cleanSentence(entry.sceneText);
+  const action = cleanSentence(entry.choiceText);
+  const aftermath = cleanSentence(entry.aftermath);
+  const actionSentence = action
+    ? `随后，${action.startsWith("你") ? action : `你${action}`}。`
+    : "";
+  return `${sceneText}。${actionSentence}${aftermath}。`;
+}
+
 function renderStats() {
   if (!elements.stats) return;
   elements.stats.innerHTML = Object.entries(state.stats)
@@ -3011,7 +3008,7 @@ function renderTimeline() {
   const paragraphs = state.history.map((entry) => `
     <p class="story-paragraph">
       <span class="story-marker">S${entry.turn} · ${entry.title}</span>
-      ${entry.sceneText}你决定${entry.choiceText.replace(/[。！？]$/, "")}。${entry.beat}${entry.aftermath}
+      ${buildStoryTurn(entry)}
     </p>
   `);
 
@@ -3049,8 +3046,7 @@ function renderChoices() {
     const button = document.createElement("button");
     button.className = "aftermath-card";
     button.innerHTML = `
-      <span class="aftermath-kicker">下一页已经写好</span>
-      <strong>${entry.beat}</strong>
+      <span class="aftermath-kicker">这一页继续往下写</span>
       <p>${entry.aftermath}</p>
       <small>${state.pendingFinish ? "点这里封存这一轮" : "点这里翻到下一幕"}</small>
     `;

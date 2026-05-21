@@ -142,6 +142,10 @@ if (!afterChoice.awaitingContinue) throw new Error("Choice should first render a
 if (!/aftermath-card/.test(elements.get("choices").children[0]?.className || "")) {
   throw new Error("Aftermath should replace the original choice area.");
 }
+const aftermathCardHtml = elements.get("choices").children[0]?._innerHTML || "";
+if (/你第一次注意到学院夜里|共享盘里出现|打印机开始优先输出/.test(aftermathCardHtml)) {
+  throw new Error("Aftermath card should not show generic transition beats as extra story prompts.");
+}
 const branchA = debug.continue().currentSceneId;
 debug.start("paper", "standard", 1200);
 debug.choose(1);
@@ -171,6 +175,9 @@ if (snapshot.historyLength < 12) throw new Error("A full run should contain a lo
 if (!/story-thread/.test(snapshot.timelineHtml)) throw new Error("Story thread did not render.");
 if (!/story-paragraph/.test(snapshot.timelineHtml)) throw new Error("Continuous story paragraphs did not render.");
 if (/你的选择|你当时/.test(snapshot.timelineHtml)) throw new Error("Story should not use explicit choice labels.");
+if (/你第一次注意到学院夜里|共享盘里出现|打印机开始优先输出/.test(snapshot.timelineHtml)) {
+  throw new Error("Timeline should not append generic transition beats to each story paragraph.");
+}
 if (!/第\d{3}号怪谈/.test(snapshot.endingTitle)) throw new Error("Deep dossier-style ending title did not render.");
 if (!/档案返修处|预审雨棚|共享盘地下河|指标标本室|会议回声井|预算折叠层|仪器养殖场|引用香火台|伦理镜像库|招聘回廊|署名迁徙带|绩效天象馆/.test(snapshot.timelineHtml)) {
   throw new Error("Final story should include a deep archive family ending.");

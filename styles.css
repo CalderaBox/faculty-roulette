@@ -387,7 +387,7 @@ select {
   text-align: right;
 }
 
-.aftermath-card {
+.choices .aftermath-card {
   grid-template-columns: 1fr;
   gap: 12px;
   padding: 22px 24px;
@@ -398,7 +398,7 @@ select {
     #151a20;
 }
 
-.aftermath-card:hover {
+.choices .aftermath-card:hover {
   border-color: rgba(242, 193, 93, .66);
   background:
     linear-gradient(135deg, rgba(242, 193, 93, .18), transparent 48%),
@@ -414,20 +414,14 @@ select {
   text-transform: uppercase;
 }
 
-.aftermath-card strong {
-  color: var(--ink);
-  font-size: 18px;
-  line-height: 1.7;
-}
-
-.aftermath-card p {
+.choices .aftermath-card p {
   margin: 0;
   color: #e7dfd0;
   font-size: 17px;
   line-height: 1.95;
 }
 
-.aftermath-card small {
+.choices .aftermath-card small {
   color: var(--gold);
   text-align: left;
 }
