@@ -237,6 +237,59 @@ const stageAftermaths = [
   ]
 ];
 
+const aftermathTwistsByTone = {
+  paper: [
+    ({ sceneTitle, action }) => `你以为“${action}”只是在处理眼前这页，凌晨投稿系统却把《${sceneTitle}》登记成一篇 already accepted 的短文，通讯作者栏写着“按惯例补齐”。`,
+    ({ sceneTitle }) => `这件事的脚注第二天长进了一篇综述里，标题和《${sceneTitle}》一模一样，只是作者们都声称自己从未见过原始事件。`,
+    ({ action }) => `你刚把“${action}”当成临时办法，参考文献管理器就替它生成了 DOI。最惊悚的是，引用格式比你自己整理得更规范。`
+  ],
+  grant: [
+    ({ sceneTitle }) => `《${sceneTitle}》的后续没有出现在邮箱里，而是出现在预算表第 17 行。那一行没有金额，只有一句批注：此处应由申请人证明自己尚未被批准。`,
+    ({ action }) => `你执行完“${action}”后，经费系统弹出一条温柔提示：该行为具有预算潜力，是否拆分为三个子课题继续承担。`,
+    ({ sceneTag }) => `${sceneTag}很快被财务处解释成一种支出类别。大家都松了口气，因为只要能归类，怪事就暂时不用被解决。`
+  ],
+  teaching: [
+    ({ sceneTitle }) => `后来学生把《${sceneTitle}》写进课程反馈，说这是本学期最有参与感的一次案例教学。你翻到最后，发现助教栏里多了一个和你同名的人。`,
+    ({ action }) => `“${action}”很快变成课堂上的标准答案，但没人记得题目是什么。期末卷里它占 20 分，评分细则写得像一份失踪声明。`,
+    ({ sceneTag }) => `${sceneTag}的墙上多出一块白板，上面提前写好下周的讨论结论。字迹很像你，只是比你更愿意加班。`
+  ],
+  service: [
+    ({ action }) => `你以为“${action}”只是帮个小忙，结果这句话被做成了委员会章程第一页。章程没有落款，因为落款处已经自动盖了你的时间。`,
+    ({ sceneTitle }) => `《${sceneTitle}》结束后，会议室自动预约了同名续集。参会人只有你一个，但纪要显示大家充分交换了意见。`,
+    ({ sceneTag }) => `${sceneTag}把这件事包装成“协同创新”。第二天，协同部分消失了，只剩创新两字贴在你的门牌下面。`
+  ],
+  health: [
+    ({ action }) => `你选择“${action}”以后，体检系统给你发来一份结果：各项指标正常，异常的是你居然还在试图正常。`,
+    ({ sceneTitle }) => `《${sceneTitle}》当天晚上，睡眠软件把你的浅睡眠识别成一次院务会议。它甚至贴心地标注：发言积极，恢复不足。`,
+    ({ sceneTag }) => `${sceneTag}的空气突然变得很安静，像有人替你按下暂停。十分钟后，暂停被登记为一次未完成的休息申请。`
+  ],
+  hide: [
+    ({ action }) => `你试图用“${action}”从现场退开，缺席记录却比本人更早到场。它坐在最后一排，替你点了头。`,
+    ({ sceneTitle }) => `《${sceneTitle}》里所有人都说没看见你，只有门禁系统坚持给你算了三次出勤。它的语气像在保护一位老朋友。`,
+    ({ sceneTag }) => `${sceneTag}的角落多出一件外套，口袋里放着你明天才会打印的材料。你没有拿走，它却自己跟回了办公室。`
+  ],
+  official: [
+    ({ action }) => `“${action}”被写进正式文件后，语气立刻稳重了许多。稳重到第二天它开始反过来要求你补交动机说明。`,
+    ({ sceneTitle }) => `《${sceneTitle}》的纪要版本比真实现场更完整，甚至补上了你没有说出口的谨慎表态。领导批注：成熟。`,
+    ({ sceneTag }) => `${sceneTag}很快盖上了章。章印不是红色，而是一种接近黄昏的颜色，像流程已经替你提前下班。`
+  ],
+  question: [
+    ({ action }) => `你问出“${action}”之后，问题没有得到回答，而是被系统拆成四个必填项。最后一项问：你是否确认自己真的想知道。`,
+    ({ sceneTitle }) => `《${sceneTitle}》因为你的追问短暂露出背面，背面贴着一张更旧的通知：此问题曾由未来的你退回修改。`,
+    ({ sceneTag }) => `${sceneTag}安静了几秒，随后所有人同时打开笔记本，像这个问题终于触发了某个隐藏签到环节。`
+  ],
+  follow: [
+    ({ action }) => `你顺着“${action}”追下去，线索没有变清楚，反而开始学会回头看你。它每次转弯都慢半拍，像在确认你有没有跟上。`,
+    ({ sceneTitle }) => `《${sceneTitle}》留下的痕迹一路通向一间不存在的办公室。门缝里传出打印声，打印内容正是你站在门口犹豫的姿势。`,
+    ({ sceneTag }) => `${sceneTag}的走廊突然变长，长到足够容纳三个版本的解释。最靠近你的那个版本已经开始使用你的口头禅。`
+  ],
+  care: [
+    ({ action }) => `你把“${action}”当成一点体面，系统却把它识别为可持续服务能力。第二天，体面被排进了固定时段。`,
+    ({ sceneTitle }) => `《${sceneTitle}》后来被学生私下叫作安全屋。问题是安全屋每到周五都会自动生成新的求助入口。`,
+    ({ sceneTag }) => `${sceneTag}里那点善意没有消失，只是被行政系统温柔地装订起来。封面写着：可复制经验。`
+  ]
+};
+
 const endingFamilies = [
   {
     name: "镜面评审走廊",
@@ -2823,7 +2876,42 @@ function drawEvent() {
 }
 
 function pickAftermath(choice) {
-  return pick(choice.aftermaths || ["这一选项很快长出了一层你没要求的后果。"]);
+  return pick(buildAftermathPool(choice));
+}
+
+function shortText(text, max = 34) {
+  const compact = cleanSentence(text).replace(/\s+/g, "");
+  return compact.length > max ? `${compact.slice(0, max)}……` : compact;
+}
+
+function buildAftermathContext(choice, scene = state.current) {
+  return {
+    action: shortText(choice.text || "这件事"),
+    sceneTitle: scene?.title || "这一幕",
+    sceneTag: scene?.tag || "学院",
+    profile: profileLabels[state.profile] || "某位青椒"
+  };
+}
+
+function buildAftermathPool(choice, scene = state.current) {
+  const pool = [...(choice.aftermaths || [])];
+  const context = buildAftermathContext(choice, scene);
+  const tones = choice.tones?.length ? choice.tones : ["official"];
+
+  for (const tone of tones) {
+    for (const template of aftermathTwistsByTone[tone] || []) {
+      pool.push(template(context));
+    }
+  }
+
+  if (pool.length < 4) {
+    pool.push(
+      `《${context.sceneTitle}》没有按常理收尾。你刚完成“${context.action}”，页面边缘就多出一行小字：该后果仍在寻找合适的责任人。`,
+      `这件事看似结束了，但${context.sceneTag}把它折成一张很薄的回执，塞进你尚未打开的抽屉里。`
+    );
+  }
+
+  return [...new Set(pool)].filter(Boolean);
 }
 
 function applyChoice(index) {
@@ -3177,6 +3265,27 @@ function snapshot() {
   };
 }
 
+function aftermathPoolReport() {
+  const items = [];
+  for (const scene of scenePool) {
+    for (const choice of scene.choices || []) {
+      items.push({
+        sceneId: scene.id,
+        title: scene.title,
+        choiceText: choice.text,
+        count: buildAftermathPool(choice, scene).length
+      });
+    }
+  }
+
+  return {
+    totalChoices: items.length,
+    min: Math.min(...items.map((item) => item.count)),
+    max: Math.max(...items.map((item) => item.count)),
+    underFour: items.filter((item) => item.count < 4)
+  };
+}
+
 if (elements.profile) {
   elements.profile.addEventListener("change", updateProfileNote);
 }
@@ -3221,6 +3330,9 @@ root.__facultyRouletteDebug = {
   continue() {
     continueStory();
     return snapshot();
+  },
+  getAftermathPoolReport() {
+    return aftermathPoolReport();
   },
   getState() {
     return snapshot();
