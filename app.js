@@ -577,17 +577,17 @@ const endingDossierCases = [
 ];
 
 const endingRouteLabels = {
-  paper: "论文、审稿和引用留下的纸面回声",
-  grant: "基金、预算和报销折出的经费阴影",
-  teaching: "课堂、学生和课件互相传染的教学灵异",
-  service: "会议、委员会和临时任务织成的事务网",
-  health: "失眠、体检和打卡记录里的身体预警",
-  luck: "所有偶然事件假装成运气的路线",
-  hide: "低调潜行和消失备案留下的空位",
-  follow: "追问、跟踪和回声不断引出的线索",
-  official: "通知、表格和礼貌流程制造的正式幻觉",
-  question: "逆向提问撬开的制度缝隙",
-  care: "善意、照看和情绪劳动被流程长期认领"
+  paper: "纸面回声",
+  grant: "经费阴影",
+  teaching: "课堂灵异",
+  service: "事务菌丝",
+  health: "身体预警",
+  luck: "偶然路线",
+  hide: "空位备案",
+  follow: "追问回声",
+  official: "流程幻觉",
+  question: "逆向提问",
+  care: "善意认领"
 };
 
 function buildEndingDossier(familyIndex, fateIndex) {
@@ -603,13 +603,14 @@ function buildEndingDossier(familyIndex, fateIndex) {
 function buildRouteThread(digest = routeDigest()) {
   const labels = digest
     .map((tone) => endingRouteLabels[tone])
-    .filter(Boolean);
+    .filter(Boolean)
+    .slice(0, 2);
 
   if (!labels.length) {
-    return "回看这一路，最清晰的线索反而是那些没有被记录的停顿。学院把它们称为适应过程，档案则把它们夹在最薄的一页里。";
+    return "档案角落只补了一句：未记录的停顿，比成果更像证词。";
   }
 
-  return `回看这一路，${labels.join("、")}反复出现，像几条不同颜色的线在同一枚图钉下打结。结局不是凭空落下来的，它只是终于承认这些线一直在拖着你走。`;
+  return `档案角落补注：${labels.join("、")}一直在场，只是现在才肯签名。`;
 }
 
 const routeEchoes = {
@@ -3128,11 +3129,10 @@ function buildRouteEcho() {
 function buildEndingNarrative() {
   const profile = buildEndingProfile();
   const dossier = buildEndingDossier(profile.familyIndex, profile.fateIndex);
-  const routeText = buildRouteEcho();
   const routeThread = buildRouteThread(profile.digest);
   const archive = String(profile.archiveNumber).padStart(3, "0");
   const title = `第${archive}号怪谈：${dossier.title}`;
-  const text = `${dossier.text}${routeThread}${routeText}`;
+  const text = `${dossier.text}${routeThread}`;
 
   return {
     title,
