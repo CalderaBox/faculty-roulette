@@ -159,6 +159,12 @@ vm.runInNewContext(app, context, { filename: "app.js" });
 const debug = context.__facultyRouletteDebug;
 if (!debug) throw new Error("Debug helper was not exposed.");
 
+const contentReport = debug.getContentReport();
+if (contentReport.sceneCount < 44) throw new Error("Scene pool should include the expanded weird-tale set.");
+if (contentReport.choiceCount < 132) throw new Error("Expanded scene pool should expose more choice variety.");
+if (contentReport.uniqueSceneIds !== contentReport.sceneCount) throw new Error("Scene IDs should be unique.");
+if (!contentReport.randomProfileEnabled) throw new Error("Random profile default should be available.");
+
 const aftermathReport = debug.getAftermathPoolReport();
 if (aftermathReport.totalChoices < 100) throw new Error("Aftermath pool report is missing choices.");
 if (aftermathReport.min < 5) throw new Error("Every choice should expose several bound aftermath variants.");
@@ -174,6 +180,15 @@ if (endingDossierReport.uniqueTexts !== 108) throw new Error("Every ending dossi
 if (endingDossierReport.missingCases.length) throw new Error("Some ending dossier cases are missing bespoke text.");
 if (endingDossierReport.duplicateSentences.length) throw new Error("Ending dossiers should not repeat full sentences.");
 if (endingDossierReport.minTextLength < 35) throw new Error("Ending dossier text should still contain a specific story beat.");
+
+const randomA = debug.start("random", "standard", 6101);
+const randomB = debug.start("random", "standard", 6102);
+if (randomA.profile === "random" || randomB.profile === "random") {
+  throw new Error("Random profile should resolve to a concrete profile.");
+}
+if (randomA.profile === randomB.profile) {
+  throw new Error("Consecutive random profile starts should avoid repeating the same concrete profile.");
+}
 
 let snapshot = debug.start("paper", "standard", 1111);
 if (snapshot.currentSceneId !== "paper_intro") throw new Error("Paper profile should start from its own intro scene.");

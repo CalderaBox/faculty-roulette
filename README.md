@@ -8,11 +8,12 @@ Playable zero-dependency prototype.
 
 ## Features
 
-- Five faculty archetypes
+- Five faculty archetypes, plus a random default profile for fresh no-change runs
 - Three universe intensity modes
 - Daily seed and random seed runs
 - Profile-specific opening scenes instead of one shared fixed script
 - A larger branching scene pool where previous choices change which scenes can appear next
+- 44 weird-tale scenes and 132 choice entries across profile, flag, and route-dependent branches
 - The same choice can produce different creepy aftermath variants under different seeds
 - Every choice now gets a shorter tone-bound aftermath beat for cleaner story flow without cross-scene stitching
 - Longer story runs with scene-by-scene progression on every choice

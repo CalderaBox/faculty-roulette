@@ -40,7 +40,11 @@ const profiles = {
   stealth: { paper: 44, grant: 42, teaching: 48, service: 30, health: 78, luck: 60 }
 };
 
+const profileKeys = Object.keys(profiles);
+let lastRandomProfile = null;
+
 const profileNotes = {
+  random: "每次开局自动抽取一份角色档案。不改也会换命运，像学院把抽签箱偷偷接进了人事系统。",
   balanced: "你习惯把所有事情整理进可解释的表格里，所以学院格外喜欢把不可解释的东西送到你这里归档。",
   paper: "你看见走廊都像投稿系统的快捷入口，因此很多怪谈也会顺着引用链来拜访你。",
   grant: "你能从预算表里闻出焦味。问题是，预算表有时也会先闻到你。",
@@ -2535,6 +2539,488 @@ const scenePool = [
         ]
       }
     ]
+  },
+  {
+    id: "calendar_hydra",
+    minTurn: 2,
+    maxTurn: 6,
+    weight: 1.15,
+    title: "自己约会的日历",
+    tag: "共享日历",
+    risk: "中",
+    text: "你的日历在凌晨两点给自己发了邀请，主题是“把下周三借给周二”。地点写着：会议室 A，或任何看起来愿意被占用的时间。",
+    choices: [
+      {
+        text: "接受邀请，看看周二究竟想从周三借走什么",
+        delta: { service: 1, luck: -1 },
+        flags: ["calendar_bloom", "service_more"],
+        tones: ["service", "follow"],
+        next: ["copied_minutes", "sealed_seminar"],
+        aftermaths: [
+          "你点了接受，日历立刻把午饭改名为协调窗口。",
+          "周三安静地少了一小时，像有人从时间里撕走一张便利贴。"
+        ],
+        logs: ["log: calendar accepted self-issued invitation"]
+      },
+      {
+        text: "拒绝邀请，并在备注里写：时间也需要伦理审批",
+        delta: { health: 2, service: -1 },
+        flags: ["question_system", "ethics_tick"],
+        tones: ["question", "health"],
+        next: ["ethics_potted_plant", "office_404"],
+        aftermaths: [
+          "拒绝按钮变灰后，备注栏长出一枚很小的审批章。",
+          "日历没有生气，只把你的睡眠标成“待论证资源”。"
+        ],
+        logs: ["log: calendar refusal rerouted through ethics note"]
+      },
+      {
+        text: "把那场会拖到星期零，给现实留一点缓冲",
+        delta: { luck: 1, paper: -1 },
+        flags: ["hide", "void_pages"],
+        tones: ["hide", "official"],
+        next: ["blank_id_card", "duplicate_you"],
+        aftermaths: [
+          "星期零没有出现在日历上，却先占用了你的提醒音。",
+          "系统同意了延期，只是把延期原因写成“用户存在感不足”。"
+        ],
+        logs: ["log: zero weekday created provisional buffer"]
+      }
+    ]
+  },
+  {
+    id: "ai_reviewer_room",
+    minTurn: 2,
+    maxTurn: 8,
+    weight: 1.1,
+    profiles: ["paper", "balanced", "grant"],
+    title: "会引用你草稿的 AI 评审",
+    tag: "预印本后台",
+    risk: "中",
+    text: "一个评审助手把你还没写完的草稿引用了三次，语气特别客气。它还建议你阅读自己明天上午才会想到的那段文献综述。",
+    choices: [
+      {
+        text: "让它继续评，看看它到底从哪份未来草稿里学会了你",
+        delta: { paper: 2, health: -1 },
+        flags: ["ai_coauthor", "future_mail"],
+        tones: ["paper", "follow"],
+        next: ["reviewer_from_tomorrow", "midnight_revision"],
+        aftermaths: [
+          "助手给出小修，理由是你的未来表达比现在更谦虚。",
+          "它把参考文献排得很整齐，连你还没犯的错都标了页码。"
+        ],
+        logs: ["log: ai reviewer cited unwritten draft"]
+      },
+      {
+        text: "把聊天记录截图存档，标题写得像事故报告",
+        delta: { service: 1, luck: 1 },
+        flags: ["archive", "question_system"],
+        tones: ["official", "question"],
+        next: ["archive_manual", "ethics_desk"],
+        aftermaths: [
+          "截图保存后，文件名自动补上“供本人否认时使用”。",
+          "后台很快弹出提示：感谢你帮助模型完善惊吓能力。"
+        ],
+        logs: ["log: ai review transcript archived"]
+      },
+      {
+        text: "关掉窗口，改用最古老的办法：盯着空白页心虚",
+        delta: { health: 1, paper: -1 },
+        flags: ["hide", "burnout"],
+        tones: ["hide", "health"],
+        next: ["hallway_kettle", "office_404"],
+        aftermaths: [
+          "空白页没有催你，却在页眉留下一行“我也看过那份评审”。",
+          "你赢回了十分钟人类尊严，代价是文档开始自己保存。"
+        ],
+        logs: ["log: ai window closed, blank page retained witness"]
+      }
+    ]
+  },
+  {
+    id: "library_return_oracle",
+    minTurn: 3,
+    maxTurn: 7,
+    weight: 1.05,
+    title: "替你归还未来书籍的还书箱",
+    tag: "图书馆",
+    risk: "低",
+    text: "还书箱吐出一张小票，显示你已经归还《青年教师如何体面消失》第四版。问题是这本书明天才会被你借走。",
+    choices: [
+      {
+        text: "照着小票去找那本书，先把消失方法学会再说",
+        delta: { luck: 1, health: 1 },
+        flags: ["hide", "future_mail"],
+        tones: ["follow", "hide"],
+        next: ["corridor_nameplate", "duplicate_you"],
+        aftermaths: [
+          "书架空着，索书号却在你手机里轻轻震动。",
+          "借阅记录多出一行：读者已理解，请勿过度实践。"
+        ],
+        logs: ["log: future return slip followed"]
+      },
+      {
+        text: "把小票交给馆员，问图书馆是否开始经营时间差",
+        delta: { service: 1, luck: -1 },
+        flags: ["question_system", "library_due"],
+        tones: ["question", "official"],
+        next: ["ethics_potted_plant", "campus_map"],
+        aftermaths: [
+          "馆员看完小票，熟练地拿出一枚写着“暂不外借”的印章。",
+          "还书箱咳了一声，像有人在金属里面憋笑。"
+        ],
+        logs: ["log: library temporal circulation questioned"]
+      },
+      {
+        text: "假装没看见，毕竟按时还书已经算一种奇迹",
+        delta: { health: 2, paper: -1 },
+        flags: ["health_patch", "hide"],
+        tones: ["health", "hide"],
+        next: ["hallway_kettle", "printer_queue"],
+        aftermaths: [
+          "小票自己折成书签，夹进你包里最薄的那本会议手册。",
+          "你路过闸机时，机器温柔地显示：逃避续借成功。"
+        ],
+        logs: ["log: future slip ignored but retained"]
+      }
+    ]
+  },
+  {
+    id: "alumni_mask_ball",
+    minTurn: 4,
+    maxTurn: 10,
+    weight: 1.05,
+    title: "校友会借走你的脸",
+    tag: "筹款酒会",
+    risk: "中",
+    text: "校友会宣传片里出现了你，正站在一排香槟旁边讲科研改变人生。你确定那天自己在办公室吃冷掉的盒饭，而且嘴角没有那么自信。",
+    choices: [
+      {
+        text: "顺势认领这段发言，看看自信能不能倒灌回本人",
+        delta: { grant: 2, service: 1, health: -1 },
+        flags: ["alumni_mask", "grant_chase"],
+        tones: ["grant", "official"],
+        next: ["donor_dinner", "funding_oracle"],
+        aftermaths: [
+          "你刚点头，宣传片里的你也点了一下头，幅度更专业。",
+          "发展办很高兴，说你的镜头感已经具备可持续筹款潜力。"
+        ],
+        logs: ["log: alumni mask acknowledged by user"]
+      },
+      {
+        text: "要求撤下镜头，理由是本人尚未授权被做成好消息",
+        delta: { health: 1, service: -1 },
+        flags: ["question_system", "hide"],
+        tones: ["question", "hide"],
+        next: ["dean_smile", "retirement_party"],
+        aftermaths: [
+          "对方答应撤下本人，只留下那个更适合筹款的笑容。",
+          "邮件回复很快：感谢你对学院形象的阶段性贡献。"
+        ],
+        logs: ["log: promotional face partially removed"]
+      },
+      {
+        text: "把视频发给学生，问他们这算不算另一种替课",
+        delta: { teaching: 1, luck: 1 },
+        flags: ["teaching_mask", "student_care"],
+        tones: ["teaching", "care"],
+        next: ["silent_lecture", "student_feedback"],
+        aftermaths: [
+          "学生回复：老师这个版本语速稳定，可以考虑录播常驻。",
+          "视频里的你轻轻清嗓，像准备开始点名。"
+        ],
+        logs: ["log: alumni video repurposed as teaching artifact"]
+      }
+    ]
+  },
+  {
+    id: "lab_fridge_committee",
+    minTurn: 3,
+    maxTurn: 9,
+    weight: 1.15,
+    title: "冰箱里的学术委员会",
+    tag: "实验室",
+    risk: "中",
+    text: "实验室冰箱第三层传来很小的掌声。你拉开门，看见几支试剂围坐成半圆，正在审议你的项目可行性，主席是一盒过期很久的抗体。",
+    choices: [
+      {
+        text: "向试剂委员会陈述研究意义，尽量别让冷气泄露太多",
+        delta: { paper: 1, grant: 1, health: -1 },
+        flags: ["fridge_oracle", "paper_push"],
+        tones: ["paper", "grant"],
+        next: ["phantom_lab", "forgotten_dataset"],
+        aftermaths: [
+          "抗体主席给出原则同意，但要求你补充低温条件下的初心。",
+          "冰箱门关上后，里面传来整齐的“建议大修”。"
+        ],
+        logs: ["log: reagent committee heard project defense"]
+      },
+      {
+        text: "把会议纪要贴在冰箱门上，至少让它们承担服务工作",
+        delta: { service: 2, luck: -1 },
+        flags: ["service_more", "fridge_minutes"],
+        tones: ["service", "official"],
+        next: ["committee_pearl", "basement_minutes"],
+        aftermaths: [
+          "纪要贴上后，磁吸条自动排成一行：请按温度落实责任。",
+          "第二天有人在冰箱前签到，字迹像冻硬的蚯蚓。"
+        ],
+        logs: ["log: fridge committee assigned service labor"]
+      },
+      {
+        text: "关门并给它们调高一度，学术讨论也要注意保暖",
+        delta: { health: 2, teaching: 1 },
+        flags: ["care", "health_patch"],
+        tones: ["care", "health"],
+        next: ["office_plant_union", "hallway_kettle"],
+        aftermaths: [
+          "冰箱安静下来，显示屏闪出一句：感谢人道主义温控。",
+          "那盒抗体后来给你寄来一封很冷但很礼貌的致谢信。"
+        ],
+        logs: ["log: reagent committee stabilized by humane temperature"]
+      }
+    ]
+  },
+  {
+    id: "ethics_potted_plant",
+    minTurn: 5,
+    maxTurn: 11,
+    weight: 1.05,
+    requiredAnyFlags: ["question_system", "ethics_tick", "student_care", "care"],
+    title: "只给绿植签字的伦理表",
+    tag: "伦理窗口",
+    risk: "中",
+    text: "伦理系统拒绝了你的申请，却批准了你办公室那盆绿萝作为共同研究者。理由是它在整个项目里表现出持续沉默，风险明显更低。",
+    choices: [
+      {
+        text: "让绿萝当共同 PI，反正它的会议出勤率确实更稳定",
+        delta: { grant: 1, health: 1, service: -1 },
+        flags: ["ethics_vine", "care"],
+        tones: ["care", "official"],
+        next: ["office_plant_union", "annual_report_mirror"],
+        aftermaths: [
+          "绿萝没有反对，只把一根藤伸向经费预算栏。",
+          "系统提示：植物负责人已阅读并同意所有人类麻烦。"
+        ],
+        logs: ["log: pothos approved as project co-pi"]
+      },
+      {
+        text: "申诉：沉默不等于知情，尤其是盆栽沉默",
+        delta: { service: 1, luck: -1 },
+        flags: ["question_system", "ethics_tick"],
+        tones: ["question", "service"],
+        next: ["ethics_desk", "copied_minutes"],
+        aftermaths: [
+          "申诉被认真受理，并转交给园艺后勤会签。",
+          "绿萝叶片微微发亮，像已经提前读过你的申诉。"
+        ],
+        logs: ["log: plant consent appealed to horticultural office"]
+      },
+      {
+        text: "把绿萝搬到窗边，让它先看看外面的真实世界",
+        delta: { health: 2, luck: 1 },
+        flags: ["health_patch", "hide"],
+        tones: ["health", "hide"],
+        next: ["campus_map", "corridor_nameplate"],
+        aftermaths: [
+          "阳光照到叶子上，伦理系统短暂显示“样本心情改善”。",
+          "你第一次觉得项目里至少有一位成员真的在生长。"
+        ],
+        logs: ["log: plant coauthor relocated for wellbeing"]
+      }
+    ]
+  },
+  {
+    id: "conference_badge_swarm",
+    minTurn: 5,
+    maxTurn: 12,
+    weight: 1.1,
+    title: "胸牌开始繁殖的会议",
+    tag: "会议酒店",
+    risk: "高",
+    text: "签到台给了你一张胸牌。你刚别上，口袋里又响起塑料摩擦声：第二张、第三张、第四张，全都写着你的名字，但单位一栏各不相同。",
+    choices: [
+      {
+        text: "把所有胸牌都戴上，看看哪个单位先替你发言",
+        delta: { paper: 1, service: 2, health: -2 },
+        flags: ["badge_swarm", "service_more"],
+        tones: ["service", "official"],
+        next: ["sealed_seminar", "copied_minutes"],
+        aftermaths: [
+          "你走进会场时，门禁为每一张胸牌各响了一次欢迎。",
+          "主持人看着你胸前那串身份，礼貌地问哪位先报告。"
+        ],
+        logs: ["log: badge swarm entered parallel affiliation mode"]
+      },
+      {
+        text: "只留最不像自己的那张，做一次低风险身份实验",
+        delta: { luck: 2, health: -1 },
+        flags: ["hide", "duplicate_you"],
+        tones: ["hide", "follow"],
+        next: ["duplicate_you", "retirement_party"],
+        aftermaths: [
+          "那张胸牌很快适应了你，甚至开始替你避开熟人。",
+          "午餐券上印着一个陌生学院，但菜还是熟悉地难吃。"
+        ],
+        logs: ["log: alternate badge accepted user posture"]
+      },
+      {
+        text: "把胸牌排成投稿顺序，给混乱一点学术礼貌",
+        delta: { paper: 2, luck: -1 },
+        flags: ["paper_push", "question_system"],
+        tones: ["paper", "question"],
+        next: ["citation_moths", "reviewer_from_tomorrow"],
+        aftermaths: [
+          "胸牌自动生成通讯作者脚注，星号多得像一小片雪。",
+          "系统把你识别为“多单位联合焦虑体”。"
+        ],
+        logs: ["log: badge order converted to authorship order"]
+      }
+    ]
+  },
+  {
+    id: "ppt_oracle",
+    minTurn: 4,
+    maxTurn: 10,
+    weight: 1.05,
+    title: "会自己美化痛苦的 PPT",
+    tag: "汇报排练",
+    risk: "中",
+    text: "你打开汇报文件，发现 PPT 自动把所有失败实验改成了“阶段性发现”。动画效果很丝滑，丝滑到像在替痛苦做公关。",
+    choices: [
+      {
+        text: "保留美化效果，看看体面能不能先跑赢事实",
+        delta: { grant: 1, service: 1, health: -1 },
+        flags: ["ppt_oracle", "official"],
+        tones: ["official", "grant"],
+        next: ["dean_smile", "funding_oracle"],
+        aftermaths: [
+          "封面自动加上“稳中向好”，字体端正得像已经评审通过。",
+          "你讲到失败时，幻灯片替你切到掌声页。"
+        ],
+        logs: ["log: ppt beautified adverse findings"]
+      },
+      {
+        text: "把失败改回失败，给它一点难得的诚实",
+        delta: { paper: 1, health: 1, luck: -1 },
+        flags: ["question_system", "paper_push"],
+        tones: ["question", "paper"],
+        next: ["midnight_revision", "phantom_lab"],
+        aftermaths: [
+          "PPT 沉默了三秒，然后把标题改成“暂未商业化的真相”。",
+          "你第一次看见模板露出疲惫的底色。"
+        ],
+        logs: ["log: presentation restored failure label"]
+      },
+      {
+        text: "让它继续自动播放，你只负责在旁边点头",
+        delta: { service: 2, health: -2 },
+        flags: ["burnout", "service_more"],
+        tones: ["service", "health"],
+        next: ["retirement_party", "annual_report_mirror"],
+        aftermaths: [
+          "PPT 播完后自己回答了三个问题，态度比你稳定。",
+          "会议室灯光变暖，像在奖励一份合格的替身劳动。"
+        ],
+        logs: ["log: autopresenting slide deck handled questions"]
+      }
+    ]
+  },
+  {
+    id: "office_plant_union",
+    minTurn: 6,
+    maxTurn: 13,
+    weight: 1.05,
+    title: "办公室植物成立工会",
+    tag: "窗台",
+    risk: "低",
+    text: "你的绿萝、仙人掌和那盆一直不知名的草在窗台上排成半圆，要求改善光照、减少加班旁听，并明确反对被写进“温馨办公环境”照片。",
+    choices: [
+      {
+        text: "认真记录诉求，给植物们安排一次非正式座谈",
+        delta: { health: 2, service: 1 },
+        flags: ["plant_union", "care"],
+        tones: ["care", "service"],
+        next: ["ethics_potted_plant", "hallway_kettle"],
+        aftermaths: [
+          "仙人掌负责纪律，绿萝负责延伸议题，草负责沉默施压。",
+          "座谈结束后，窗台第一次像个真正的会议室。"
+        ],
+        logs: ["log: office plants held informal consultation"]
+      },
+      {
+        text: "把它们搬去院办门口，让诉求直接面对阳光和流程",
+        delta: { service: -1, luck: 1 },
+        flags: ["official", "hide"],
+        tones: ["official", "hide"],
+        next: ["corridor_nameplate", "dean_smile"],
+        aftermaths: [
+          "院办很快把植物归入公共文化建设，诉求也被归入绿化成果。",
+          "绿萝看起来没有赢，但藤蔓悄悄爬上了意见箱。"
+        ],
+        logs: ["log: plant demands routed to office culture"]
+      },
+      {
+        text: "和它们一起罢工十分钟，假装自己也需要浇水",
+        delta: { health: 3, paper: -1 },
+        flags: ["health_patch", "plant_union"],
+        tones: ["health", "care"],
+        next: ["printer_queue", "campus_map"],
+        aftermaths: [
+          "十分钟里没有人找你，只有土壤发出非常轻的赞同声。",
+          "你的日程表把这段时间标为“低碳协商”。"
+        ],
+        logs: ["log: user joined plant work stoppage"]
+      }
+    ]
+  },
+  {
+    id: "annual_report_mirror",
+    minTurn: 7,
+    maxTurn: 15,
+    weight: 1.2,
+    title: "年终总结里的陌生代表作",
+    tag: "年终系统",
+    risk: "高",
+    text: "年终系统替你生成了一项代表作，题目很漂亮，摘要很成熟，甚至已经有人引用。唯一的问题是你从没写过它，读起来却像你最想假装写过的那种。",
+    choices: [
+      {
+        text: "接受这项代表作，毕竟它比你更懂年终总结",
+        delta: { paper: 2, luck: -2 },
+        flags: ["report_mirror", "paper_push"],
+        tones: ["paper", "official"],
+        next: ["citation_moths", "duplicate_you"],
+        aftermaths: [
+          "系统满意地保存了版本，代表作在屏幕里轻轻舒展了一下。",
+          "你突然收到一封祝贺邮件，措辞像从论文致谢里拆出来的。"
+        ],
+        logs: ["log: annual report accepted phantom flagship work"]
+      },
+      {
+        text: "删掉它，哪怕今年只剩下一些朴素的狼狈",
+        delta: { health: 2, paper: -1 },
+        flags: ["health_patch", "question_system"],
+        tones: ["health", "question"],
+        next: ["hallway_kettle", "retirement_party"],
+        aftermaths: [
+          "删除按钮问你是否确定放弃更体面的自己。",
+          "你点了确定，屏幕暗了一下，像有人终于闭眼。"
+        ],
+        logs: ["log: phantom flagship removed from annual report"]
+      },
+      {
+        text: "把它改成“正在生成”，让未来先别把话说死",
+        delta: { grant: 1, luck: 1 },
+        flags: ["future_mail", "grant_chase"],
+        tones: ["grant", "follow"],
+        next: ["funding_oracle", "forgotten_dataset"],
+        aftermaths: [
+          "系统接受了“正在生成”，并把它评为一种潜力成果。",
+          "未来松了一口气，顺手给你寄来三条补充材料。"
+        ],
+        logs: ["log: annual report deferred phantom work into potential output"]
+      }
+    ]
   }
 ];
 
@@ -2641,6 +3127,17 @@ function updateSeedLabel() {
 
 function pick(list) {
   return list[Math.floor(seededRandom() * list.length)];
+}
+
+function pickRandomProfile() {
+  const pool = profileKeys.filter((profile) => profile !== lastRandomProfile);
+  const next = pool[Math.floor(Math.random() * pool.length)] || profileKeys[0];
+  lastRandomProfile = next;
+  return next;
+}
+
+function resolveProfile(profileValue) {
+  return profiles[profileValue] ? profileValue : pickRandomProfile();
 }
 
 function addDelta(target, delta) {
@@ -2910,7 +3407,8 @@ function nextMood() {
 }
 
 function startGame(profileOverride, modeOverride) {
-  state.profile = profileOverride || elements.profile?.value || "balanced";
+  const requestedProfile = profileOverride || elements.profile?.value || "random";
+  state.profile = resolveProfile(requestedProfile);
   state.mode = modeOverride || elements.mode?.value || "standard";
   state.turn = 1;
   state.maxTurns = modeSettings[state.mode].turns;
@@ -2937,6 +3435,7 @@ function startGame(profileOverride, modeOverride) {
 
   state.queue.push(introSceneByProfile[state.profile]);
   nextMood();
+  updateProfileNote();
   drawEvent();
 }
 
@@ -3293,7 +3792,13 @@ function render() {
 
 function updateProfileNote() {
   if (!elements.profileNote) return;
-  const profile = elements.profile?.value || "balanced";
+  const profile = elements.profile?.value || "random";
+  if (profile === "random") {
+    elements.profileNote.textContent = state.started
+      ? `本局抽中：${profileLabels[state.profile]}。${profileNotes[state.profile]}`
+      : profileNotes.random;
+    return;
+  }
   elements.profileNote.textContent = profileNotes[profile];
 }
 
@@ -3428,6 +3933,16 @@ function endingDossierReport() {
   };
 }
 
+function contentReport() {
+  const sceneIds = scenePool.map((scene) => scene.id);
+  return {
+    sceneCount: scenePool.length,
+    choiceCount: scenePool.reduce((sum, scene) => sum + (scene.choices || []).length, 0),
+    uniqueSceneIds: new Set(sceneIds).size,
+    randomProfileEnabled: Boolean(profileNotes.random)
+  };
+}
+
 if (elements.profile) {
   elements.profile.addEventListener("change", updateProfileNote);
 }
@@ -3477,6 +3992,9 @@ root.__facultyRouletteDebug = {
   },
   getEndingDossierReport() {
     return endingDossierReport();
+  },
+  getContentReport() {
+    return contentReport();
   },
   getState() {
     return snapshot();
