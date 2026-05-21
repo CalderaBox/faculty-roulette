@@ -194,6 +194,60 @@ const aftermathTwistsByTone = {
   ]
 };
 
+const aftermathDeepenersByTone = {
+  paper: [
+    ({ sceneTitle }) => `更怪的是，第二天数据库把《${sceneTitle}》拆成了三篇互相引用的预印本，摘要都写得很谦虚，像一群提前排队等你背锅的影子。你删掉其中一篇，另外两篇的致谢里立刻多出你的名字。`,
+    ({ action }) => `当晚，审稿系统给“${action}”分配了两位评审，一位建议小修，另一位建议把作者本人作为补充材料上传。你点开意见附件，里面只有一张空白页，页眉却已经写好“作者回应非常充分”。`
+  ],
+  grant: [
+    ({ sceneTitle }) => `最意外的是，《${sceneTitle}》被自动归入“前期基础良好”的证明材料。财务老师看完沉默片刻，说这类怪事不能报销，但如果换成“不可预期学术环境扰动”，也许能走差旅。`,
+    ({ action }) => `你以为“${action}”只是一个动作，预算系统却把它识别成一条支出路径。三分钟后，表格自己长出配套经费、绩效目标和验收方式，只差把你也折进附件三。`
+  ],
+  teaching: [
+    ({ sceneTitle }) => `后来《${sceneTitle}》被学生整理成课堂笔记，标题叫“老师如何演示制度性灵异”。最吓人的是，笔记最后附了课后习题，第一题要求学生推导你下一次会在哪个办公室被点名。`,
+    ({ action }) => `“${action}”很快传到课程群里，变成一个看似温和的学习方法。到了晚上，群公告自动改成你的口吻，提醒大家明天带上教材、雨伞和一份尚未发生的证明。`
+  ],
+  service: [
+    ({ sceneTag }) => `过了两小时，${sceneTag}把这件事升级成“可持续协同机制”。机制启动后，所有人都少做了一点事，唯独你的日历多出一块灰色区域，备注是：由默认热心人自然消化。`,
+    ({ action }) => `你做完“${action}”以后，会议纪要没有结束，而是开始向前补写会议开端。它补得很认真，甚至替你安排了一段你没说过、但大家听起来都很放心的开场白。`
+  ],
+  health: [
+    ({ action }) => `你原本以为“${action}”能把自己从系统里轻轻取出来一会儿，结果健康打卡把这段时间标成“高质量沉默”。第二天，学院建议推广你的恢复经验，题目叫《如何在不休息的情况下表现出休息》。`,
+    ({ sceneTitle }) => `《${sceneTitle}》结束后，你的手环把心率曲线画成一栋楼的剖面图。最高的那一层没有房间，只有一张工位和一杯还热着的水，像身体提前替你去了某个不该去的地方。`
+  ],
+  hide: [
+    ({ action }) => `你以为“${action}”能让自己消失，没想到消失也需要备案。晚上系统发来确认邮件：你的缺席已被充分看见，并将作为一种低调贡献纳入后续评价。`,
+    ({ sceneTitle }) => `《${sceneTitle}》之后，楼里的摄像头学会只拍你的空位。空位越来越上镜，甚至在宣传片里露了一秒，字幕写着“青年教师主动融入学院氛围”。`
+  ],
+  official: [
+    ({ sceneTitle }) => `最妙的是，《${sceneTitle}》的正式版本比现场更像现场。它删掉了所有犹豫、停顿和尴尬，只留下一个非常适合被转发的你，端正得像刚从模板里走出来。`,
+    ({ action }) => `“${action}”被归档后，文件开始反过来指导现实。第二天所有人都按照文件里的顺序行动，只有你还记得原本不是这样，于是你看起来最不像当事人。`
+  ],
+  question: [
+    ({ action }) => `你问完“${action}”后，空气像被按下了保存。随后每个人都收到一份调查问卷，题目是“你是否愿意承认自己听见过这个问题”，选项只有“愿意”和“稍后愿意”。`,
+    ({ sceneTitle }) => `《${sceneTitle}》的答案没有出现，出现的是一个更整洁的问题。它穿着学院通知的格式，礼貌地站在你邮箱门口，像在等你先承认它比答案更适合发表。`
+  ],
+  follow: [
+    ({ action }) => `你顺着“${action}”继续追，追到最后发现线索不是通向真相，而是通向一个已经替你写好结论的文件夹。文件夹名很客气：供本人发现时使用。`,
+    ({ sceneTag }) => `${sceneTag}的回声开始变得有礼貌，每隔几步就停下来等你。等到第三次，它忽然问你为什么一直跟着它，语气像一位被学生追问到办公室门口的老师。`
+  ],
+  care: [
+    ({ action }) => `“${action}”里那点善意很快被系统闻到了。它没有感谢你，只是把善意拆成流程、经验和可复制案例，最后温柔地通知你：这项能力很适合长期承担。`,
+    ({ sceneTitle }) => `《${sceneTitle}》后来在学生之间变成一个小传说：据说只要在走廊尽头念出你的名字，就会出现一封措辞周全的安慰邮件。问题是，那些邮件的落款时间都比求助早一天。`
+  ]
+};
+
+const aftermathEchoes = [
+  ({ sceneTitle }) => `后来，${sceneTitle}被走廊复述成另一个版本：你明明没有到场，却在每个版本里都负责按下最后一个确认键。`,
+  ({ action }) => `午夜时，电脑又弹出一条撤回提示，撤回对象不是文件，而是你对“${action}”仍然属于自己的理解。`,
+  ({ sceneTag }) => `再过几天，${sceneTag}的门牌下面多了一行很小的字：本处所有偶然均已通过流程确认，请勿擅自醒来。`,
+  ({ profile }) => `你把这事讲给另一位${profile}听，对方只点点头，说他上周也经历过，只是轮到他的版本里你是旁白。`,
+  ({ sceneTitle, action }) => `最后，${sceneTitle}在档案系统里生成了一个新附件，标题平平无奇：关于“${action}”曾短暂像个人选择的情况说明。`,
+  ({ sceneTag }) => `第二天清晨，${sceneTag}的打印机吐出一页空白纸，页脚却写着：本页已充分表达，建议不要继续追问。`,
+  ({ action }) => `更麻烦的是，“${action}”从此学会自己出现在会议纪要里，每次都比你本人提前十分钟入席。`,
+  ({ sceneTitle }) => `你以为这只是${sceneTitle}的一次尾声，结果保洁阿姨从桌底扫出半张日程表，上面排满了你尚未经历的善后。`
+];
+
 const endingFamilies = [
   {
     name: "镜面评审走廊",
@@ -2775,6 +2829,24 @@ function buildAftermathContext(choice, scene = state.current) {
   };
 }
 
+function pickAftermathDeepener(choice, context, index) {
+  const tones = choice.tones?.length ? choice.tones : ["official"];
+  const tone = tones[index % tones.length] || "official";
+  const templates = aftermathDeepenersByTone[tone] || aftermathDeepenersByTone.official;
+  return templates[index % templates.length](context);
+}
+
+function pickAftermathEcho(context, index) {
+  return aftermathEchoes[index % aftermathEchoes.length](context);
+}
+
+function deepenAftermath(baseText, choice, context, index) {
+  const base = cleanSentence(baseText);
+  const deepener = pickAftermathDeepener(choice, context, index);
+  const echo = pickAftermathEcho(context, index);
+  return `${base}。${deepener}${echo}`;
+}
+
 function buildAftermathPool(choice, scene = state.current) {
   const pool = [...(choice.aftermaths || [])];
   const context = buildAftermathContext(choice, scene);
@@ -2793,7 +2865,9 @@ function buildAftermathPool(choice, scene = state.current) {
     );
   }
 
-  return [...new Set(pool)].filter(Boolean);
+  return [...new Set(pool)]
+    .filter(Boolean)
+    .map((item, index) => deepenAftermath(item, choice, context, index));
 }
 
 function applyChoice(index) {
@@ -3089,11 +3163,13 @@ function aftermathPoolReport() {
   const items = [];
   for (const scene of scenePool) {
     for (const choice of scene.choices || []) {
+      const pool = buildAftermathPool(choice, scene);
       items.push({
         sceneId: scene.id,
         title: scene.title,
         choiceText: choice.text,
-        count: buildAftermathPool(choice, scene).length
+        count: pool.length,
+        minChars: Math.min(...pool.map((item) => item.length))
       });
     }
   }
@@ -3102,7 +3178,9 @@ function aftermathPoolReport() {
     totalChoices: items.length,
     min: Math.min(...items.map((item) => item.count)),
     max: Math.max(...items.map((item) => item.count)),
-    underFour: items.filter((item) => item.count < 4)
+    minChars: Math.min(...items.map((item) => item.minChars)),
+    underFour: items.filter((item) => item.count < 4),
+    shortAftermaths: items.filter((item) => item.minChars < 120)
   };
 }
 

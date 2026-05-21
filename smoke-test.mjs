@@ -144,6 +144,8 @@ const aftermathReport = debug.getAftermathPoolReport();
 if (aftermathReport.totalChoices < 100) throw new Error("Aftermath pool report is missing choices.");
 if (aftermathReport.min < 5) throw new Error("Every choice should expose several bound aftermath variants.");
 if (aftermathReport.underFour.length) throw new Error("Some choices have too few bound aftermath variants.");
+if (aftermathReport.minChars < 120) throw new Error("Every aftermath variant should read as a fuller creepy story beat.");
+if (aftermathReport.shortAftermaths.length) throw new Error("Some choices still have too-short aftermath variants.");
 
 let snapshot = debug.start("paper", "standard", 1111);
 if (snapshot.currentSceneId !== "paper_intro") throw new Error("Paper profile should start from its own intro scene.");

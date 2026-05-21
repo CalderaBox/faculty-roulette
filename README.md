@@ -14,7 +14,7 @@ Playable zero-dependency prototype.
 - Profile-specific opening scenes instead of one shared fixed script
 - A larger branching scene pool where previous choices change which scenes can appear next
 - The same choice can produce different creepy aftermath variants under different seeds
-- Every choice now gets an expanded tone-bound aftermath pool for bigger twists without cross-scene stitching
+- Every choice now gets expanded into a longer tone-bound micro-story for bigger twists without cross-scene stitching
 - Longer story runs with scene-by-scene progression on every choice
 - Richer aftermath prose adapted from the earlier haunted-academia version
 - Choices now pause on a prominent aftermath passage before the next scene appears
