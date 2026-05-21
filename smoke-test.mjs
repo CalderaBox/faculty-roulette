@@ -32,6 +32,10 @@ class FakeElement {
     return node;
   }
 
+  querySelectorAll() {
+    return [];
+  }
+
   select() {
     this.selected = true;
   }
@@ -53,7 +57,9 @@ const ids = [
   "status",
   "mood",
   "combo",
+  "actionsLeft",
   "stats",
+  "projectBoard",
   "wheel",
   "eventTag",
   "eventRisk",
@@ -119,6 +125,7 @@ if (elements.get("status").textContent !== "结局生成") throw new Error("Game
 if (!elements.get("shareText").value.includes("青椒轮盘")) throw new Error("Share text is incomplete.");
 if (!/stat/.test(elements.get("stats").innerHTML)) throw new Error("Stats did not render.");
 if (!/S6/.test(elements.get("trajectory").innerHTML)) throw new Error("Trajectory did not render.");
+if (!/project-card/.test(elements.get("projectBoard").innerHTML)) throw new Error("Project board did not render.");
 if (!/chip/.test(elements.get("achievements").innerHTML)) throw new Error("Achievements did not render.");
 if (!/S1/.test(elements.get("timeline").innerHTML)) throw new Error("Timeline did not render.");
 if (!/myth/.test(elements.get("bestiary").innerHTML)) throw new Error("Bestiary did not render.");

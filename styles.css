@@ -358,7 +358,7 @@ select {
 
 .board-head {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -422,6 +422,76 @@ select {
     linear-gradient(145deg, rgba(105, 217, 143, .12), transparent 42%),
     linear-gradient(315deg, rgba(242, 193, 93, .08), transparent 36%),
     #11161b;
+}
+
+.strategy-panel {
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid rgba(246, 241, 232, .1);
+  border-radius: 10px;
+  background:
+    linear-gradient(135deg, rgba(122, 184, 255, .09), transparent 38%),
+    #11161b;
+}
+
+.strategy-copy {
+  max-width: 800px;
+  margin: 0 0 14px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.project-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.project-card {
+  min-height: 178px;
+  display: grid;
+  gap: 10px;
+  padding: 13px;
+  border: 1px solid rgba(246, 241, 232, .12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .035);
+}
+
+.project-card.complete {
+  border-color: rgba(105, 217, 143, .45);
+  background: rgba(105, 217, 143, .08);
+}
+
+.project-card h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.project-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.project-card button {
+  width: 100%;
+  margin: 0;
+}
+
+.progress {
+  height: 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #2b3139;
+}
+
+.progress i {
+  display: block;
+  height: 100%;
+  width: var(--value);
+  border-radius: inherit;
+  background: var(--blue);
 }
 
 .event-meta {
@@ -719,7 +789,8 @@ textarea {
   .board-head,
   .stats,
   .after-panel,
-  .dossier-grid {
+  .dossier-grid,
+  .project-board {
     grid-template-columns: 1fr;
   }
 

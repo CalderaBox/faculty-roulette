@@ -24,6 +24,12 @@ const profileNotes = {
   stealth: "你擅长不出现在不该出现的会议里。健康和运气较好，但声望成长更慢。"
 };
 
+const actionBudget = {
+  standard: 3,
+  publish: 2,
+  humane: 4
+};
+
 const profiles = {
   balanced: { paper: 50, grant: 46, teaching: 52, service: 42, health: 72, luck: 50 },
   paper: { paper: 68, grant: 36, teaching: 42, service: 35, health: 58, luck: 48 },
@@ -110,6 +116,49 @@ const bestiary = [
   { id: "deadline-comet", name: "截止彗星", hint: "高波动事件后现身", test: (s) => s.history.some((item) => item.swing >= 24) },
   { id: "lucky-stamp", name: "幸运盖章机", hint: "运气很高后现身", test: (s) => s.stats.luck >= 78 },
   { id: "normal-human", name: "正常人目击报告", hint: "健康结局后现身", test: (s) => s.finished && s.stats.health >= 70 }
+];
+
+const projectTemplates = [
+  {
+    id: "paper",
+    name: "代表作手稿",
+    desc: "把散落的想法压缩成一篇能投稿的东西。",
+    target: 9,
+    perAction: 3,
+    delta: { paper: 5, health: -2 },
+    complete: { paper: 16, luck: 4 },
+    completeText: "代表作形成了清晰轮廓，审稿人暂时还没有发现你。"
+  },
+  {
+    id: "grant",
+    name: "基金叙事线",
+    desc: "让一个尚未稳定的想法看起来像五年规划。",
+    target: 8,
+    perAction: 2,
+    delta: { grant: 5, service: 1, health: -1 },
+    complete: { grant: 18, service: 4 },
+    completeText: "你的基金故事终于从“想做”变成了“似乎必须做”。"
+  },
+  {
+    id: "teaching",
+    name: "课程重构",
+    desc: "把祖传 PPT 改造成学生能听懂的版本。",
+    target: 7,
+    perAction: 2,
+    delta: { teaching: 6, paper: -1 },
+    complete: { teaching: 15, luck: 3 },
+    completeText: "学生第一次主动问了一个不是考试范围的问题。"
+  },
+  {
+    id: "boundary",
+    name: "边界防火墙",
+    desc: "训练自己识别“轻量级任务”的真实体积。",
+    target: 6,
+    perAction: 2,
+    delta: { health: 4, service: -2 },
+    complete: { health: 14, service: -8, luck: 4 },
+    completeText: "你学会了在不燃烧自己的情况下保持礼貌。"
+  }
 ];
 
 const events = [
@@ -234,7 +283,9 @@ const achievementRules = [
   { id: "lucky", label: "宇宙偏心", test: (s) => s.stats.luck >= 78 },
   { id: "balanced", label: "六边形小而稳", test: (s) => Math.min(...Object.values(s.stats)) >= 48 },
   { id: "chaos", label: "系统边缘漫游", test: (s) => s.history.some((item) => item.swing >= 22) },
-  { id: "bestiary", label: "传说目击者", test: (s) => s.myths.size >= 3 }
+  { id: "bestiary", label: "传说目击者", test: (s) => s.myths.size >= 3 },
+  { id: "builder", label: "长期主义者", test: (s) => s.projects.filter((item) => item.completeDone).length >= 2 },
+  { id: "firewall", label: "拒绝轻量级", test: (s) => s.projects.some((item) => item.id === "boundary" && item.completeDone) }
 ];
 
 const defaultMaxSemester = 6;
@@ -257,7 +308,9 @@ const els = {
   status: document.querySelector("#status"),
   mood: document.querySelector("#mood"),
   combo: document.querySelector("#combo"),
+  actionsLeft: document.querySelector("#actionsLeft"),
   stats: document.querySelector("#stats"),
+  projectBoard: document.querySelector("#projectBoard"),
   wheel: document.querySelector("#wheel"),
   eventTag: document.querySelector("#eventTag"),
   eventRisk: document.querySelector("#eventRisk"),
@@ -368,6 +421,8 @@ function startGame() {
     history: [],
     achievements: new Set(),
     myths: new Set(),
+    projects: projectTemplates.map((project) => ({ ...project, progress: 0, completeDone: false })),
+    actionsLeft: actionBudget[els.mode.value],
     mode,
     mood,
     rule: null,
@@ -398,6 +453,7 @@ function drawEvent() {
     return;
   }
 
+  state.actionsLeft = actionBudget[els.mode.value];
   const event = pickEvent();
   state.rule = absurdRules[(state.semester + Math.floor(seededRandom() * absurdRules.length)) % absurdRules.length];
   state.current = event;
@@ -442,6 +498,26 @@ function applyChoice(index) {
   drawEvent();
 }
 
+function investProject(projectId) {
+  if (!state || state.finished || state.actionsLeft <= 0) return;
+  const project = state.projects.find((item) => item.id === projectId);
+  if (!project || project.completeDone) return;
+
+  state.actionsLeft -= 1;
+  project.progress = Math.min(project.target, project.progress + project.perAction);
+  addDelta(state.stats, project.delta);
+  state.log.unshift(`S${state.semester} 项目投入：${project.name}。`);
+
+  if (project.progress >= project.target && !project.completeDone) {
+    project.completeDone = true;
+    addDelta(state.stats, project.complete);
+    state.log.unshift(`项目完成：${project.completeText}`);
+  }
+
+  updateAchievements();
+  render();
+}
+
 function updateAchievements() {
   bestiary.forEach((myth) => {
     if (myth.test(state)) state.myths.add(myth.id);
@@ -473,6 +549,7 @@ function getRank() {
   if (state.stats.paper > 78 && state.stats.grant > 68) return "高压上岸型 PI";
   if (state.stats.teaching > 78 && state.stats.health > 45) return "口碑型老师";
   if (state.stats.luck > 76) return "宇宙偏爱型青椒";
+  if (state.projects.filter((item) => item.completeDone).length >= 3 && state.stats.health > 35) return "项目管理型幸存者";
   if (state.mode === modeSettings.publish && total > 390) return "高压驯兽师";
   if (state.mode === modeSettings.humane && state.stats.health > 70) return "罕见正常人";
   if (total > 410) return "稀有稳定型青椒";
@@ -509,6 +586,7 @@ function finishGame() {
 
   updateAchievements();
   const unlocked = achievementRules.filter((item) => state.achievements.has(item.id)).map((item) => item.label);
+  const completedProjects = state.projects.filter((item) => item.completeDone).map((item) => item.name);
   const share = `我在《青椒轮盘 Faculty Roulette》里获得结局：${rank}。\n论文${state.stats.paper} / 基金${state.stats.grant} / 教学${state.stats.teaching} / 服务${state.stats.service} / 健康${state.stats.health} / 运气${state.stats.luck}\n宇宙：${state.mood.name} / ${state.mode.label}\n成就：${unlocked.length ? unlocked.join("、") : "暂无，但仍然活着"}`;
   els.endingTitle.textContent = rank;
   els.endingText.textContent = text;
@@ -520,6 +598,7 @@ function finishGame() {
       <dt>诊断结果</dt><dd>${rank}</dd>
       <dt>主要症状</dt><dd>${state.mood.name}，${state.mode.label}</dd>
       <dt>目击传说</dt><dd>${unlockedMyths.length ? unlockedMyths.join("、") : "暂未目击，但墙里有声音"}</dd>
+      <dt>完成项目</dt><dd>${completedProjects.length ? completedProjects.join("、") : "没有完成项目，但积累了很多解释"}</dd>
       <dt>建议处方</dt><dd>${state.stats.health < 35 ? "先睡觉，再讨论宏大问题" : "保留边界，谨慎答应“轻量级”任务"}</dd>
     </dl>
   `;
@@ -540,6 +619,37 @@ function renderStats() {
       <div class="bar"><i style="--value:${value}%; --bar-color:${statColors[key]}"></i></div>
     </div>
   `).join("");
+}
+
+function renderProjects() {
+  if (!state) {
+    els.projectBoard.innerHTML = projectTemplates.map((project) => `
+      <div class="project-card">
+        <h3>${project.name}</h3>
+        <p>${project.desc}</p>
+        <div class="progress"><i style="--value:0%"></i></div>
+        <button disabled>等待开局</button>
+      </div>
+    `).join("");
+    return;
+  }
+
+  els.projectBoard.innerHTML = state.projects.map((project) => {
+    const percent = Math.round((project.progress / project.target) * 100);
+    const disabled = state.actionsLeft <= 0 || project.completeDone || state.finished;
+    return `
+      <div class="project-card ${project.completeDone ? "complete" : ""}">
+        <h3>${project.name}</h3>
+        <p>${project.completeDone ? project.completeText : project.desc}</p>
+        <div class="progress"><i style="--value:${percent}%"></i></div>
+        <button data-project="${project.id}" ${disabled ? "disabled" : ""}>${project.completeDone ? "已完成" : `投入 1 AP · ${project.progress}/${project.target}`}</button>
+      </div>
+    `;
+  }).join("");
+
+  els.projectBoard.querySelectorAll("button[data-project]").forEach((button) => {
+    button.addEventListener("click", () => investProject(button.dataset.project));
+  });
 }
 
 function renderTrajectory() {
@@ -601,9 +711,11 @@ function render() {
     els.status.textContent = "等待开局";
     els.mood.textContent = "尚未抽取";
     els.combo.textContent = "尚未形成";
+    els.actionsLeft.textContent = "-";
     els.rank.textContent = "未入职";
     els.crisis.textContent = "--";
     renderStats();
+    renderProjects();
     renderTrajectory();
     renderAchievements();
     renderTimeline();
@@ -616,9 +728,11 @@ function render() {
   els.status.textContent = state.finished ? "结局生成" : state.stats.health <= 25 ? "健康预警" : state.stats.luck <= 25 ? "运气偏冷" : "勉强运转";
   els.mood.textContent = state.mood.name;
   els.combo.textContent = getCombo();
+  els.actionsLeft.textContent = `${state.actionsLeft} AP`;
   els.rank.textContent = getRank();
   els.crisis.textContent = crisis >= 70 ? "红色" : crisis >= 40 ? "橙色" : "绿色";
   renderStats();
+  renderProjects();
   renderTrajectory();
   renderAchievements();
   renderTimeline();
