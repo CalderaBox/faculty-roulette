@@ -16,815 +16,2333 @@ const statColors = {
   luck: "#ff7474"
 };
 
-const profileNotes = {
-  balanced: "你相信系统性努力，也相信周五下午不该开会。各项指标都不极端，适合第一次体验。",
-  paper: "你把日历按投稿 deadline 来理解。论文起步高，但教学和健康会向你投来安静的目光。",
-  grant: "你熟悉预算表的颜色，也会在梦里听到系统截止提醒。基金强，时间和健康偏脆。",
-  teaching: "你真的在乎课堂，但系统未必在乎。教学口碑高，论文和基金需要努力追赶。",
-  stealth: "你擅长不出现在不该出现的会议里。健康和运气较好，但声望成长更慢。"
+const profileLabels = {
+  balanced: "均衡型青椒",
+  paper: "论文冲刺型",
+  grant: "基金焦虑型",
+  teaching: "教学口碑型",
+  stealth: "低调潜行型"
 };
 
-const actionBudget = {
-  standard: 3,
-  publish: 2,
-  humane: 4
-};
-
-const economyBudget = {
-  standard: { budget: 6, energy: 6 },
-  publish: { budget: 5, energy: 5 },
-  humane: { budget: 7, energy: 7 }
+const introSceneByProfile = {
+  balanced: "balanced_intro",
+  paper: "paper_intro",
+  grant: "grant_intro",
+  teaching: "teaching_intro",
+  stealth: "stealth_intro"
 };
 
 const profiles = {
-  balanced: { paper: 50, grant: 46, teaching: 52, service: 42, health: 72, luck: 50 },
-  paper: { paper: 68, grant: 36, teaching: 42, service: 35, health: 58, luck: 48 },
-  grant: { paper: 43, grant: 70, teaching: 40, service: 45, health: 55, luck: 46 },
-  teaching: { paper: 40, grant: 38, teaching: 72, service: 46, health: 64, luck: 50 },
-  stealth: { paper: 44, grant: 40, teaching: 48, service: 30, health: 78, luck: 62 }
+  balanced: { paper: 52, grant: 48, teaching: 50, service: 42, health: 70, luck: 52 },
+  paper: { paper: 68, grant: 40, teaching: 40, service: 34, health: 58, luck: 48 },
+  grant: { paper: 42, grant: 70, teaching: 40, service: 46, health: 56, luck: 46 },
+  teaching: { paper: 40, grant: 40, teaching: 72, service: 46, health: 64, luck: 50 },
+  stealth: { paper: 44, grant: 42, teaching: 48, service: 30, health: 78, luck: 60 }
+};
+
+const profileNotes = {
+  balanced: "你习惯把所有事情整理进可解释的表格里，所以学院格外喜欢把不可解释的东西送到你这里归档。",
+  paper: "你看见走廊都像投稿系统的快捷入口，因此很多怪谈也会顺着引用链来拜访你。",
+  grant: "你能从预算表里闻出焦味。问题是，预算表有时也会先闻到你。",
+  teaching: "你在意课堂是不是真的发生过，因此课堂之外那些不该发生的东西会显得格外清楚。",
+  stealth: "你擅长不出现在不该出现的名单里，但学院偶尔会因此怀疑你是不是已经存在于别的地方。"
 };
 
 const modeSettings = {
   standard: {
     label: "标准学术天气",
-    semesters: 12,
+    turns: 14,
     multiplier: 1,
     bonus: {},
-    rule: "普通难度。系统不友善，但还没有完全拟人化。"
+    rule: "系统仍然假装自己只是流程，但流程已经学会挑人了。"
   },
   publish: {
     label: "非升即走模式",
-    semesters: 14,
-    multiplier: 1.18,
-    bonus: { paper: 4, grant: 4, health: -10, luck: -4 },
-    rule: "高压难度。正收益更甜，负收益更疼，结局更戏剧化。"
+    turns: 15,
+    multiplier: 1.15,
+    bonus: { paper: 4, grant: 4, health: -8, luck: -2 },
+    rule: "收益更甜，副作用更尖。怪谈尤其喜欢在这一档成熟。"
   },
   humane: {
     label: "理想学院模式",
-    semesters: 12,
-    multiplier: .82,
-    bonus: { health: 10, luck: 6, service: -3 },
-    rule: "温柔难度。仍有荒诞，但至少有人记得你是人。"
+    turns: 13,
+    multiplier: 0.88,
+    bonus: { health: 10, luck: 6, service: -2 },
+    rule: "仍然荒诞，但至少没人会把二十件事说成轻量级支持。"
   }
 };
 
 const moods = [
-  { name: "论文季风", spin: 25, bonus: { paper: 2 }, memo: "今天的空气里有返修味。" },
-  { name: "基金低压槽", spin: 85, bonus: { grant: 2 }, memo: "预算表会膨胀，人的意志会收缩。" },
-  { name: "课堂晴转多云", spin: 145, bonus: { teaching: 2 }, memo: "学生的沉默有很多种含义。" },
-  { name: "服务性降雨", spin: 205, bonus: { service: 2 }, memo: "轻量级任务通常不会轻量结束。" },
-  { name: "健康预警", spin: 265, bonus: { health: -2, luck: 2 }, memo: "咖啡不是一种睡眠。" },
-  { name: "审稿人二号回流", spin: 325, bonus: { luck: -2, paper: 2 }, memo: "有些意见看起来像意见，其实是天气。" }
+  { name: "论文季风", spin: 25, bonus: { paper: 1 } },
+  { name: "基金低压槽", spin: 86, bonus: { grant: 1 } },
+  { name: "课堂晴转多云", spin: 148, bonus: { teaching: 1 } },
+  { name: "服务性降雪", spin: 209, bonus: { service: 1 } },
+  { name: "健康预警", spin: 270, bonus: { health: -1, luck: 1 } },
+  { name: "走廊回声", spin: 331, bonus: { luck: 1 } }
 ];
 
 const absurdRules = [
   {
-    name: "所有邮件默认紧急",
-    text: "本学期服务类损耗加深，但服务收益也更容易被看见。",
-    modify: (delta) => ({ ...delta, service: (delta.service || 0) + 2, health: (delta.health || 0) - 2 })
+    id: "reply-all",
+    label: "本学期特殊规则：凡是看起来像“确认一下”的事情，都会额外抄送给未来的你。",
+    apply(choice) {
+      const delta = {};
+      if (hasTone(choice, "official") || hasTone(choice, "service")) {
+        addDelta(delta, { service: 1, health: -1 });
+      }
+      return delta;
+    }
   },
   {
-    name: "审稿意见会繁殖",
-    text: "论文收益更高，但每次推进论文都会额外消耗健康。",
-    modify: (delta) => ({ ...delta, paper: delta.paper ? delta.paper + 3 : delta.paper, health: delta.paper ? (delta.health || 0) - 2 : delta.health })
+    id: "deadline-fog",
+    label: "本学期特殊规则：所有截止日期都往前走半步，只有疲劳留在原地。",
+    apply(choice) {
+      const delta = {};
+      if (hasTone(choice, "paper")) {
+        addDelta(delta, { paper: 1, health: -1 });
+      }
+      if (hasTone(choice, "grant")) {
+        addDelta(delta, { grant: 1, health: -1 });
+      }
+      return delta;
+    }
   },
   {
-    name: "预算表具有主观能动性",
-    text: "基金相关选择波动变大，运气会轻微参与评审。",
-    modify: (delta) => ({ ...delta, grant: delta.grant ? delta.grant + 4 : delta.grant, luck: (delta.luck || 0) - 1 })
+    id: "quiet-hall",
+    label: "本学期特殊规则：走廊里说得越少，系统越容易误判你已经同意。",
+    apply(choice) {
+      const delta = {};
+      if (hasTone(choice, "hide")) {
+        addDelta(delta, { luck: 1 });
+      }
+      if (hasTone(choice, "question")) {
+        addDelta(delta, { service: -1, luck: 1 });
+      }
+      return delta;
+    }
   },
   {
-    name: "评教在暗处凝视",
-    text: "教学收益放大，但服务和健康会被课堂余波牵连。",
-    modify: (delta) => ({ ...delta, teaching: delta.teaching ? delta.teaching + 3 : delta.teaching, service: (delta.service || 0) + 1, health: (delta.health || 0) - 1 })
+    id: "kindness-tax",
+    label: "本学期特殊规则：所有善意都会被算作额外工时，但学院依旧称之为自然发生。",
+    apply(choice) {
+      const delta = {};
+      if (hasTone(choice, "care") || hasTone(choice, "service")) {
+        addDelta(delta, { health: -1, teaching: 1 });
+      }
+      return delta;
+    }
   },
   {
-    name: "今天学院像个人",
-    text: "负面影响减轻。请珍惜这条罕见时间线。",
-    modify: (delta) => Object.fromEntries(Object.entries(delta).map(([key, value]) => [key, value < 0 ? Math.ceil(value / 2) : value]))
+    id: "budget-tide",
+    label: "本学期特殊规则：预算像潮水一样涨落，只有表格知道退潮时谁还站在岸上。",
+    apply(choice) {
+      const delta = {};
+      if (hasTone(choice, "grant") || hasTone(choice, "official")) {
+        addDelta(delta, { grant: 1 });
+      }
+      return delta;
+    }
   },
   {
-    name: "咖啡因通货膨胀",
-    text: "所有高收益选择都会更伤身体，但本轮更容易产出戏剧性结局。",
-    modify: (delta) => {
-      const positive = Object.values(delta).some((value) => value >= 8);
-      return positive ? { ...delta, health: (delta.health || 0) - 4, luck: (delta.luck || 0) + 2 } : delta;
+    id: "class-echo",
+    label: "本学期特殊规则：课堂会替你记住说过的话，哪怕那堂课后来并不承认自己存在。",
+    apply(choice) {
+      const delta = {};
+      if (hasTone(choice, "teaching") || hasTone(choice, "care")) {
+        addDelta(delta, { teaching: 1, luck: 1 });
+      }
+      return delta;
+    }
+  },
+  {
+    id: "mirror-hour",
+    label: "本学期特殊规则：晚上九点后做出的决定，会先在玻璃里完成一次。",
+    apply(choice) {
+      const delta = {};
+      if (hasTone(choice, "follow") || hasTone(choice, "hide")) {
+        addDelta(delta, { luck: 1 });
+      }
+      return delta;
+    }
+  },
+  {
+    id: "small-task",
+    label: "本学期特殊规则：凡被称作“小事”的请求，默认会拿走一格健康。",
+    apply() {
+      return { health: -1 };
     }
   }
 ];
 
-const bestiary = [
-  { id: "reviewer-hydra", name: "审稿九头蛇", hint: "连续论文波动后现身", test: (s) => s.history.filter((item) => item.tag === "Reviewer #2" || item.delta.paper > 8).length >= 2 },
-  { id: "budget-wraith", name: "预算表幽灵", hint: "基金值冲高后现身", test: (s) => s.stats.grant >= 78 },
-  { id: "meeting-vine", name: "会议藤蔓", hint: "服务值过高后现身", test: (s) => s.stats.service >= 70 },
-  { id: "coffee-oracle", name: "咖啡占卜师", hint: "健康跌破红线后现身", test: (s) => s.stats.health <= 28 },
-  { id: "silent-class", name: "沉默教室", hint: "教学口碑很高后现身", test: (s) => s.stats.teaching >= 80 },
-  { id: "deadline-comet", name: "截止彗星", hint: "高波动事件后现身", test: (s) => s.history.some((item) => item.swing >= 24) },
-  { id: "lucky-stamp", name: "幸运盖章机", hint: "运气很高后现身", test: (s) => s.stats.luck >= 78 },
-  { id: "normal-human", name: "正常人目击报告", hint: "健康结局后现身", test: (s) => s.finished && s.stats.health >= 70 }
-];
-
-const projectTemplates = [
-  {
-    id: "paper",
-    name: "代表作手稿",
-    desc: "把散落的想法压缩成一篇能投稿的东西。",
-    target: 9,
-    perAction: 3,
-    budgetCost: 1,
-    energyCost: 2,
-    risk: 2,
-    delta: { paper: 5, health: -2 },
-    complete: { paper: 16, luck: 4 },
-    completeText: "代表作形成了清晰轮廓，审稿人暂时还没有发现你。"
-  },
-  {
-    id: "grant",
-    name: "基金叙事线",
-    desc: "让一个尚未稳定的想法看起来像五年规划。",
-    target: 8,
-    perAction: 2,
-    budgetCost: 2,
-    energyCost: 1,
-    risk: 3,
-    delta: { grant: 5, service: 1, health: -1 },
-    complete: { grant: 18, service: 4 },
-    completeText: "你的基金故事终于从“想做”变成了“似乎必须做”。"
-  },
-  {
-    id: "teaching",
-    name: "课程重构",
-    desc: "把祖传 PPT 改造成学生能听懂的版本。",
-    target: 7,
-    perAction: 2,
-    budgetCost: 1,
-    energyCost: 1,
-    risk: 1,
-    delta: { teaching: 6, paper: -1 },
-    complete: { teaching: 15, luck: 3 },
-    completeText: "学生第一次主动问了一个不是考试范围的问题。"
-  },
-  {
-    id: "boundary",
-    name: "边界防火墙",
-    desc: "训练自己识别“轻量级任务”的真实体积。",
-    target: 6,
-    perAction: 2,
-    budgetCost: 0,
-    energyCost: 1,
-    risk: 0,
-    delta: { health: 4, service: -2 },
-    complete: { health: 14, service: -8, luck: 4 },
-    completeText: "你学会了在不燃烧自己的情况下保持礼貌。"
-  }
-];
-
-const chainEvents = [
-  {
-    id: "paper-preprint",
-    tag: "Paper Arc",
-    risk: "high",
-    unlock: (s) => s.projects.some((item) => item.id === "paper" && item.completeDone),
-    title: "你的预印本开始在圈内乱窜",
-    text: "有人在群里转发了你的预印本。赞美和误解一起涌来，你突然意识到自己真的把东西发出去了。",
-    choices: [
-      { text: "立刻补一版说明文档", delta: { paper: 8, health: -3, luck: 2 }, flag: "paper_clarity", log: "你用一夜换来了少一点误读。", memo: "被看见并不总是纯收益。" },
-      { text: "保持沉默，观察它自行传播", delta: { luck: 7, service: -2, paper: 3 }, flag: "paper_wave", log: "讨论开始自行繁殖，方向也开始失控。", memo: "传播和理解从来不是同一件事。" },
-      { text: "干脆顺势做一个公开演讲", delta: { teaching: 6, paper: 5, health: -4 }, flag: "paper_stage", log: "你发现自己也许不仅在写论文，也在塑造一个位置。", memo: "台前的你和文稿里的你并不完全相同。" }
-    ]
-  },
-  {
-    id: "grant-program-officer",
-    tag: "Grant Arc",
-    risk: "high",
-    unlock: (s) => s.projects.some((item) => item.id === "grant" && item.completeDone),
-    title: "项目官在会后叫住了你",
-    text: "她说你的方向有趣，但问了一个你最怕被问到的问题：如果只给你一半资源，你还做什么？",
-    choices: [
-      { text: "砍掉野心，保住主轴", delta: { grant: 10, paper: -2, luck: 1 }, flag: "grant_core", log: "你第一次觉得克制也可以很锋利。", memo: "不是所有放弃都算妥协。" },
-      { text: "赌一把完整蓝图", delta: { grant: 12, health: -5, luck: -2 }, flag: "grant_gamble", log: "你在逻辑上站住了，但心跳没有。", memo: "宏图的代价往往由肉身支付。" },
-      { text: "把学生培养写成核心价值", delta: { teaching: 5, grant: 7, service: 2 }, flag: "grant_people", log: "她点头的那一下比任何模板都重要。", memo: "有时候人本身就是项目的理由。" }
-    ]
-  },
-  {
-    id: "teaching-course-fork",
-    tag: "Teaching Arc",
-    risk: "medium",
-    unlock: (s) => s.projects.some((item) => item.id === "teaching" && item.completeDone),
-    title: "学生把你的课程二创了",
-    text: "有人把你讲过的一套框架做成了可视化小工具，还在学院群里火了。你要决定这算不算你的成果。",
-    choices: [
-      { text: "公开夸学生，把 spotlight 给出去", delta: { teaching: 9, luck: 4, paper: -1 }, flag: "teaching_generous", log: "学生第一次真切地感到自己被看见。", memo: "位置让出去，有时会换回更大的位置。" },
-      { text: "把它纳入你的课程品牌", delta: { teaching: 7, service: 3, luck: -2 }, flag: "teaching_brand", log: "你的课程开始像一个可识别的名字。", memo: "品牌感和控制欲常常共生。" },
-      { text: "顺势写成教学论文", delta: { teaching: 4, paper: 8, health: -2 }, flag: "teaching_publish", log: "你把课堂里的火花压成了可引用格式。", memo: "好教学有时也能变成研究对象。" }
-    ]
-  },
-  {
-    id: "boundary-lightweight",
-    tag: "Boundary Arc",
-    risk: "medium",
-    unlock: (s) => s.projects.some((item) => item.id === "boundary" && item.completeDone),
-    title: "那封“轻量级任务”邮件又来了",
-    text: "这次你比上次更早看穿了它，但拒绝的代价也更真实。你知道自己正在测试新的边界系统。",
-    choices: [
-      { text: "明确列出可接受范围", delta: { health: 8, service: -4, luck: 2 }, flag: "boundary_clean", log: "你第一次在不内疚的情况下说了不。", memo: "清晰不是攻击，清晰只是清晰。" },
-      { text: "接受，但要求交换资源", delta: { service: 5, budget: 0, luck: 4 }, flag: "boundary_trade", log: "你把任务谈成了一笔交易，而不是献祭。", memo: "边界不是墙，也可以是价格表。" },
-      { text: "转化成制度建议", delta: { service: 7, health: -2, teaching: 2 }, flag: "boundary_system", log: "问题没有消失，但它第一次被写进了系统。", memo: "把个体问题转成制度语言，是另一种抵抗。" }
-    ]
-  }
-];
-
-const hauntingEvents = [
-  {
-    id: "haunt-folder",
-    tag: "Archive",
-    risk: "haunting",
-    stage: 1,
-    title: "档案室里多出了一份你的材料",
-    text: "深夜去档案室找旧表格时，你在最下层抽屉里看到一份写着你名字的材料。封面日期是明年，里面夹着还没发生过的审稿意见。",
-    choices: [
-      { text: "把材料整份带走", delta: { luck: 5, health: -3, paper: 4 }, ghost: "future_file", log: "你把未来塞进了背包，回程路上一直觉得它在变重。", memo: "有些信息不是给现在的你准备的。" },
-      { text: "只抄下最关键的一页", delta: { paper: 6, health: -1, service: -1 }, ghost: "copied_margin", log: "你带走了一页复印件，原件却像从未存在过。", memo: "怪谈也会做版本控制。" },
-      { text: "关上抽屉，当作没看见", delta: { health: 3, luck: -4 }, ghost: "closed_drawer", log: "你关上抽屉时听到里面有纸张自行翻页。", memo: "拒绝知道，不等于事情会停下。" }
-    ]
-  },
-  {
-    id: "haunt-dataset",
-    tag: "Instrument",
-    risk: "haunting",
-    stage: 2,
-    title: "仪器吐出了一份没人做过的数据",
-    text: "凌晨的仪器在无人操作时自动导出了一组极其漂亮的数据。文件作者署名是一个三年前离开的学生，而你确信她从没做过这个实验。",
-    choices: [
-      { text: "把它接进当前论文", delta: { paper: 10, luck: 3, health: -5 }, ghost: "borrowed_data", log: "数据完美得过分，你开始害怕它真的成立。", memo: "最顺手的结果往往最不干净。" },
-      { text: "沿着作者名去查旧硬盘", delta: { paper: 4, grant: 3, luck: 5 }, ghost: "old_disk", log: "你找到了一块旧硬盘，里面日期全部比系统时间早一天。", memo: "硬盘不会说话，但时间戳会。" },
-      { text: "立刻删掉并重装系统", delta: { health: 2, luck: -5, service: 2 }, ghost: "purge_run", log: "你删掉了文件，第二天它出现在共享盘里。", memo: "技术性的删除，对怪谈不总是有效。" }
-    ]
-  },
-  {
-    id: "haunt-mail",
-    tag: "Mailbox",
-    risk: "haunting",
-    stage: 3,
-    title: "你收到了自己明天发出的邮件",
-    text: "凌晨 3:14，一封来自你自己的邮件出现在收件箱。发送时间是明天，正文只有一句话：不要让第七层亮灯。",
-    choices: [
-      { text: "回复这封邮件", delta: { service: 1, luck: 7, health: -2 }, ghost: "replied_future", log: "你收到自动回执：谢谢，你已经回复过了。", memo: "通信一旦闭环，时间就会开始打结。" },
-      { text: "转发给最信任的同事", delta: { teaching: 2, health: 1, luck: -3 }, ghost: "shared_mail", log: "同事说她没看到正文，只有一个空白附件。", memo: "不是所有证据都愿意被第二个人看见。" },
-      { text: "带着它上七楼看看", delta: { health: -6, luck: 4, paper: 2 }, ghost: "visited_floor", log: "七楼整层都黑着，只有尽头那盏灯像在等你。", memo: "有些楼层平时存在，深夜才真正开放。" }
-    ]
-  },
-  {
-    id: "haunt-minutes",
-    tag: "Minutes",
-    risk: "haunting",
-    stage: 4,
-    title: "会议纪要记录了你没参加过的发言",
-    text: "学院发来的会议纪要里，详细记录了你那天根本不在场时说过的话。更糟的是，那些发言比你平时更锋利，也更像你真正想说的。",
-    choices: [
-      { text: "承认那就是你会说的话", delta: { service: 5, health: -3, luck: 4 }, ghost: "owned_minutes", log: "你开始怀疑，平时开会的那个你是不是才是影子。", memo: "怪谈有时不是制造另一个你，而是替你更诚实。" },
-      { text: "要求学院更正纪要", delta: { service: -3, health: 2, luck: -2 }, ghost: "corrected_minutes", log: "秘书回信说：已按你当时原意修正。", memo: "当系统非常确定你出现过时，辩解会显得很薄。" },
-      { text: "把纪要里的观点写进真实提案", delta: { grant: 8, paper: 3, health: -2 }, ghost: "used_minutes", log: "提案忽然完整了，像那份纪要一直在替你打草稿。", memo: "偷用幽灵版本的自己，后果通常不会立刻出现。" }
-    ]
-  },
-  {
-    id: "haunt-basement",
-    tag: "Basement",
-    risk: "haunting",
-    stage: 5,
-    title: "地下层办公室里坐着一个已经上岸的你",
-    text: "学期末，你顺着匿名打印出的平面图走到地下层尽头。那间不存在于楼层示意里的办公室里，坐着一个明显更成功、也更安静的你。他把一份署好名的 offer 推到桌上，说只要你承认哪一份经历才是真的。",
-    choices: [
-      { text: "签字，换取那份平稳人生", delta: { luck: 10, health: 6, teaching: -6 }, ghost: "signed_offer", log: "你签完字后，对方笑了一下，像把某种职责还给了你。", memo: "每一种稳定都在别处留下了欠条。" },
-      { text: "拒绝签字，带着现有一切离开", delta: { health: -4, paper: 5, grant: 5 }, ghost: "walked_out", log: "你离开时身后有人轻轻说：那就继续活成未完成稿。", memo: "拒绝答案，往往意味着接受开放结局。" },
-      { text: "把桌上的 offer 折成纸船带走", delta: { luck: 6, paper: 4, service: -3 }, ghost: "folded_offer", log: "纸船在洗手池里自己漂了很久，没有沉。", memo: "怪谈最怕的，也许是被你改写成别的用途。" }
-    ]
-  },
-  {
-    id: "haunt-citation",
-    tag: "Citation",
-    risk: "haunting",
-    stage: 6,
-    title: "你被一篇还没写出的论文引用了",
-    text: "数据库里突然出现一条引用记录，引用的是你尚未完成的文章，而且精准批评了你下一版才会犯的错误。",
-    choices: [
-      { text: "照着批评提前修正", delta: { paper: 8, luck: 4, health: -2 }, ghost: "future_citation", log: "你第一次在错误发生前就改掉了它。", memo: "当批评来自未来时，谦逊会变得很奇怪。" },
-      { text: "追查这篇不存在的论文", delta: { grant: 4, luck: 6, service: -2 }, ghost: "citation_hunt", log: "索引页尽头有一个空白作者栏，只写着你的工号。", memo: "有些引用不是在文献里生成的。" },
-      { text: "把它打印出来贴在桌前", delta: { teaching: 3, health: -1, paper: 5 }, ghost: "citation_altar", log: "纸张边缘每天都会多一行批注。", memo: "把异常变成工作流，是一种危险的适应。" }
-    ]
-  },
-  {
-    id: "haunt-student",
-    tag: "Student Dream",
-    risk: "haunting",
-    stage: 7,
-    title: "学生讲述了你没有做过的组会",
-    text: "学生说昨晚的组会很有收获，还复述了你根本没讲过的话。更糟的是，那段话和你最近反复做的梦一字不差。",
-    choices: [
-      { text: "顺着她的话继续追问", delta: { teaching: 7, luck: 4, health: -3 }, ghost: "dream_meeting", log: "她画出的白板结构，和你梦里的一模一样。", memo: "梦一旦被第二个人证实，就不再只是梦。" },
-      { text: "让她把记忆写下来", delta: { paper: 4, teaching: 4, service: 1 }, ghost: "written_dream", log: "她交来的记录最后一页，是你从未见过的签名。", memo: "书面材料会让怪谈显得更像证据。" },
-      { text: "严肃纠正：昨晚没有组会", delta: { health: 2, luck: -4, teaching: -2 }, ghost: "denied_meeting", log: "她沉默了几秒，问你是不是最近太累。", memo: "当只有你记得现实版本时，现实会变得很孤单。" }
-    ]
-  },
-  {
-    id: "haunt-printer",
-    tag: "Printer",
-    risk: "haunting",
-    stage: 8,
-    title: "打印机吐出了一份你的讣告",
-    text: "你只是想打项目预算，打印机却连着吐出三页排版很正式的讣告。上面的研究方向、论文数量和追悼会流程都精准得令人不适。",
-    choices: [
-      { text: "把它锁进抽屉继续工作", delta: { grant: 6, health: -4, luck: 2 }, ghost: "locked_obit", log: "抽屉从里面传来纸张缓慢折叠的声音。", memo: "有些文件被归档后才开始活动。" },
-      { text: "逐段核对其中的履历", delta: { paper: 6, service: 2, health: -2 }, ghost: "read_obit", log: "你发现里面有两篇论文连标题都还没想好。", memo: "最令人害怕的不是死亡，而是文风。" },
-      { text: "把它改成自己的个人陈述", delta: { luck: 5, paper: 5, service: -2 }, ghost: "rewrote_obit", log: "你改得越认真，那份文本就越像真的在等你。", memo: "把讣告改成自述，也许是最过分的一种反抗。" }
-    ]
-  },
-  {
-    id: "haunt-map",
-    tag: "Map",
-    risk: "haunting",
-    stage: 9,
-    title: "校园地图每晚都会少一层楼",
-    text: "教学楼平面图开始在深夜更新。先是少了一层，再是多出一段走廊，最后你的办公室被标在了“暂不开放区域”。",
-    choices: [
-      { text: "照着新地图去走一遍", delta: { health: -5, luck: 6, teaching: 2 }, ghost: "walked_map", log: "你走到尽头时，看见了写着自己名字的临时门牌。", memo: "地图不是用来描述空间的，它也可以分配空间。" },
-      { text: "把地图发到群里求证", delta: { service: 4, luck: -3, teaching: 1 }, ghost: "shared_map", log: "别人看到的版本和你的完全不同。", memo: "共享并不总意味着共识。" },
-      { text: "偷偷保存每天的变化", delta: { paper: 4, grant: 2, luck: 4 }, ghost: "saved_map", log: "第九天后，地图开始主动给文件命名。", memo: "记录异常，本身也会被异常记录。" }
-    ]
-  },
-  {
-    id: "haunt-voice",
-    tag: "Voice",
-    risk: "haunting",
-    stage: 10,
-    title: "答辩录像里出现了不属于任何人的声音",
-    text: "你回看学生答辩录像，发现提问环节里混进了一道声音。它既不像你，也不像任何老师，却提前说出了答辩人下一页的标题。",
-    choices: [
-      { text: "把整段音轨拆出来分析", delta: { paper: 5, luck: 5, health: -3 }, ghost: "isolated_voice", log: "频谱图里有一列峰值刚好拼出你的姓名首字母。", memo: "声音在被看见之后会变得更具体。" },
-      { text: "问学生是否也听见了", delta: { teaching: 6, health: -1, luck: 2 }, ghost: "shared_voice", log: "学生说她以为那是你给的提示。", memo: "怪谈有时通过教学完成传播。" },
-      { text: "直接删掉那一分钟录像", delta: { health: 2, luck: -5, service: 1 }, ghost: "deleted_voice", log: "第二天备份盘里多出了三份同名文件。", memo: "删除对声音的效果，比对纸张更差。" }
-    ]
-  },
-  {
-    id: "haunt-review",
-    tag: "Review",
-    risk: "haunting",
-    stage: 11,
-    title: "审稿系统把你列成了自己的审稿人",
-    text: "投稿系统自动给你发来审稿邀请，稿件作者是你，审稿人也是你。附件里的匿名意见充满了你从未承认过、但全都属实的批评。",
-    choices: [
-      { text: "认真审这篇‘自己的稿子’", delta: { paper: 9, health: -4, luck: 3 }, ghost: "self_review", log: "你写出了最诚实的一份审稿意见，也最像遗书。", memo: "匿名之后，人会比平时更像自己。" },
-      { text: "接受意见，但拒绝继续投稿", delta: { health: 5, paper: -2, luck: 1 }, ghost: "withheld_paper", log: "你第一次觉得不发表也是一种结局。", memo: "撤回有时不是退缩，而是止血。" },
-      { text: "把审稿意见发给未来的自己", delta: { luck: 6, service: -1, paper: 4 }, ghost: "mailed_review", log: "发送成功后，收件箱里少了一封旧邮件。", memo: "当时间开始收发自己时，顺序就不再稳定。" }
-    ]
-  },
-  {
-    id: "haunt-finalroom",
-    tag: "Threshold",
-    risk: "haunting",
-    stage: 12,
-    title: "你终于看见了第七层真正亮灯的房间",
-    text: "学年最后一夜，你顺着所有异常留下的坐标来到第七层尽头。那间房里摆着你的工位、你的杯子、你的未改完稿件，只是灰尘说明它已经被使用很多年了。",
-    choices: [
-      { text: "坐下，把未改完的稿继续改完", delta: { paper: 10, luck: 4, health: -4 }, ghost: "sat_down", log: "你坐下那一刻，整栋楼像终于校准到了某个版本。", memo: "完成稿件不一定意味着完成你自己。" },
-      { text: "带走杯子和草稿，转身离开", delta: { health: 4, luck: 5, service: -2 }, ghost: "carried_back", log: "你走出房间时，门牌上的名字慢慢淡掉了。", memo: "带走证物，有时就是拒绝被收录。" },
-      { text: "关灯，把门反锁", delta: { health: 2, grant: 4, luck: 6 }, ghost: "locked_room", log: "灯灭之后，楼里每一扇窗都映出了你的背影。", memo: "结束一个入口，不代表你关掉了整栋楼。" }
-    ]
-  }
-];
-
-const events = [
-  {
-    tag: "Reviewer #2",
-    risk: "high",
-    title: "审稿意见来了",
-    text: "Reviewer #2 认为你的论文“很有潜力”，但需要补一个不可能在本周完成的实验。",
-    choices: [
-      { text: "硬补实验，先把睡眠抵押出去", delta: { paper: 15, health: -13, luck: -3 }, log: "你补上了实验，也学会了站着睡觉。", memo: "论文推进了，身体在后台发出轻微警报。" },
-      { text: "写一封礼貌但很硬的 rebuttal", delta: { paper: 8, luck: 4, service: -2 }, log: "你赢得了语气上的胜利，结果未知。", memo: "有时最有力的实验是句法。" },
-      { text: "转投另一个 venue", delta: { paper: -3, health: 5, luck: 3 }, log: "你把文件名改成 final_final_v9_really.pdf。", memo: "放弃也是一种项目管理。" }
-    ]
-  },
-  {
-    tag: "Admin",
-    risk: "medium",
-    title: "学院要求提交年度总结",
-    text: "模板有 17 个表，每个表都要求填写“代表性成果”，且所有单元格都喜欢合并。",
-    choices: [
-      { text: "认真填完所有表格", delta: { service: 8, health: -6, grant: -2 }, log: "行政老师说你的材料很规范。", memo: "规范是一种美德，也是一种体力劳动。" },
-      { text: "复制去年的格式，祈祷没人细看", delta: { service: -3, health: 3, luck: -2 }, log: "你获得了半天自由，以及一点风险。", memo: "你赌的是组织记忆的空白。" },
-      { text: "把它做成自动化小工具", delta: { service: 5, paper: -2, luck: 5 }, log: "隔壁课题组开始向你求脚本。", memo: "技术债变成了人情债。" }
-    ]
-  },
-  {
-    tag: "Classroom",
-    risk: "medium",
-    title: "学生问：老师，这个会考吗",
-    text: "你刚刚讲完一段你认为足以改变人生的内容。教室里空气安静得很具体。",
-    choices: [
-      { text: "耐心解释知识体系", delta: { teaching: 10, health: -4, luck: 1 }, log: "学生点头，但你不确定他们点头的含义。", memo: "口碑是慢变量。" },
-      { text: "说：重要的是思维方式", delta: { teaching: -2, health: 2, service: -1 }, log: "教室里出现短暂而礼貌的沉默。", memo: "这句话非常正确，也非常危险。" },
-      { text: "把它加入考试范围", delta: { teaching: 5, service: 2, luck: -4 }, log: "课堂注意力显著提升，评教分数隐约下降。", memo: "恐惧确实是一种激励机制。" }
-    ]
-  },
-  {
-    tag: "Grant",
-    risk: "high",
-    title: "基金截止前 48 小时",
-    text: "你突然发现预算表、合作单位盖章和摘要英文版都还没有完全对齐。",
-    choices: [
-      { text: "通宵整合所有材料", delta: { grant: 17, health: -17, luck: -2 }, log: "系统在 23:58 接收了你的申请。", memo: "系统接收了材料，也接收了你的灵魂碎片。" },
-      { text: "砍掉最复杂的研究目标", delta: { grant: 8, paper: -3, health: -4 }, log: "项目变得可写了，也变得朴素了。", memo: "可执行性有时候来自克制。" },
-      { text: "找前辈要一份成功模板", delta: { grant: 11, service: 2, luck: -1 }, log: "你打开模板，发现里面也有别人的模板痕迹。", memo: "学术传承以 docx 的形式发生。" }
-    ]
-  },
-  {
-    tag: "Service",
-    risk: "medium",
-    title: "突然多了一个委员会",
-    text: "邮件标题写着“轻量级服务工作”，正文里出现了“长期机制”。",
-    choices: [
-      { text: "接受，积累学院存在感", delta: { service: 12, health: -5, paper: -4 }, log: "你获得了会议纪要撰写权。", memo: "存在感增加，存在时间减少。" },
-      { text: "委婉拒绝", delta: { service: -6, health: 5, luck: -2 }, log: "你的措辞很漂亮，对方已读未回。", memo: "拒绝也是一种学术写作。" },
-      { text: "推荐一位更合适的同事", delta: { service: 2, luck: 4, teaching: -1 }, log: "你感到一种微妙的战略胜利。", memo: "推荐信之外，还有推荐人。" }
-    ]
-  },
-  {
-    tag: "Coauthor",
-    risk: "high",
-    title: "合作作者消失了",
-    text: "距离投稿还有三天，共同一作头像灰了。群聊里只剩下你的撤回消息。",
-    choices: [
-      { text: "自己补完整个实验段", delta: { paper: 13, health: -12, luck: -3 }, log: "你完成了实验，也完成了一次人格重塑。", memo: "单人协作是一种极限运动。" },
-      { text: "降低论文野心", delta: { paper: 5, health: 4, grant: -2 }, log: "论文短了，人生长了。", memo: "并非所有故事都需要顶会结尾。" },
-      { text: "发一封温和但带附件的催稿信", delta: { paper: 7, service: 2, luck: 1 }, log: "对方回复：不好意思刚看到。", memo: "附件是一种文明的压力。" }
-    ]
-  },
-  {
-    tag: "Lab",
-    risk: "medium",
-    title: "仪器预约系统崩了",
-    text: "你终于排到的机时消失在维护公告里，公告发布时间是昨天凌晨 1:13。",
-    choices: [
-      { text: "现场蹲守，等有人取消", delta: { paper: 8, health: -7, luck: 4 }, log: "你在走廊里认识了三个同样失眠的人。", memo: "走廊社交也是科研基础设施。" },
-      { text: "改用公开数据做替代实验", delta: { paper: 4, grant: 2, luck: -1 }, log: "你开始相信 supplementary 的力量。", memo: "可复现性偶尔会拯救你。" },
-      { text: "把失败写进方法局限", delta: { paper: -2, health: 4, teaching: 2 }, log: "你获得了诚实，以及一个更短的结果部分。", memo: "局限性写得好，也像一种结果。" }
-    ]
-  },
-  {
-    tag: "Opportunity",
-    risk: "low",
-    title: "有人邀请你做播客嘉宾",
-    text: "主题是“年轻学者如何保持创造力”。你看了一眼日程表，笑得很安静。",
-    choices: [
-      { text: "去，顺便讲讲真实处境", delta: { luck: 8, service: 5, paper: -2 }, log: "节目播出后，有人说你讲出了大家的心声。", memo: "公共表达也是一种作品。" },
-      { text: "婉拒，把时间还给论文", delta: { paper: 6, health: 2, luck: -2 }, log: "你的日程表短暂恢复了人形。", memo: "不是每个机会都要被抓住。" },
-      { text: "推荐学生参加", delta: { teaching: 7, luck: 3, service: -1 }, log: "学生第一次感到自己的研究有人听。", memo: "让位置也是一种指导。" }
-    ]
-  },
-  {
-    tag: "Email",
-    risk: "medium",
-    title: "凌晨收到“急”字邮件",
-    text: "邮件只有三行，但每一行都可以展开成一个工作包。",
-    choices: [
-      { text: "立刻处理", delta: { service: 8, health: -8, luck: -2 }, log: "对方第二天下午回复：辛苦，收到。", memo: "即时响应会训练别人继续即时请求。" },
-      { text: "早上再回", delta: { health: 5, service: -2, luck: 2 }, log: "世界没有崩塌，你有点意外。", memo: "延迟并不总是失职。" },
-      { text: "拆成三个明确问题回复", delta: { service: 3, teaching: 2, health: -2 }, log: "任务变清楚了，麻烦也变清楚了。", memo: "边界清晰有时比效率更重要。" }
-    ]
-  },
-  {
-    tag: "Student",
-    risk: "low",
-    title: "学生拿来一个很野的想法",
-    text: "它不太像你的方向，但里面有一点危险的光。",
-    choices: [
-      { text: "给它两周探索窗口", delta: { teaching: 8, luck: 7, paper: -2 }, log: "两周后，你们有了一个奇怪但可爱的原型。", memo: "好奇心需要预算，也需要边界。" },
-      { text: "拉回主线任务", delta: { paper: 6, teaching: -2, luck: -1 }, log: "进度稳定了，空气平了。", memo: "稳定有成本，发散也有。" },
-      { text: "把它变成组会讨论题", delta: { teaching: 5, service: 3, health: -2 }, log: "组会第一次没有人低头看电脑。", memo: "好的问题会暂时解除疲惫。" }
-    ]
-  }
-];
-
-const achievementRules = [
-  { id: "deadline", label: "23:58 提交", test: (s) => s.stats.grant >= 76 },
-  { id: "teacher", label: "有人真的听懂了", test: (s) => s.stats.teaching >= 78 },
-  { id: "paper", label: "返修免疫", test: (s) => s.stats.paper >= 80 },
-  { id: "boundaries", label: "边界感练习生", test: (s) => s.stats.service <= 32 && s.stats.health >= 55 },
-  { id: "burnout", label: "咖啡不是睡眠", test: (s) => s.stats.health <= 28 },
-  { id: "lucky", label: "宇宙偏心", test: (s) => s.stats.luck >= 78 },
-  { id: "balanced", label: "六边形小而稳", test: (s) => Math.min(...Object.values(s.stats)) >= 48 },
-  { id: "chaos", label: "系统边缘漫游", test: (s) => s.history.some((item) => item.swing >= 22) },
-  { id: "bestiary", label: "传说目击者", test: (s) => s.myths.size >= 3 },
-  { id: "builder", label: "长期主义者", test: (s) => s.projects.filter((item) => item.completeDone).length >= 2 },
-  { id: "firewall", label: "拒绝轻量级", test: (s) => s.projects.some((item) => item.id === "boundary" && item.completeDone) },
-  { id: "lean", label: "精益存活", test: (s) => s.finished && s.budget >= 3 && s.energy >= 2 },
-  { id: "story", label: "剧情穿透者", test: (s) => s.storyFlags.size >= 3 }
-];
-
-const defaultMaxSemester = 12;
-let state = null;
-let seed = Date.now() % 100000;
-
-const storyProgressions = [
-  "你第一次注意到学院夜里会比白天多出一条走廊。",
-  "共享盘里出现了一个以你命名、但你从未创建过的文件夹。",
-  "打印机开始优先输出与你有关、却尚未发生的材料。",
-  "有人在会议上引用了你没讲过的话，而所有人都觉得那很正常。",
-  "第七层的灯第一次在你离开后才亮起。",
-  "你开始分不清哪些数据是结果，哪些数据是在等你成为结果。",
-  "学生、同事和系统逐渐各自记住了不同版本的你。",
-  "你发现最可怕的不是异常本身，而是异常越来越高效。",
-  "所有证据都开始互相印证，只有现实版本显得越来越单薄。",
-  "你已经能提前猜到下一次怪事会从哪个介质里钻出来。",
-  "学院像一台会自我修补的机器，而你正在它的修补日志里。",
-  "到最后，你意识到自己经历的不是事故，而是一套完整且正在运行的叙事。"
-];
-
-const stageAftermaths = [
-  [
-    "你把材料带回办公室后，它自己从骑缝章里长出第二页，内容是三个月后财务处会退回一笔你还没申请到的经费。第二天财务老师路过，顺手问你那份盖好章的版本能不能也抄送她一份。",
-    "复印件在凌晨两点悄悄把页脚改成了“内部流转件”，连订书钉位置都比你常用的更熟练。次日系秘书看了一眼，说你终于学会按学院格式做人了。",
-    "你关上抽屉以后，抽屉自己从里面锁死了。保卫处来了三个人研究半天，最后给出的解释是“老楼有记忆”，然后把这句写进了维修单。"
-  ],
-  [
-    "你把数据接进论文后，图表漂亮得像提前做过宣传。第二天合作者夸你终于学会讲故事，而你开始怀疑故事是不是先于实验出生。",
-    "旧硬盘里除了数据，还有一份被删到只剩标题的组会纪要，标题写着“请未来的你别再重跑这一组”。机器没声音，但讽刺意味已经很完整。",
-    "你重装完系统，桌面干净得像刚入职那天。唯一没被删掉的是回收站里的进度条，它一直显示“正在恢复学院默认配置”。"
-  ],
-  [
-    "回信发出去三分钟，发件箱里多了一封你写给下个月自己的提醒：七楼的灯不是用来照明，是用来点名。系统很贴心，已经帮你加了星标。",
-    "同事说她只收到一个空附件，但附件大小显示 14MB。她随口开玩笑问你是不是把 tenure 的原件发来了，办公室里刚好停电了一次。",
-    "你走到七楼尽头，发现那盏灯照着一排空工位，每个工位上都摆着一杯已经凉透的咖啡。门牌写着“青年人才支持区”，但门锁只认凌晨三点之后的脚步声。"
-  ],
-  [
-    "你承认那段发言像你之后，学院开始更爱请你参会，因为“你终于愿意稳定输出观点”。只是你越来越分不清，是你在开会，还是纪要先替你发过言。",
-    "你要求修正纪要，秘书很快回了最新版。新版删掉了那段发言，却顺手补上了你没参加过的鼓掌环节，逻辑上甚至更自洽了一点。",
-    "你把纪要里的句子写进提案后，评审意见罕见地只提了一条：建议申请人保持这种成熟口吻。你第一次意识到，最会写提案的也许不是你，而是那个替你发言的记录员。"
-  ],
-  [
-    "你签完字，桌上的钢笔自动滚回了原位，像一场流程闭环。离开地下层时，电梯镜子里那个更成功的你还在整理你的领带，手法比你本人老练得多。",
-    "你拒绝签字走出去，次日邮箱里出现一封未署名 congratulation，祝贺你继续保留了不稳定版本的职业生涯。附件是一张体检预约单，时间已经替你选好。",
-    "你把 offer 折成纸船带走后，它在洗手池里绕着下水口转了半小时没沉。午后院长突然问你要不要考虑承担一个“更适合长期发展的额外角色”，语气像在发第二份录取通知。"
-  ],
-  [
-    "你照着未来批评提前修稿，果然躲过了那个错误，却顺手犯了一个更高级的新错。审稿系统像很满意，第二轮意见只回了四个字：继续成长。",
-    "你追查那篇不存在的论文，最后在数据库死角里发现一页作者说明：通讯作者待系统生成。你笑了一下，因为这比很多真实论文还诚实。",
-    "你把那条引文贴在桌前之后，它每天都多一条边注，像有人在远程带教。最离谱的是边注里开始提醒你少喝咖啡，口吻像一位终于看不下去的审稿人。"
-  ],
-  [
-    "你顺着学生的话继续追问，她把白板结构一笔不差地画了出来，连你梦里没记住的箭头都画对了。组里没人觉得奇怪，只夸这次组会终于有效率了。",
-    "学生交来的记录最后一页写着“本纪要经两位导师确认”，另一位导师栏里是你的名字，但笔迹明显比你休息得更充分。你开始怀疑睡眠是不是一种共同作者机制。",
-    "你纠正说昨晚没有组会，学生愣了两秒，反过来问你是不是最近太累。她语气非常礼貌，像在给一位记忆衰退的 PI 留最后体面。"
-  ],
-  [
-    "你把讣告锁进抽屉继续工作，当晚抽屉里传来纸张自行翻页的细响。第二天它被打印成了学院主页样式，只差发布日期和鲜花图片。",
-    "你逐段核对讣告履历，发现其中两篇代表作还没写，但摘要已经比你常用的风格克制许多。你不得不承认，那份文风像一个更会过同行评审的你。",
-    "你把讣告改成个人陈述后，文本居然更通顺了。招聘系统那天晚上自动给你推送了三个职位，像是认为你终于学会了正确介绍自己的消失方式。"
-  ],
-  [
-    "你照着新地图走了一圈，走回来的时候楼层数和出发时不一样。保洁阿姨却很自然地告诉你，老楼一直有弹性，尤其到年底评估季。",
-    "你把地图发群里求证，群里每个人看到的版本都不一样。最先回复的人说这很正常，学院本来就按经费等级分配现实。",
-    "你开始保存每天的地图变化，第九天后文件自己学会命名，把今天的版本标成“可申报空间”。你第一次见到建筑学和行政学在深夜如此团结。"
-  ],
-  [
-    "你反复听那段答辩录音，发现那道陌生声音专挑最尴尬的问题先说出来，像提前帮整个房间节省了时间。第二天学院通知你担任新的答辩秘书，说你最近很懂流程。",
-    "你把录音做成文本，文本在转写完成后多出一列“系统建议提问”。列名非常体面，内容却像一个读过所有隐性规则的幽灵顾问。",
-    "你删掉那段声音后重新导出视频，画面里每个人都慢了半拍，只有空白椅子正好同步。你忽然理解了什么叫会议质量控制。"
-  ],
-  [
-    "系统把你分配成自己论文的审稿人，你认真写了第一条意见，提交时页面提示：感谢你继续维护本刊学术标准。你从没想过自省还能按件收费。",
-    "你试图申诉冲突回避，编辑部回信极快：经核查，审稿人与你观点高度一致，风险可控。文字温柔得像一把已经写好模板的刀。",
-    "你披着匿名身份给自己放行，接收邮件却写着“感谢作者兼评审兼后续争议处理联系人”。三合一的效率让你第一次真切感到现代学术工业的流畅。"
-  ],
-  [
-    "你走进七楼那间亮着灯的房间，看到桌上放着一套已经积灰的工牌，姓名是你，照片也是你，只是眼神比你更习惯流程。门后的日历停在你尚未经历的某个聘期节点。",
-    "你把那张积灰工牌翻过来，背面写着“本岗位负责替系统解释系统”。回身时楼道里传来掌声，但整层楼的门牌都还是空白的。",
-    "你没有进去，只把门缝拍了张照。第二天照片自动进了学院宣传素材库，分类名称叫“青年教师风采候选”，构图比你亲自拍的更像正式结局。"
-  ]
-];
-
 const endingFamilies = [
   {
-    name: "档案返修处",
-    title: "被修订的履历",
-    setup: "后来你发现学院真正稳定运作的不是制度，而是档案。每份简历、纪要和推荐表都会在夜里互相校对，直到把人修成适合归档的版本。",
-    mapping: "白天大家称之为流程完善，夜里它更像一门文书炼金术：先删去犹豫，再补上成果，最后盖章说你一直如此。"
+    name: "镜面评审走廊",
+    text: "你的经历最后被整理成一条会自我审稿的走廊。门一扇扇开过去，每扇门里都坐着一个提前读过你人生摘要的评审。"
   },
   {
-    name: "预审雨棚",
-    title: "永远在门口",
-    setup: "你被留在一座巨大的预审雨棚下面，所有申请都能往前走半步，却始终不正式进门。每扇门后都有人探头说只差一个附件。",
-    mapping: "学院很爱这种气候，因为人在等待时最配合，像一封永远写在“待完善”状态里的邮件。"
+    name: "预算水族馆",
+    text: "财务办公室把你归入玻璃缸档案，所有经费流向都以鱼群的方式解释。你每改一次预算，水面上就浮出另一份口头意见。"
   },
   {
-    name: "共享盘地下河",
-    title: "文件自己会游泳",
-    setup: "你逐渐明白，共享盘不是存储空间，而是一条地下河。课题、提案、截图和传闻都会顺流漂移，最后在某个最合适的领导讲话里靠岸。",
-    mapping: "谁先创建文件并不重要，重要的是谁在涨水那天刚好站在汇报室里。"
+    name: "引用飞蛾季",
+    text: "学院记得你是那个让引用飞蛾吃饱的人。后来飞蛾不再碰文献，只盯着所有还没来得及写出的段落。"
   },
   {
-    name: "指标标本室",
-    title: "活体考核样本",
-    setup: "学院把所有人都做成指标标本，钉在透明柜里，柜门上写着可量化、可比较、可复现。你偶尔怀疑自己是不是也有编号，只是平时看不见。",
-    mapping: "好处是每个人看起来都非常客观，坏处是客观到后来连呼吸都像一条可以横向对比的数据。"
+    name: "课程替身系",
+    text: "你留下的不是课程，而是一套会自行开课的替身系统。投影仪先于教师到场，学生后来逐渐接受了这件事。"
   },
   {
-    name: "会议回声井",
-    title: "发言先于本人",
-    setup: "你坠入一口专门回收会议用语的深井，任何观点只要掉进去两次，就会以更稳妥、更可引用的形式弹回来，顺便挂上你的名字。",
-    mapping: "这口井最擅长做的不是讨论，而是把所有活人训练成纪要风格。"
+    name: "服务菌丝网络",
+    text: "每一项顺手帮忙最后都长出细丝，互相勾连，形成一张覆盖院系的温柔而耗电的网络。你只是其中最常被点亮的节点。"
   },
   {
-    name: "预算折叠层",
-    title: "经费的几何学",
-    setup: "你闯进预算折叠层之后，钱不再按金额存在，而按表格结构存在。一个数字只要放进正确单元格，就能比现实先获得合理性。",
-    mapping: "财务从不说这叫怪谈，他们更喜欢说这是口径统一。"
+    name: "伦理电梯井",
+    text: "所有问题最终都掉进同一口井里，井壁贴满表单。电梯偶尔上来一次，带回来的永远是另一个版本的你刚刚勾选过的答案。"
   },
   {
-    name: "仪器养殖场",
-    title: "数据反向饲养人",
-    setup: "你看见仪器像一排静静进食的动物，吃进去的是样品，吐出来的是职业命运。偶尔它们也吐出人没做过、但制度很需要的数据。",
-    mapping: "实验室于是有了新的默契：结果不一定来自实验，但一定要来自机器。"
+    name: "夜班导师档案",
+    text: "深夜之后，学院把你写进一份只在保安交接班时阅读的导师手册。里面所有建议都诚恳，但收件人总比现实晚半学期。"
   },
   {
-    name: "引用香火台",
-    title: "被供奉的脚注",
-    setup: "你把论文和引文摆上香火台之后，才知道引用不只是学术关系，也是一种供奉秩序。被引用得越多，越像被很多看不见的手合力塑形。",
-    mapping: "最灵验的往往不是最好的文章，而是最先学会自己给自己烧香的那类。"
+    name: "未来会议纪要",
+    text: "你的结局被印在会议纪要的第三页。那页从来不发给参会人，只在下次会议开始前静静躺在桌上，像某种提前完成的回声。"
   },
   {
-    name: "伦理镜像库",
-    title: "合规的影子",
-    setup: "伦理镜像库里保存着每个项目更合规、更得体、也更不像人的版本。你有时会进去借一点口径，再假装那一直是你的原话。",
-    mapping: "这地方让一切都显得合法，代价只是现实要往旁边稍微挪一挪。"
+    name: "地下层观察站",
+    text: "B4 的门再也没有从地图上消失。后来大家都知道，那是专门用来观测学术天气和人员命运交叉干扰的观测站。"
   },
   {
-    name: "招聘回廊",
-    title: "岗位会认人",
-    setup: "在招聘回廊里，职位并不是空着等人，而是先挑中一种性格，再慢慢长出对应的人。你走过时，墙上很多门牌都会轻轻亮一下。",
-    mapping: "所以大家总说岗位匹配，其实更像门锁先学会了谁的脚步声。"
+    name: "门牌交换委员会",
+    text: "门牌、头衔、职位和责任在这一档案里持续交换位置。唯一稳定的是，最后总有人发现自己坐到了原本属于你的位置。"
   },
   {
-    name: "署名迁徙带",
-    title: "名字有自己的路线",
-    setup: "你来到署名迁徙带后才知道，名字并不总跟着人走。它们会顺着课题、项目、群聊和会议嘉宾名单迁徙，落在最需要体面的地方。",
-    mapping: "署名秩序因此像一种候鸟学，只是每年都有人突然发现自己没飞到该去的表格里。"
+    name: "反向退休宴",
+    text: "你的故事被保存成一场总在举办但从不彻底结束的退休宴。每次蛋糕切开，里面都会露出另一份仍在进行的工作安排。"
   },
   {
-    name: "绩效天象馆",
-    title: "天气就是考核",
-    setup: "绩效天象馆把学院所有天气都解释成考核。晴天叫窗口期，阴天叫爬坡期，闪电则是新的专项通知。",
-    mapping: "人在这种气候里待久了，会误以为自己真的只是某张年度图表上的一片云。"
+    name: "提前结项宇宙",
+    text: "学院最终把你归类到提前结项宇宙：所有事情都像已经完成过一次，于是每个人都理直气壮地要求你再来一遍。"
   }
 ];
 
 const endingFates = [
   {
-    name: "借壳批复",
-    turn: "最后系统给了你一份极为体面的批复，但批复同意的不是你本人，而是你在流程里留下的那个更听话的壳。你继续上班、开会、带学生，直到有一天门禁识别你的速度快得像已经认识你很多年。"
+    name: "被正式留档",
+    text: "你没有离开系统，系统把你留在了页边。此后所有新老师都会在脚注里先读到你。"
   },
   {
-    name: "空白返修",
-    turn: "你拿到的结局是一张空白返修单，学院什么都没说，只在每个栏位预先打了勾。你于是学会一边补材料，一边猜测自己究竟是在完善项目，还是在完善可被项目使用的人形。"
+    name: "看似上岸",
+    text: "表面上，一切都像一次普通上岸。只是办公室窗玻璃会在傍晚把那套更早版本的经历反复放给你看。"
   },
   {
-    name: "自动挂名",
-    turn: "后来很多成果上都会自动出现你的名字，像系统终于决定替你节约社交能耗。麻烦在于，你也开始在自己没做过的工作里看见熟悉的文风，仿佛名字比本人更早学会了合作。"
+    name: "仍在返工",
+    text: "你的结局并未结束，只是被标注成返工。于是时间线礼貌地后退半步，让你继续在同一页上修改。"
   },
   {
-    name: "走廊 tenure",
-    turn: "你没有拿到正式房间，却在一条长期不过期的走廊里安顿下来。每次有人路过都会向你点头，像默认你就是某种制度缓冲层的常驻讲解员。"
+    name: "被学院复制",
+    text: "你后来不再以单数出现。学院把你的方法、语气和疲惫复制成一种可流通模板。"
   },
   {
-    name: "指标超生",
-    turn: "你的指标后来开始自己繁殖，一个项目生出三个附件，一条成果拆成五项贡献，一份汇报长出七个版本。大家都夸你产能稳定，只有你知道那更像一场数据多胞胎现象。"
+    name: "成为内部传说",
+    text: "后来没有人能说清楚你到底属于哪个系，但每个系都举过你的例子，而且版本都略有不同。"
   },
   {
-    name: "预算转世",
-    turn: "那些没批下来的经费并没有真的消失，它们只是转世成别的口径重新回来。你逐渐学会从差旅、设备和劳务的缝里辨认同一笔钱的前世今生。"
+    name: "以沉默续聘",
+    text: "没有正式通知，没有仪式，只是某一天你的门牌没有再被摘下来，连怪谈也默许这算一种续聘。"
   },
   {
-    name: "教学显灵",
-    turn: "有一学期课堂突然变得异常灵验，你随口讲的例子都会在期末变成学生报告、社团项目和学院新闻。直到某次你半开玩笑说别让七楼亮灯，整栋楼真的安静了一周。"
+    name: "被未来引用",
+    text: "你最完整的成果并不是论文，而是未来的人已经开始用你没来得及提交的版本互相说服。"
   },
   {
-    name: "审稿回魂",
-    turn: "你最终变成了一位极受欢迎的匿名评审，因为所有意见都准确、克制、还带一点人情味。奇怪的是，你后来读到其中几条时，总能想起自己曾在哪个深夜被它们提前使用过。"
+    name: "转入夜班叙事",
+    text: "白天的你完成了流程，晚上的你负责维持故事。两边都认为对方只是偶尔加班。"
   },
   {
-    name: "系统续命",
-    turn: "最离奇的结局是，学院靠你续了一口命。不是靠你的论文、基金或教学，而是靠你在异常发生时总能第一时间配合解释，于是整套系统比去年更健康地活了下来。"
+    name: "成功逃出一半",
+    text: "你确实走出去了一部分，但另一部分继续留在系统里按时开会、改稿、回邮件，并且做得很专业。"
   }
 ];
 
-const ghostEchoes = {
-  future_file: "那份来自未来的材料后来总在你需要签字前先到一步，像一位懂流程的快递员。",
-  copied_margin: "你抄走的那一页边角不断增生批注，最后长成一套完整的内部口径。",
-  closed_drawer: "那只抽屉再也没完全打开过，但每逢考核周都会从里面传出翻页声。",
-  borrowed_data: "那组无人做过的数据时不时冒出来提醒你：漂亮结果也有自来水。",
-  old_disk: "旧硬盘上的时间戳始终早一天，像提前替学院试跑了一遍命运。",
-  purge_run: "被你删掉的文件学会了迁移，所以每次清理都更像一次搬家。",
-  replied_future: "来自明天的回执越来越礼貌，像未来版本的你终于学会了行政语言。",
-  shared_mail: "那封转发失败的邮件后来总以附件形式绕回来，仿佛证据只是不想走正门。",
-  visited_floor: "七楼尽头那盏灯始终记得你的脚步频率，比门禁系统还念旧。",
-  owned_minutes: "会议纪要替你保存了一种更锋利的发言人格，必要时会自动代班。",
-  corrected_minutes: "被修正的纪要没消失，只是搬进了更高权限的文件夹。",
-  used_minutes: "你借来的那几句成熟口吻后来在不同提案里自行循环引用。",
-  signed_offer: "地下层那份 offer 没有过期，它只是改学会了在人事系统里换皮出现。",
-  walked_out: "你离开地下层时带走了一阵不稳定气流，此后很多门都只开半扇。",
-  folded_offer: "那只纸船偶尔会出现在洗手池边，像在催你继续把答案折小一点。",
-  future_citation: "未来引文还在更新，说明未来对你仍有修改意见。",
-  citation_hunt: "那条不存在的引文后来被越来越多人认真讨论，像空气突然拥有 DOI。",
-  citation_altar: "桌前那张引文越贴越旧，内容却越来越新，十分符合学界传统。",
-  dream_meeting: "学生口中的组会继续发生，只是参会人员名单总比现实完整一些。",
-  written_dream: "那份梦境纪要被传抄了几轮后，大家都默认它属于正常科研材料。",
-  denied_meeting: "你坚持现实版本的那天之后，很多人开始对你投来温柔但专业的担忧。",
-  locked_obit: "抽屉里的讣告继续偷偷排版，像等一场更正式的发布会。",
-  read_obit: "那份履历式讣告证明你连消失都可能被要求写得更像成果总结。",
-  rewrote_obit: "你改写后的讣告太像求职陈述，以至于系统无法决定该把它投给谁。",
-  walked_map: "新地图总愿意给你留一条路，只是路的尽头不一定在现实楼层。",
-  shared_map: "群里看到的不同地图让你第一次相信制度确实按人分配现实。",
-  saved_map: "被你保存的地图后来开始反过来保存你，把工位和去向一起归档。",
-  heard_voice: "录音里的陌生声音总比全场更懂该在什么时候提哪种问题。",
-  transcribed_voice: "那列系统建议提问后来长成了一套很会自我复制的话术。",
-  muted_voice: "你删掉声音之后，空白椅子反而在录像里坐得越来越稳。",
-  self_review: "你写给自己的审稿意见后来被证明是全流程里最诚恳的环节。",
-  appealed_review: "编辑部那封温柔的拒绝申诉信，让你彻底理解了什么叫风险可控。",
-  cleared_review: "你放行自己的那一刻，学术工业终于完成了一次完整闭环。",
-  entered_finalroom: "第七层亮着灯的房间没有欢迎词，只有一套已经为你积灰的工牌。",
-  turned_badge: "工牌背面的岗位说明短短一行，却足够解释整栋楼的沉默。",
-  left_door: "那张门缝照片后来在宣传库里被裁得非常励志，几乎看不出原始用途。"
-};
+const scenePool = [
+  {
+    id: "balanced_intro",
+    kind: "intro",
+    profiles: ["balanced"],
+    tag: "入职周",
+    risk: "低",
+    title: "透明手册",
+    text: "院长把一本透明的新教师手册递给你。你一翻开，脚注里已经写好了你明天会同意的三件事。",
+    choices: [
+      {
+        text: "把手册按页码重新排序，再看它还能不能预言",
+        delta: { paper: 1, service: 1, luck: 1 },
+        flags: ["catalogue"],
+        tones: ["official", "follow"],
+        next: ["archive_manual", "basement_minutes"],
+        aftermaths: [
+          "你把页码理顺后，脚注立刻把顺序改成了新的，像是在夸你配合。",
+          "整理完的那一刻，手册比刚才厚了一页，上面只有一句：谢谢协助归档。"
+        ],
+        logs: [
+          "log: handbook acknowledged your formatting preferences",
+          "log: archival system prefers tidy people"
+        ]
+      },
+      {
+        text: "给全系发一封礼貌确认邮件，问这是不是统一版本",
+        delta: { service: 2, grant: 1, luck: -1 },
+        flags: ["polite_broadcast"],
+        tones: ["official", "service"],
+        next: ["committee_pearl", "copied_minutes"],
+        aftermaths: [
+          "五分钟后你收到二十七封“谢谢提醒”，其中九封来自明天。",
+          "没有人回答是不是统一版本，但从此每个会议通知都会多抄送你一层。"
+        ],
+        logs: [
+          "log: reply-all storm registered",
+          "log: your name has entered three mailing lists at once"
+        ]
+      },
+      {
+        text: "先把自己办公室门牌拧正，假装今天只发生了物理问题",
+        delta: { health: 2, luck: 1 },
+        flags: ["door_focus", "hide"],
+        tones: ["hide", "health"],
+        next: ["corridor_nameplate", "office_404"],
+        aftermaths: [
+          "门牌刚拧正，走廊另一头就有两块牌子同时歪了回去。",
+          "你成功把问题缩小成一块螺丝，但那颗螺丝后来开始出现在别人的桌上。"
+        ],
+        logs: [
+          "log: local reality adjusted through hardware maintenance",
+          "log: corridor accepted temporary explanation"
+        ]
+      }
+    ]
+  },
+  {
+    id: "paper_intro",
+    kind: "intro",
+    profiles: ["paper"],
+    tag: "投稿口",
+    risk: "中",
+    title: "来自明天的审稿邀请",
+    text: "你刚入职就收到一封审稿邀请。附件里是你半年后才会投稿的那篇论文，审稿意见已经写到第三轮。",
+    choices: [
+      {
+        text: "先接下这份审稿，看看未来到底嫌弃你哪一段",
+        delta: { paper: 3, health: -1, luck: 1 },
+        flags: ["paper_push", "future_mail"],
+        tones: ["paper", "follow"],
+        next: ["reviewer_from_tomorrow", "citation_moths"],
+        aftermaths: [
+          "你读到第三条意见时，突然发现它已经被你今天下午的版本提前修掉了。",
+          "文档边栏有个很客气的批注：请继续保持这种能提前配合返修的态度。"
+        ],
+        logs: [
+          "log: future reviewer granted provisional access",
+          "log: citation timeline folded inward"
+        ]
+      },
+      {
+        text: "回邮件追问编辑是谁把时间线泄露给了你",
+        delta: { paper: 1, service: -1, luck: 2 },
+        flags: ["question_system", "paper_push"],
+        tones: ["paper", "question"],
+        next: ["ethics_desk", "forgotten_dataset"],
+        aftermaths: [
+          "编辑没有回信，但系统自动补发了一份伦理说明，标题写着“关于提前知道结果的边界”。",
+          "你没问到答案，却收到一封系统通知：查询已被记录为研究行为。"
+        ],
+        logs: [
+          "log: editorial office redirected to ethics layer",
+          "log: curiosity scored as procedural activity"
+        ]
+      },
+      {
+        text: "假装没看见，再多投一篇，让未来自己忙一点",
+        delta: { paper: 2, health: -2, luck: -1 },
+        flags: ["paper_push", "burnout"],
+        tones: ["paper", "hide"],
+        next: ["midnight_revision", "metrics_fever"],
+        aftermaths: [
+          "你关掉邮件后又开了一个文档，标题栏自己补完成“final_v7_really”。",
+          "未来那边似乎立刻知道你选择了加码，因为下一封拒稿信已经排好版了。"
+        ],
+        logs: [
+          "log: productivity surge detected under denial protocol",
+          "log: manuscript queue now self-replicates"
+        ]
+      }
+    ]
+  },
+  {
+    id: "grant_intro",
+    kind: "intro",
+    profiles: ["grant"],
+    tag: "申报季",
+    risk: "中",
+    title: "会哼歌的预算表",
+    text: "财务老师给你发来去年的模板。你打开后发现每个单元格都在用极轻的声音哼你的名字，像在提醒你谁才是主笔。",
+    choices: [
+      {
+        text: "先把所有小数点对齐，看看它会不会因此安静",
+        delta: { grant: 3, service: 1, health: -1 },
+        flags: ["grant_chase", "budget_tuned"],
+        tones: ["grant", "official"],
+        next: ["funding_oracle", "budget_aquarium"],
+        aftermaths: [
+          "你对齐完最后一列后，预算表不哼歌了，改成轻轻给你打拍子。",
+          "所有小数点像校准过一样站好队，顺便把你下周的时间也对齐到了申报口。"
+        ],
+        logs: [
+          "log: decimal harmony achieved",
+          "log: template accepted your caret position"
+        ]
+      },
+      {
+        text: "去问财务有没有更早一版模板，最好是还没开始闹鬼的那种",
+        delta: { grant: 2, service: 1, luck: 1 },
+        flags: ["official", "grant_chase"],
+        tones: ["grant", "official", "question"],
+        next: ["donor_dinner", "travel_reimbursement"],
+        aftermaths: [
+          "财务说模板只有去年版和“更去年版”，你拿到的是后者，它多了一列梦境支出。",
+          "老师递给你一个更旧的压缩包，解压后里面先跳出一张晚宴座次表。"
+        ],
+        logs: [
+          "log: legacy budget package recovered",
+          "log: archival finance branch now watching"
+        ]
+      },
+      {
+        text: "把预算表打印出来锁进抽屉，今晚先别让它看见你",
+        delta: { grant: 1, health: 1, luck: 1 },
+        flags: ["hide", "grant_chase"],
+        tones: ["grant", "hide", "health"],
+        next: ["office_404", "funding_oracle"],
+        aftermaths: [
+          "抽屉是锁上了，但你半夜经过办公室时听见里面还在轻声改数。",
+          "你成功争取到一晚上安静，代价是第二天打印纸自己出现在工位中央。"
+        ],
+        logs: [
+          "log: budget form moved to off-screen processing",
+          "log: temporary concealment approved"
+        ]
+      }
+    ]
+  },
+  {
+    id: "teaching_intro",
+    kind: "intro",
+    profiles: ["teaching"],
+    tag: "第一堂课",
+    risk: "中",
+    title: "多出来的学生",
+    text: "点名名单上有一个从未注册的名字。更麻烦的是，这位学生已经在教学平台里提交了下周才会出现的作业。",
+    choices: [
+      {
+        text: "当场点出这个名字，看看会不会有人应声",
+        delta: { teaching: 3, health: -1, luck: 1 },
+        flags: ["student_care", "follow_echo"],
+        tones: ["teaching", "care", "follow"],
+        next: ["silent_lecture", "student_feedback"],
+        aftermaths: [
+          "教室最后一排的椅子轻轻响了一下，投影仪自动跳到了下一页。",
+          "没有人举手，但签到系统自己把那格打成了出席。"
+        ],
+        logs: [
+          "log: attendance anomaly acknowledged aloud",
+          "log: classroom echo escalated"
+        ]
+      },
+      {
+        text: "先悄悄把名单修正，别让整节课都围着一个名字转",
+        delta: { teaching: 2, service: 1, luck: -1 },
+        flags: ["official", "teaching_mask"],
+        tones: ["teaching", "official", "hide"],
+        next: ["student_feedback", "copied_minutes"],
+        aftermaths: [
+          "你删掉名字的那一刻，课程群里多出一条感谢老师保护隐私的留言。",
+          "名单恢复正常，但讲台上的粉笔自己写下了那个名字的首字母。"
+        ],
+        logs: [
+          "log: roster edited under low-visibility protocol",
+          "log: unidentified student retained passive access"
+        ]
+      },
+      {
+        text: "把问题抛给全班：如果一个名字先于本人到达课堂，该怎么算出勤",
+        delta: { teaching: 2, paper: 1, luck: 2 },
+        flags: ["question_system", "teaching_mask"],
+        tones: ["teaching", "question"],
+        next: ["ethics_desk", "silent_lecture"],
+        aftermaths: [
+          "学生们讨论得很热烈，像早就排练过这道题，只有那张空椅子始终最专注。",
+          "你原想活跃气氛，结果收获了一份很像研究设计的黑板板书。"
+        ],
+        logs: [
+          "log: pedagogical anomaly reframed as seminar prompt",
+          "log: classroom opened ethics-adjacent branch"
+        ]
+      }
+    ]
+  },
+  {
+    id: "stealth_intro",
+    kind: "intro",
+    profiles: ["stealth"],
+    tag: "走廊末端",
+    risk: "低",
+    title: "B4 的钥匙卡",
+    text: "你随手刷了一下门禁，卡竟然打开了地图上不存在的 B4 办公室。门里坐着一把很像你工位的椅子，已经转向了门口。",
+    choices: [
+      {
+        text: "先进去坐一下，看看这张椅子认不认人",
+        delta: { luck: 2, health: 1 },
+        flags: ["hide", "follow_echo"],
+        tones: ["hide", "follow", "health"],
+        next: ["office_404", "blank_id_card"],
+        aftermaths: [
+          "椅子高度和你办公室那把完全一致，只有扶手上多了一行还没发生的日程。",
+          "你刚坐下，桌面灯就自动亮了，像这间屋子一直在等某个体温。"
+        ],
+        logs: [
+          "log: unauthorized room accepted current user",
+          "log: basement office synced posture profile"
+        ]
+      },
+      {
+        text: "把门禁异常上报，尽量让问题留在工单系统里",
+        delta: { service: 1, luck: 1 },
+        flags: ["official", "question_system"],
+        tones: ["official", "question"],
+        next: ["corridor_nameplate", "copied_minutes"],
+        aftermaths: [
+          "工单两分钟就结单了，备注是“该房间已恢复为概念状态”。",
+          "你收到了一个工单编号，后来发现它和自己员工编号只差一位。"
+        ],
+        logs: [
+          "log: infrastructure anomaly filed and quietly closed",
+          "log: facilities branch mirrored your identifier"
+        ]
+      },
+      {
+        text: "借这间办公室午睡一会儿，反正目前看起来没人投诉",
+        delta: { health: 3, luck: 1 },
+        flags: ["health_patch", "hide"],
+        tones: ["health", "hide"],
+        next: ["blank_id_card", "ghost_postdoc"],
+        aftermaths: [
+          "你睡了二十分钟，醒来时桌上多了一张写着“欢迎回来”的空白工牌。",
+          "这觉补得很值，唯一的问题是你梦里那套日程第二天开始逐条兑现。"
+        ],
+        logs: [
+          "log: basement rest sequence completed",
+          "log: recovery event linked to unregistered office"
+        ]
+      }
+    ]
+  },
+  {
+    id: "archive_manual",
+    minTurn: 2,
+    requiredAnyFlags: ["catalogue", "question_system"],
+    tag: "档案室",
+    risk: "中",
+    title: "脚注比正文更了解你",
+    text: "档案室里那本手册又出现了，这次脚注已经更新到你下学期会拒绝的第一个邀请。",
+    choices: [
+      {
+        text: "沿着脚注补注释，看看它准备把你写成什么样",
+        delta: { paper: 2, service: 1, luck: 1 },
+        flags: ["follow_echo", "paper_push"],
+        tones: ["paper", "follow"],
+        next: ["forgotten_dataset", "reviewer_from_tomorrow"],
+        aftermaths: [
+          "你每补一条注释，脚注就对你更熟一点，直到开始提前使用你的语气。",
+          "原本只是边栏的东西，写着写着开始侵占正文，像在接手叙述权。"
+        ],
+        logs: [
+          "log: marginalia promoted to co-author status",
+          "log: archive text now predicts tone as well as action"
+        ]
+      },
+      {
+        text: "把手册封进信封，只保留封面编号",
+        delta: { service: 1, health: 1 },
+        flags: ["official", "hide"],
+        tones: ["official", "hide", "health"],
+        next: ["committee_pearl", "corridor_nameplate"],
+        aftermaths: [
+          "你封好之后，信封背面很客气地长出了一页补充材料。",
+          "编号被你保住了，内容却开始在别的纸面上以目录形式出现。"
+        ],
+        logs: [
+          "log: containment attempt triggered distributed copies",
+          "log: archive object now travels by metadata"
+        ]
+      },
+      {
+        text: "只拍那些空白页，看看学院究竟把什么留给了沉默",
+        delta: { luck: 2, paper: 1 },
+        flags: ["question_system", "void_pages"],
+        tones: ["question", "follow"],
+        next: ["sealed_seminar", "duplicate_you"],
+        aftermaths: [
+          "照片放大后并不空白，上面全是你还没做出的否认。",
+          "看似什么都没拍到，但相册自动把这组照片放进了“重要人物”分类。"
+        ],
+        logs: [
+          "log: blank pages contained deferred content",
+          "log: silence indexed as evidence"
+        ]
+      }
+    ]
+  },
+  {
+    id: "committee_pearl",
+    minTurn: 2,
+    requiredAnyFlags: ["polite_broadcast", "official", "service_more"],
+    tag: "委员会",
+    risk: "中",
+    title: "会生长的议程",
+    text: "委员会议程每过一分钟就多出一条待办，像珍珠一样圆润、沉默，而且越来越多。",
+    choices: [
+      {
+        text: "主动接手纪要，至少可以决定句号落在哪",
+        delta: { service: 3, health: -1, luck: 1 },
+        flags: ["service_more", "official"],
+        tones: ["service", "official"],
+        next: ["copied_minutes", "dean_smile"],
+        aftermaths: [
+          "你刚接下纪要，议程就安静下来，像终于找到合适的寄主。",
+          "句号确实归你了，但每个句号后面都悄悄长出新的下一项。"
+        ],
+        logs: [
+          "log: minute-taking rights granted with hidden appendices",
+          "log: committee load now bonded to user"
+        ]
+      },
+      {
+        text: "把所有人名缩写成首字母，看看责任会不会也跟着缩小",
+        delta: { service: 1, luck: 2 },
+        flags: ["hide", "service_more"],
+        tones: ["hide", "service"],
+        next: ["blank_id_card", "corridor_nameplate"],
+        aftermaths: [
+          "责任没有缩小，只是开始以首字母的形式更快地找到你。",
+          "缩写版议程传播得很广，后来连保洁阿姨都知道某个字母最近很忙。"
+        ],
+        logs: [
+          "log: accountability compressed but not reduced",
+          "log: initials now circulate independently"
+        ]
+      },
+      {
+        text: "问一句：为什么议程里会提前出现我的追悼词",
+        delta: { service: -1, luck: 3, paper: 1 },
+        flags: ["question_system", "follow_echo"],
+        tones: ["question", "follow"],
+        next: ["basement_minutes", "duplicate_you"],
+        aftermaths: [
+          "会议室短暂沉默，随后所有人默契地翻到下一页，像这本来就是常规流程。",
+          "没有人回答，只有投影仪把你的名字从黑体切成了宋体。"
+        ],
+        logs: [
+          "log: agenda anomaly verbally acknowledged",
+          "log: committee redirected question to lower floor"
+        ]
+      }
+    ]
+  },
+  {
+    id: "reviewer_from_tomorrow",
+    minTurn: 2,
+    requiredAnyFlags: ["paper_push", "future_mail"],
+    tag: "审稿口",
+    risk: "高",
+    title: "尚未完成的返修",
+    text: "那份来自明天的审稿意见更新了。评审现在批评的是你今天晚上才准备写进论文的新实验。",
+    choices: [
+      {
+        text: "照着预言返修，抢在未来自己之前把锅背完",
+        delta: { paper: 4, health: -2, luck: 1 },
+        flags: ["paper_push", "burnout"],
+        tones: ["paper", "follow"],
+        next: ["midnight_revision", "phantom_lab"],
+        aftermaths: [
+          "你成功追上了未来，但未来显然不喜欢被追上，于是又多给了一轮意见。",
+          "返修提交瞬间，系统跳出提示：感谢提前完成历史记录。"
+        ],
+        logs: [
+          "log: manuscript edited to match future criticism",
+          "log: review loop expanded by one speculative cycle"
+        ]
+      },
+      {
+        text: "顺着元数据往回查，看看谁在替时间线写审稿系统",
+        delta: { paper: 2, luck: 2, service: -1 },
+        flags: ["question_system", "paper_push"],
+        tones: ["paper", "question"],
+        next: ["forgotten_dataset", "ethics_desk"],
+        aftermaths: [
+          "元数据里只有一串很熟悉的缩写，缩写展开后刚好是你的未来办公室门牌。",
+          "你没追到编辑，倒是追到了一份比投稿早三个月生成的接受函。"
+        ],
+        logs: [
+          "log: metadata pointed toward local timeline contamination",
+          "log: editorial authority unresolved"
+        ]
+      },
+      {
+        text: "给匿名评审回一封感谢信，直接写上他还没公开的名字",
+        delta: { service: 1, luck: 3 },
+        flags: ["official", "follow_echo"],
+        tones: ["official", "follow"],
+        next: ["dean_smile", "sealed_seminar"],
+        aftermaths: [
+          "邮箱并没有退信，只是第二天校内系统多了一个“过于熟悉匿名流程”的标签。",
+          "你很有礼貌地吓到了对方，因为之后所有通知都开始省略称呼。"
+        ],
+        logs: [
+          "log: anonymity barrier punctured politely",
+          "log: reviewer channel rerouted to institutional layer"
+        ]
+      }
+    ]
+  },
+  {
+    id: "citation_moths",
+    minTurn: 2,
+    requiredAnyFlags: ["paper_push"],
+    tag: "文献库",
+    risk: "中",
+    title: "吃引文的飞蛾",
+    text: "办公室夜灯一亮，飞蛾开始绕着文稿转，只啃那些没有被充分引用的段落，效率惊人且口味保守。",
+    choices: [
+      {
+        text: "拿一篇会议摘要去喂它们，让正文先活下来",
+        delta: { paper: 2, luck: 2, health: -1 },
+        flags: ["paper_push"],
+        tones: ["paper", "follow"],
+        next: ["midnight_revision", "travel_reimbursement"],
+        aftermaths: [
+          "飞蛾很满意，甚至把你摘要里最弱的一句也顺手啃干净了。",
+          "它们吃完后在稿子边缘留下细碎粉末，排成了下一篇文章的题目。"
+        ],
+        logs: [
+          "log: citation moths accepted substitute feed",
+          "log: abstract converted into survival tax"
+        ]
+      },
+      {
+        text: "让它们继续吃，看看最后剩下的是不是更像核心观点",
+        delta: { paper: 1, luck: 3 },
+        flags: ["hide", "question_system"],
+        tones: ["question", "hide"],
+        next: ["duplicate_you", "phantom_lab"],
+        aftermaths: [
+          "最后剩下的确实更像核心观点，只是它提前引用了你还没见过的文献。",
+          "你赌了一把极简主义，飞蛾则礼貌地替你删掉了所有犹豫。"
+        ],
+        logs: [
+          "log: unsolicited minimalist editing completed",
+          "log: remaining paragraphs cite future sources"
+        ]
+      },
+      {
+        text: "把飞蛾视频发给合作者，请他判断这是生态问题还是投稿问题",
+        delta: { paper: 1, service: 2, luck: 1 },
+        flags: ["service_more", "paper_push"],
+        tones: ["paper", "service"],
+        next: ["coauthor_shadow", "metrics_fever"],
+        aftermaths: [
+          "合作者回得很快，附件里是另一版论文，作者名单比你记得的长一个人。",
+          "视频刚发出去，飞蛾就排成了合作者名字的首字母，态度相当合作。"
+        ],
+        logs: [
+          "log: coauthor notified of insect-mediated peer review",
+          "log: authorship branch opened"
+        ]
+      }
+    ]
+  },
+  {
+    id: "funding_oracle",
+    minTurn: 2,
+    requiredAnyFlags: ["grant_chase"],
+    tag: "茶水间",
+    risk: "中",
+    title: "会点评申请书的咖啡机",
+    text: "茶水间的咖啡机吐出一张纸条：创新性不错，技术路线略保守。你还没把申请书打印出来。",
+    choices: [
+      {
+        text: "把去年的摘要喂进去，看看它要不要展开说说",
+        delta: { grant: 3, health: -1, luck: 1 },
+        flags: ["grant_chase", "official"],
+        tones: ["grant", "official"],
+        next: ["donor_dinner", "budget_aquarium"],
+        aftermaths: [
+          "咖啡机咕噜了一阵，吐出三条建议和一张晚宴座位图，像是把自己当成了评审秘书。",
+          "你收获了一杯过甜的美式，以及一份比你本人更有信心的项目摘要。"
+        ],
+        logs: [
+          "log: beverage dispenser entered panel simulation mode",
+          "log: grant narrative improved under steam pressure"
+        ]
+      },
+      {
+        text: "只问成功率，不问理由，先保护一下脆弱的早晨",
+        delta: { grant: 2, health: 1 },
+        flags: ["hide", "grant_chase"],
+        tones: ["grant", "hide", "health"],
+        next: ["travel_reimbursement", "ghost_postdoc"],
+        aftermaths: [
+          "咖啡机沉默了三秒，只吐出一个百分比和一句“别问细节”。",
+          "你保住了心情，但机器在杯壁上用泡沫画了一只会摇头的鱼。"
+        ],
+        logs: [
+          "log: applicant requested blunt probability only",
+          "log: oracle withheld commentary but not symbolism"
+        ]
+      },
+      {
+        text: "拔掉电源，改靠自己写，不给机器立 KPI",
+        delta: { health: 1, luck: 2, grant: 1 },
+        flags: ["question_system", "health_patch"],
+        tones: ["question", "health"],
+        next: ["forgotten_dataset", "ethics_desk"],
+        aftermaths: [
+          "咖啡机黑屏前仍努力闪出一句：你会想念我的。",
+          "你赢回了一个安静上午，代价是下午开始所有热水壶都对你异常热情。"
+        ],
+        logs: [
+          "log: oracle power cut by user",
+          "log: appliance network marked new dissenter"
+        ]
+      }
+    ]
+  },
+  {
+    id: "donor_dinner",
+    minTurn: 2,
+    requiredAnyFlags: ["grant_chase", "official"],
+    tag: "晚宴厅",
+    risk: "中",
+    title: "梦见过你的捐赠人",
+    text: "晚宴上，一位捐赠人精准说出了你项目的标题，并补充说昨晚梦里已经看见了经费执行表。",
+    choices: [
+      {
+        text: "礼貌点头，把梦也当成前期调研的一部分",
+        delta: { grant: 2, service: 2, luck: 1 },
+        flags: ["grant_chase", "service_more"],
+        tones: ["grant", "service", "official"],
+        next: ["dean_smile", "budget_aquarium"],
+        aftermaths: [
+          "对方很欣慰，还把梦里没说完的部分装进了一个基金会信封。",
+          "你顺利把离奇情节纳入社交流程，结果梦境从此也开始走正式渠道。"
+        ],
+        logs: [
+          "log: donor dream accepted as soft evidence",
+          "log: networking event merged with grant forecast"
+        ]
+      },
+      {
+        text: "请他详细描述梦境，尤其是经费超支发生在哪一页",
+        delta: { paper: 1, grant: 2, luck: 2 },
+        flags: ["follow_echo", "question_system"],
+        tones: ["grant", "question", "follow"],
+        next: ["sealed_seminar", "duplicate_you"],
+        aftermaths: [
+          "他描述得极其流利，像已经在你项目组里担任过一轮顾问。",
+          "你越问越像在收集口供，而他越讲越像在复盘一场早已发生的答辩。"
+        ],
+        logs: [
+          "log: donor dream cross-referenced with future timeline",
+          "log: banquet converted into witness interview"
+        ]
+      },
+      {
+        text: "借口去洗手间，从侧门悄悄撤离晚宴现场",
+        delta: { health: 2, luck: 1 },
+        flags: ["hide", "health_patch"],
+        tones: ["hide", "health"],
+        next: ["corridor_nameplate", "office_404"],
+        aftermaths: [
+          "你成功离席，但回到办公室时桌上已经摆好了晚宴后续任务。",
+          "洗手间镜子很贴心地复述了一遍你刚才没听完的致辞。"
+        ],
+        logs: [
+          "log: donor event exited through secondary route",
+          "log: social obligations followed user home"
+        ]
+      }
+    ]
+  },
+  {
+    id: "silent_lecture",
+    minTurn: 2,
+    requiredAnyFlags: ["student_care", "teaching_mask"],
+    tag: "教室",
+    risk: "中",
+    title: "抢先播放的讲义",
+    text: "投影仪提前播放起一套你还没做完的讲义。更不妙的是，学生们点头的节奏说明他们并不觉得这件事奇怪。",
+    choices: [
+      {
+        text: "顺着这套讲义往下讲，假装自己只是被备课感动了",
+        delta: { teaching: 3, health: -1, luck: 1 },
+        flags: ["teaching_mask", "burnout"],
+        tones: ["teaching", "official"],
+        next: ["student_feedback", "copied_minutes"],
+        aftermaths: [
+          "你讲得居然很顺，唯一的问题是那套讲义把下学期的例题也讲完了。",
+          "课堂效果出奇地好，教务系统于是默默给你排了更多课。"
+        ],
+        logs: [
+          "log: prewritten lecture accepted as live teaching",
+          "log: class performance improved but schedule inflated"
+        ]
+      },
+      {
+        text: "直接问学生，是谁把这套幻灯片提前上传到了教室",
+        delta: { teaching: 2, luck: 2, service: -1 },
+        flags: ["question_system", "student_care"],
+        tones: ["teaching", "care", "question"],
+        next: ["ethics_desk", "ghost_postdoc"],
+        aftermaths: [
+          "前排有位同学说不是上传，是“它自己习惯这个时间出现”。",
+          "你获得了几个很认真、也很不适合写进教学总结的回答。"
+        ],
+        logs: [
+          "log: classroom ownership disputed by students and equipment",
+          "log: teaching anomaly escalated"
+        ]
+      },
+      {
+        text: "关灯，只靠黑板和声音把整节课拖过去",
+        delta: { teaching: 2, health: 1, luck: 2 },
+        flags: ["follow_echo", "hide"],
+        tones: ["teaching", "follow", "hide"],
+        next: ["sealed_seminar", "office_404"],
+        aftermaths: [
+          "黑暗很配合，投影仪反而像受了冷落，整节课都在背后轻轻换页。",
+          "学生们说这样更有沉浸感，只有最后那张空椅子一直在发光。"
+        ],
+        logs: [
+          "log: low-light teaching mode stabilized",
+          "log: projector continued autonomous operation"
+        ]
+      }
+    ]
+  },
+  {
+    id: "student_feedback",
+    minTurn: 2,
+    requiredAnyFlags: ["student_care", "teaching_mask"],
+    tag: "教学平台",
+    risk: "低",
+    title: "提前送达的评教",
+    text: "教学平台弹出一份学期末评教，学生感谢你“在事故发生后仍坚持完成课程”。你并不知道事故指什么。",
+    choices: [
+      {
+        text: "把整份评教打印出来，留给未来核对事故细节",
+        delta: { teaching: 2, service: 1, health: -1 },
+        flags: ["teaching_mask", "service_more"],
+        tones: ["teaching", "service"],
+        next: ["copied_minutes", "retirement_party"],
+        aftermaths: [
+          "打印机吐纸时很体贴地多出一页空白事故说明，像等你补全。",
+          "评教措辞十分诚恳，诚恳到像悼词的前半页。"
+        ],
+        logs: [
+          "log: evaluation archived before incident timestamp",
+          "log: printer attached optional aftermath page"
+        ]
+      },
+      {
+        text: "回复那位不明学生，问他到底在感谢哪一次幸存",
+        delta: { teaching: 1, luck: 3 },
+        flags: ["student_care", "follow_echo"],
+        tones: ["care", "follow"],
+        next: ["ghost_postdoc", "duplicate_you"],
+        aftermaths: [
+          "对方秒回，说邮件最好别写太具体，因为教室墙壁也能看到。",
+          "你终于等到具体解释，可解释里夹着一张你从未开过的补课通知。"
+        ],
+        logs: [
+          "log: anonymous student replied from unresolved thread",
+          "log: survivor narrative branch opened"
+        ]
+      },
+      {
+        text: "删掉整份文件，只记住其中一句夸你的话",
+        delta: { health: 2, luck: 1 },
+        flags: ["hide"],
+        tones: ["hide", "health"],
+        next: ["dean_smile", "corridor_nameplate"],
+        aftermaths: [
+          "文件删掉了，那句夸奖却出现在你第二天的院办简报里。",
+          "你只想留下一点好心情，系统却把这句话扩散成了新的指标。"
+        ],
+        logs: [
+          "log: feedback removed, praise persisted in circulation",
+          "log: morale artifact now public"
+        ]
+      }
+    ]
+  },
+  {
+    id: "office_404",
+    minTurn: 2,
+    requiredAnyFlags: ["hide", "health_patch"],
+    tag: "B4",
+    risk: "中",
+    title: "额外星期四",
+    text: "B4 办公室白板上写着你的本周安排，其中多出一个现实日历没有的星期四，而且会议名称都很熟悉。",
+    choices: [
+      {
+        text: "去过这个额外星期四，至少别让它空着",
+        delta: { luck: 3, health: -1, paper: 1 },
+        flags: ["follow_echo", "hide"],
+        tones: ["follow", "hide"],
+        next: ["blank_id_card", "sealed_seminar"],
+        aftermaths: [
+          "你一脚踏进去，手机日历自动补出了一整天的安排，像怕你迟到。",
+          "额外星期四没有太阳，但邮件收发速度比任何工作日都快。"
+        ],
+        logs: [
+          "log: extra weekday accessed",
+          "log: basement calendar synchronized with device"
+        ]
+      },
+      {
+        text: "把白板上的自己名字擦掉，测试一下这间屋子记不记仇",
+        delta: { luck: 2, service: -1, health: 1 },
+        flags: ["hide", "question_system"],
+        tones: ["hide", "question", "health"],
+        next: ["corridor_nameplate", "duplicate_you"],
+        aftermaths: [
+          "名字擦掉后，白板只留下一个职位，像在提醒你可替换的是谁。",
+          "房间没有记仇，但第二天人事系统问你是否主动放弃所属关系。"
+        ],
+        logs: [
+          "log: office attempted depersonalized recognition",
+          "log: HR metadata briefly destabilized"
+        ]
+      },
+      {
+        text: "给这间屋子的原主人留点零食，礼数总不会错得太离谱",
+        delta: { health: 1, service: 2, luck: 1 },
+        flags: ["service_more", "health_patch"],
+        tones: ["service", "health"],
+        next: ["ghost_postdoc", "basement_minutes"],
+        aftermaths: [
+          "第二天零食不见了，取而代之的是一张批注过你课程提纲的便签。",
+          "礼数果然没错，只是对方回礼的速度说明它一直都在附近。"
+        ],
+        logs: [
+          "log: basement hospitality reciprocated",
+          "log: unknown occupant entered advisory mode"
+        ]
+      }
+    ]
+  },
+  {
+    id: "blank_id_card",
+    minTurn: 2,
+    requiredAnyFlags: ["hide"],
+    tag: "门禁处",
+    risk: "低",
+    title: "空白工牌",
+    text: "打印机吐出一张空白工牌，名字、照片、部门全空，但门禁系统对它表现出近乎尊敬的反应。",
+    choices: [
+      {
+        text: "先戴着它走一圈，看看系统会把你算成什么",
+        delta: { luck: 3, service: 1 },
+        flags: ["hide", "official"],
+        tones: ["hide", "official"],
+        next: ["corridor_nameplate", "dean_smile"],
+        aftermaths: [
+          "一路都很顺，所有门都开得特别快，像不想让你停下来观察自己。",
+          "你被不同楼层识别成不同身份，体验感异常流畅。"
+        ],
+        logs: [
+          "log: blank badge granted polymorphic access",
+          "log: identity left intentionally unresolved"
+        ]
+      },
+      {
+        text: "自己手写一个部门名，给混乱一个礼貌答案",
+        delta: { service: 1, paper: 1, luck: 1 },
+        flags: ["question_system", "paper_push"],
+        tones: ["official", "question", "paper"],
+        next: ["archive_manual", "copied_minutes"],
+        aftermaths: [
+          "你写上去的部门当天下午就出现在校内通讯录测试页里。",
+          "系统明显接受了这份自我命名，并开始向你推送该部门的会议通知。"
+        ],
+        logs: [
+          "log: handwritten department recognized as provisional reality",
+          "log: directory index expanded by one speculative unit"
+        ]
+      },
+      {
+        text: "和夜班保安换一晚，看看他愿不愿意换这个权限",
+        delta: { luck: 2, health: 1, service: 1 },
+        flags: ["follow_echo"],
+        tones: ["follow", "health", "service"],
+        next: ["basement_minutes", "sealed_seminar"],
+        aftermaths: [
+          "保安只看了一眼就同意了，并提醒你午夜后别去四层以上。",
+          "你换来的不只是工牌，还有一份用手电筒画出来的校园地图。"
+        ],
+        logs: [
+          "log: after-hours badge exchange completed",
+          "log: security branch shared restricted heuristics"
+        ]
+      }
+    ]
+  },
+  {
+    id: "basement_minutes",
+    minTurn: 3,
+    requiredAnyFlags: ["follow_echo", "official", "service_more"],
+    tag: "地下会议室",
+    risk: "高",
+    title: "先于会议的纪要",
+    text: "地下层会议室里，纪要已经打印好。纸面明确记载了与会者将如何在十分钟后分歧、让步、附议并表示感谢。",
+    choices: [
+      {
+        text: "先改两处措辞，至少让未来的自己看起来更像人话",
+        delta: { service: 2, paper: 1, health: -1 },
+        flags: ["service_more", "official"],
+        tones: ["service", "official"],
+        next: ["copied_minutes", "dean_smile"],
+        aftermaths: [
+          "十分钟后会议真的照着你改过的语气展开，甚至有人替你补了笑声。",
+          "你获得了一点叙述权，同时失去了一点对现场的惊讶。"
+        ],
+        logs: [
+          "log: future minutes edited in advance",
+          "log: meeting script complied with revisions"
+        ]
+      },
+      {
+        text: "把空椅子都拍下来，留证据给明天还正常的自己",
+        delta: { paper: 1, luck: 3 },
+        flags: ["question_system", "follow_echo"],
+        tones: ["question", "follow"],
+        next: ["duplicate_you", "sealed_seminar"],
+        aftermaths: [
+          "照片洗出来时，每张空椅子上都浮着不同人的工牌影子。",
+          "你原本只是拍证据，结果拍到了一整套座次制度。"
+        ],
+        logs: [
+          "log: empty-seat documentation captured hidden attendees",
+          "log: basement quorum exceeds visible bodies"
+        ]
+      },
+      {
+        text: "坐到写着你名字的位置，看看这套流程到底想让你成为什么",
+        delta: { health: -1, luck: 2, grant: 1 },
+        flags: ["burnout", "hide"],
+        tones: ["follow", "hide"],
+        next: ["retirement_party", "phantom_lab"],
+        aftermaths: [
+          "椅子比你预计得更合身，像早就按你的背部曲线训练过。",
+          "坐下后会议还没开始，但你已经先体会到了散会后的疲惫。"
+        ],
+        logs: [
+          "log: seat ownership synced with user posture",
+          "log: procedural fatigue arrived ahead of event"
+        ]
+      }
+    ]
+  },
+  {
+    id: "phantom_lab",
+    minTurn: 3,
+    requiredAnyFlags: ["follow_echo", "paper_push", "hide"],
+    tag: "实验台",
+    risk: "高",
+    title: "无人做过的实验",
+    text: "实验设备吐出一串异常漂亮的数据。问题是，系统日志显示这项实验从未预约、从未启动，也从未结束。",
+    choices: [
+      {
+        text: "先把数据接进论文，之后再想办法追实验",
+        delta: { paper: 4, health: -2 },
+        flags: ["paper_push", "burnout"],
+        tones: ["paper", "follow"],
+        next: ["midnight_revision", "metrics_fever"],
+        aftermaths: [
+          "数据和你的假设配合得过分默契，像它比你更急着发表。",
+          "你决定先用再说，设备则用蜂鸣声礼貌承认了这份共谋。"
+        ],
+        logs: [
+          "log: orphan dataset attached to manuscript draft",
+          "log: lab timeline remains unresolved"
+        ]
+      },
+      {
+        text: "顺着样本编号查，看看到底是谁提前替你干完了",
+        delta: { paper: 1, luck: 2, service: -1 },
+        flags: ["question_system", "follow_echo"],
+        tones: ["question", "follow"],
+        next: ["forgotten_dataset", "ghost_postdoc"],
+        aftermaths: [
+          "编号一路追到一张已经过期的门禁记录，刷卡人和你同名同工号。",
+          "系统没有告诉你是谁做的，只提醒你该在使用前注明来源。"
+        ],
+        logs: [
+          "log: sample trace looped back to internal identity",
+          "log: provenance request unresolved"
+        ]
+      },
+      {
+        text: "断电，把热敏纸留着，先别让它继续吐出更多未来",
+        delta: { health: 1, luck: 2 },
+        flags: ["hide", "official"],
+        tones: ["hide", "official", "health"],
+        next: ["ethics_desk", "dean_smile"],
+        aftermaths: [
+          "设备停了，纸条却在你口袋里继续变热，像还有半页没打印完。",
+          "你保住了一个晚上安静，但整栋楼都开始对你表现出过度配合。"
+        ],
+        logs: [
+          "log: instrument power interrupted by user",
+          "log: residual output migrated off-machine"
+        ]
+      }
+    ]
+  },
+  {
+    id: "coauthor_shadow",
+    minTurn: 3,
+    requiredAnyFlags: ["paper_push", "service_more"],
+    tag: "合作者邮件",
+    risk: "中",
+    title: "作者名单里多出来的人",
+    text: "合作者发回修订稿，作者名单里比你记得的多了一位。更离奇的是，这位新作者在致谢里感谢了你未来的帮助。",
+    choices: [
+      {
+        text: "先接受修订，看看多出来的那位究竟会写什么",
+        delta: { paper: 3, service: 1, luck: 1 },
+        flags: ["paper_push", "official"],
+        tones: ["paper", "official"],
+        next: ["midnight_revision", "duplicate_you"],
+        aftermaths: [
+          "你点了接受，那位作者立刻在第二页加了一段比你更懂你的讨论。",
+          "名单变长之后，论文忽然更像一份口供，而不是研究报告。"
+        ],
+        logs: [
+          "log: extra author merged into tracked changes",
+          "log: manuscript voice count increased"
+        ]
+      },
+      {
+        text: "回信追问：这位新作者到底是人、岗位，还是一种流程",
+        delta: { paper: 1, luck: 3 },
+        flags: ["question_system", "follow_echo"],
+        tones: ["question", "follow"],
+        next: ["ghost_postdoc", "sealed_seminar"],
+        aftermaths: [
+          "合作者只回复了一个附件，里面是本学期所有会议里那位“未出镜老师”的发言摘录。",
+          "你没问清对方身份，却问出了一个更宽的职业类别。"
+        ],
+        logs: [
+          "log: authorship query escalated beyond personhood",
+          "log: collaborator returned archival fragments"
+        ]
+      },
+      {
+        text: "干脆删掉所有人名，只留一行：本研究由事态推动完成",
+        delta: { luck: 2, health: -1, paper: 1 },
+        flags: ["hide", "burnout"],
+        tones: ["hide", "paper"],
+        next: ["ethics_desk", "retirement_party"],
+        aftermaths: [
+          "稿子立刻变得干净而危险，像一封没人愿意签名的告密信。",
+          "你短暂体验到匿名带来的轻盈，随后系统提醒你必须补全责任作者。"
+        ],
+        logs: [
+          "log: authorship field cleared and rejected by reality",
+          "log: responsibility sought new host"
+        ]
+      }
+    ]
+  },
+  {
+    id: "metrics_fever",
+    minTurn: 3,
+    requiredAnyFlags: ["paper_push", "grant_chase", "question_system"],
+    tag: "仪表盘",
+    risk: "中",
+    title: "会倒着涨的指标",
+    text: "学院仪表盘今天很奇怪：所有人忙的时候，它往下掉；所有人离线的时候，它蹭蹭往上升。",
+    choices: [
+      {
+        text: "反复刷新，逼它承认自己到底在统计什么",
+        delta: { grant: 2, health: -1, luck: 2 },
+        flags: ["grant_chase", "burnout"],
+        tones: ["grant", "question"],
+        next: ["budget_aquarium", "dean_smile"],
+        aftermaths: [
+          "你终于看出规律：它统计的不是产出，是配合度，而且很欣赏困惑中的坚持。",
+          "刷到第九次时，页面弹出一句感谢：你已帮助系统完成自校准。"
+        ],
+        logs: [
+          "log: dashboard revealed inverse labor metric",
+          "log: repeated refresh improved anomaly confidence"
+        ]
+      },
+      {
+        text: "截屏发给同事，看看是不是只有你这台电脑在发热",
+        delta: { service: 2, luck: 1 },
+        flags: ["official", "service_more"],
+        tones: ["service", "official"],
+        next: ["copied_minutes", "committee_pearl"],
+        aftermaths: [
+          "截图发出去后三个人回了“我这边也是”，另有一个人回了“别在工作时看见它”。",
+          "同事们很团结地确认了异常，同时一致建议你别再追问。"
+        ],
+        logs: [
+          "log: dashboard anomaly distributed across peer network",
+          "log: collective validation increased administrative visibility"
+        ]
+      },
+      {
+        text: "拔掉显示器，盯着黑屏里的自己看一会儿",
+        delta: { health: 1, luck: 3 },
+        flags: ["follow_echo", "hide"],
+        tones: ["hide", "follow", "health"],
+        next: ["duplicate_you", "corridor_nameplate"],
+        aftermaths: [
+          "黑屏里的你先眨眼，随后很自然地把视线移向你背后的门。",
+          "你没再看到指标，但看到了它统计你的方式。"
+        ],
+        logs: [
+          "log: display disabled, reflective interface activated",
+          "log: self-observation replaced analytics view"
+        ]
+      }
+    ]
+  },
+  {
+    id: "copied_minutes",
+    minTurn: 3,
+    requiredAnyFlags: ["service_more", "official", "teaching_mask"],
+    tag: "会议后",
+    risk: "中",
+    title: "预先替你发言的纪要",
+    text: "会后纪要流转到你邮箱，里面出现了几句你根本没说过的话。它们不算离谱，只是比你本人更圆滑一点。",
+    choices: [
+      {
+        text: "照着纪要练一遍，省得下次现场再现编",
+        delta: { service: 2, teaching: 1, health: -1 },
+        flags: ["official", "service_more"],
+        tones: ["service", "official"],
+        next: ["dean_smile", "travel_reimbursement"],
+        aftermaths: [
+          "你练得越顺，越怀疑这份纪要是不是在帮你制造一个更适配环境的版本。",
+          "第二天开会时你真的说出了差不多的话，唯一惊讶的人只有你。"
+        ],
+        logs: [
+          "log: anticipated speech matched later performance",
+          "log: minutes now functioning as rehearsal device"
+        ]
+      },
+      {
+        text: "下次故意说相反的话，看纪要还是不是照抄现实",
+        delta: { luck: 3, paper: 1 },
+        flags: ["question_system", "follow_echo"],
+        tones: ["question", "follow"],
+        next: ["ethics_desk", "duplicate_you"],
+        aftermaths: [
+          "你成功把现场带偏了，但会后纪要坚定地保留了更得体的那个你。",
+          "事实和记录分了家，学院显然觉得记录更值得继续培养。"
+        ],
+        logs: [
+          "log: spoken content diverged from official narrative",
+          "log: documentation favored alternate persona"
+        ]
+      },
+      {
+        text: "干脆缺席下一场会，让纪要独立完成它的人设塑造",
+        delta: { health: 2, luck: 1 },
+        flags: ["hide", "health_patch"],
+        tones: ["hide", "health"],
+        next: ["office_404", "retirement_party"],
+        aftermaths: [
+          "你没去，纪要照样写得很完整，甚至比平时更了解你的顾虑。",
+          "这招暂时保住了精力，也让你意识到出席本身并不总是必要条件。"
+        ],
+        logs: [
+          "log: meeting narrative self-completed without user presence",
+          "log: absence recorded as compatible behavior"
+        ]
+      }
+    ]
+  },
+  {
+    id: "ethics_desk",
+    minTurn: 3,
+    requiredAnyFlags: ["question_system", "student_care"],
+    tag: "伦理办",
+    risk: "中",
+    title: "未来自己算不算受试者",
+    text: "伦理申请表新增一项：若研究涉及未来版本的自己，请说明是否获得对方知情同意。",
+    choices: [
+      {
+        text: "先勾“不适用”，让表格自己承担一点勇气",
+        delta: { service: 1, luck: 1, health: 1 },
+        flags: ["official", "hide"],
+        tones: ["official", "hide", "health"],
+        next: ["dean_smile", "travel_reimbursement"],
+        aftermaths: [
+          "系统短暂停顿后接受了这个答案，只在页脚加了一句“暂按单时区处理”。",
+          "你顺利通过了一关形式审查，同时被悄悄放进了待观察名单。"
+        ],
+        logs: [
+          "log: ethics form accepted temporal simplification",
+          "log: case retained for quiet monitoring"
+        ]
+      },
+      {
+        text: "附上一页解释，认真描述为什么这个问题本身就已经是结果",
+        delta: { paper: 2, service: -1, luck: 2 },
+        flags: ["paper_push", "question_system"],
+        tones: ["paper", "question"],
+        next: ["forgotten_dataset", "midnight_revision"],
+        aftermaths: [
+          "你越解释越像在写论文引言，伦理办则越看越像在给你做同行评议。",
+          "附页写到第二段时，表格自动给你加了一个“理论贡献”附件槽。"
+        ],
+        logs: [
+          "log: ethics explanation upgraded into concept note",
+          "log: paperwork now cites user argument"
+        ]
+      },
+      {
+        text: "直接问工作人员：如果未来的我先签了字，当前这份还算不算缺件",
+        delta: { luck: 3, service: 1 },
+        flags: ["follow_echo", "service_more"],
+        tones: ["question", "follow", "service"],
+        next: ["sealed_seminar", "basement_minutes"],
+        aftermaths: [
+          "工作人员没有抬头，只把一张地下层会议室通行条推到了你手边。",
+          "你没得到口头回答，却得到了一条默认非常具体的路线指引。"
+        ],
+        logs: [
+          "log: ethics staff redirected inquiry to basement process",
+          "log: temporal consent remains unresolved"
+        ]
+      }
+    ]
+  },
+  {
+    id: "corridor_nameplate",
+    minTurn: 3,
+    requiredAnyFlags: ["hide", "official", "question_system"],
+    tag: "走廊",
+    risk: "低",
+    title: "会交换门牌的楼层",
+    text: "晚上七点一过，这层楼的门牌开始互换位置。教授、助理、访问学者、会议室和储藏间轮流尝试解释彼此。",
+    choices: [
+      {
+        text: "顺着自己的名字一直走，看它今晚想停在哪扇门上",
+        delta: { luck: 3, health: -1 },
+        flags: ["hide", "follow_echo"],
+        tones: ["hide", "follow"],
+        next: ["office_404", "duplicate_you"],
+        aftermaths: [
+          "你的名字转了三次弯，最后停在一扇从白天起就没有存在过的门上。",
+          "一路跟下来后，你发现名字比本人更熟悉校园夜路。"
+        ],
+        logs: [
+          "log: personal nameplate entered autonomous routing mode",
+          "log: corridor destination unstable but deliberate"
+        ]
+      },
+      {
+        text: "按字母顺序一块块摆回去，先帮楼层恢复体面",
+        delta: { service: 2, luck: 1 },
+        flags: ["official", "service_more"],
+        tones: ["official", "service"],
+        next: ["committee_pearl", "dean_smile"],
+        aftermaths: [
+          "楼层很给面子地安静了十分钟，随后把“储藏间”放到了院长办公室门上。",
+          "你成功恢复了秩序的外观，秩序则顺手把你列入了维护名单。"
+        ],
+        logs: [
+          "log: hallway ordering attempted by user",
+          "log: institution grateful for cosmetic stability"
+        ]
+      },
+      {
+        text: "把自己的门牌改成“访问中”，看看是不是能借此松一口气",
+        delta: { health: 2, luck: 2 },
+        flags: ["question_system"],
+        tones: ["question", "health", "hide"],
+        next: ["travel_reimbursement", "blank_id_card"],
+        aftermaths: [
+          "门牌改好后，第二天真的有人给你发来访问手续表。",
+          "你原想给自己请半天隐身假，系统却理解成跨单位流动意向。"
+        ],
+        logs: [
+          "log: role label changed to visiting state",
+          "log: mobility paperwork awakened"
+        ]
+      }
+    ]
+  },
+  {
+    id: "travel_reimbursement",
+    minTurn: 4,
+    requiredAnyFlags: ["grant_chase", "official", "luck"],
+    tag: "财务室",
+    risk: "中",
+    title: "还没出发的报销单",
+    text: "财务系统发来提醒，催你补交一场尚未参加会议的出租车发票。备注里很贴心地写了你回程堵车的具体时间。",
+    choices: [
+      {
+        text: "照会议手册反向编一条行程，先把表单喂饱",
+        delta: { grant: 2, service: 1, health: -1 },
+        flags: ["official", "grant_chase"],
+        tones: ["official", "grant"],
+        next: ["donor_dinner", "midnight_revision"],
+        aftermaths: [
+          "你编出的行程流畅到连自己都愿意相信那趟会已经圆满结束。",
+          "报销系统满意通过，甚至替你补上了一张不存在的地铁票。"
+        ],
+        logs: [
+          "log: reimbursement narrative fabricated successfully",
+          "log: travel record now precedes travel itself"
+        ]
+      },
+      {
+        text: "老实写明这趟会只发生在梦里，看看系统肯不肯走灵魂通道",
+        delta: { luck: 3, paper: 1 },
+        flags: ["follow_echo", "question_system"],
+        tones: ["question", "follow"],
+        next: ["budget_aquarium", "sealed_seminar"],
+        aftermaths: [
+          "系统没有驳回，只把报销类别改成了“跨叙事交流”。",
+          "你本来在开玩笑，财务却以一种有经验的态度接住了它。"
+        ],
+        logs: [
+          "log: dream travel filed under nonstandard category",
+          "log: finance office displayed concerning familiarity"
+        ]
+      },
+      {
+        text: "直接放弃这笔报销，拿健康换一点现实感",
+        delta: { health: 2, luck: 1 },
+        flags: ["hide", "health_patch"],
+        tones: ["hide", "health"],
+        next: ["retirement_party", "ghost_postdoc"],
+        aftermaths: [
+          "你放弃得很干脆，系统则把你的克制记成了某种值得复用的模板。",
+          "没报销确实更省事，只是晚上梦里那趟车还是按时开回来了。"
+        ],
+        logs: [
+          "log: reimbursement abandoned in pursuit of stability",
+          "log: dream itinerary continued without budget support"
+        ]
+      }
+    ]
+  },
+  {
+    id: "ghost_postdoc",
+    minTurn: 4,
+    requiredAnyFlags: ["student_care", "follow_echo", "grant_chase", "health_patch"],
+    tag: "镜面",
+    risk: "中",
+    title: "镜子里的前博后",
+    text: "茶水间镜面里站着一位前博后，只在你视线边缘出现。他想知道自己的合同到底是结束了，还是被写进了别的项目。",
+    choices: [
+      {
+        text: "给他留个工位和一杯咖啡，先把人当人处理",
+        delta: { service: 2, teaching: 1, health: -1 },
+        flags: ["service_more", "student_care"],
+        tones: ["service", "care"],
+        next: ["dean_smile", "retirement_party"],
+        aftermaths: [
+          "第二天你的空工位上真的多了一份整理好的文献清单，字迹像雾气压出来的。",
+          "这份善意很快得到了回报，只是回报以夜班协助的形式发生。"
+        ],
+        logs: [
+          "log: spectral postdoc assigned informal desk access",
+          "log: mirror labor now partially cooperative"
+        ]
+      },
+      {
+        text: "先问清他究竟被哪个项目卡住，顺便记下项目编号",
+        delta: { paper: 1, luck: 3 },
+        flags: ["question_system", "follow_echo"],
+        tones: ["question", "follow"],
+        next: ["forgotten_dataset", "duplicate_you"],
+        aftermaths: [
+          "他说出的编号恰好对应你还没申请到的经费条目。",
+          "你本想帮他找出口，结果先找到了一条能把你卷进去的立项痕迹。"
+        ],
+        logs: [
+          "log: mirror entity disclosed project identifier",
+          "log: funding timeline intersects with personnel shadow"
+        ]
+      },
+      {
+        text: "这周尽量避开镜子，让双方都冷静一下",
+        delta: { health: 2, luck: 1 },
+        flags: ["hide", "health_patch"],
+        tones: ["hide", "health"],
+        next: ["office_404", "corridor_nameplate"],
+        aftermaths: [
+          "你确实少见到了他，但所有不锈钢表面都开始反射得格外认真。",
+          "躲避策略暂时有效，只是系统把它理解成了新的巡回路线。"
+        ],
+        logs: [
+          "log: reflective surfaces placed on partial avoidance",
+          "log: spectral contact reduced, not removed"
+        ]
+      }
+    ]
+  },
+  {
+    id: "dean_smile",
+    minTurn: 4,
+    requiredAnyFlags: ["official", "service_more", "grant_chase"],
+    tag: "院长室",
+    risk: "高",
+    title: "听过你私下笔记的院长",
+    text: "院长今天夸你很灵活，夸奖里精确引用了你只写在私人便笺上的一句抱怨，连标点都没改。",
+    choices: [
+      {
+        text: "顺势再多答应一点，看看体制究竟吃不吃礼貌这一套",
+        delta: { service: 3, grant: 1, health: -2 },
+        flags: ["service_more", "official"],
+        tones: ["service", "official"],
+        next: ["committee_pearl", "retirement_party"],
+        aftermaths: [
+          "院长的笑容更真诚了，真诚到像系统在确认扩容成功。",
+          "你用礼貌换来短期平静，同时把自己写进了更多默认名单。"
+        ],
+        logs: [
+          "log: institutional flexibility request accepted",
+          "log: workload reservoir expanded"
+        ]
+      },
+      {
+        text: "礼貌追问：那张便笺到底是谁交给了您",
+        delta: { luck: 3, paper: 1 },
+        flags: ["question_system", "follow_echo"],
+        tones: ["question", "follow"],
+        next: ["copied_minutes", "sealed_seminar"],
+        aftermaths: [
+          "院长没有回答，只把会议日程翻到一页你尚未参加的会后纪要。",
+          "你得到的不是来源，而是一条通往来源的整齐楼梯。"
+        ],
+        logs: [
+          "log: dean declined direct provenance disclosure",
+          "log: user redirected to documentation layer"
+        ]
+      },
+      {
+        text: "什么都不说，只把笑容维持到能完整退出办公室为止",
+        delta: { health: -1, luck: 2, paper: 1 },
+        flags: ["hide", "burnout"],
+        tones: ["hide", "official"],
+        next: ["duplicate_you", "budget_aquarium"],
+        aftermaths: [
+          "你成功平稳退场，门关上后才发现自己把那句抱怨背得更熟了。",
+          "这是一种非常职业的逃生方式，职业到连走廊镜子都点头。"
+        ],
+        logs: [
+          "log: office exit completed under facial compliance",
+          "log: unspoken notes remain in circulation"
+        ]
+      }
+    ]
+  },
+  {
+    id: "forgotten_dataset",
+    minTurn: 4,
+    requiredAnyFlags: ["question_system", "paper_push", "follow_echo"],
+    tag: "旧硬盘",
+    risk: "高",
+    title: "写着下学期日期的数据文件夹",
+    text: "抽屉深处那块旧硬盘里有个文件夹，命名日期来自下学期。里面不仅有整理好的数据，还夹着一张你尚未打印的补充材料清单。",
+    choices: [
+      {
+        text: "先打开最新文件，接受“之后再解释”这套顺序",
+        delta: { paper: 3, luck: 2, health: -1 },
+        flags: ["follow_echo", "paper_push"],
+        tones: ["paper", "follow"],
+        next: ["duplicate_you", "midnight_revision"],
+        aftermaths: [
+          "文件结构清晰得不像意外，更像有人知道你终究会来找它。",
+          "你打开越多，越像在阅读一份自己未来的整理习惯说明书。"
+        ],
+        logs: [
+          "log: forward-dated dataset opened",
+          "log: user behavior increasingly preempted"
+        ]
+      },
+      {
+        text: "把时间戳和门禁记录对照，试着给现实留下一个交叉验证",
+        delta: { paper: 1, service: 1, luck: 2 },
+        flags: ["question_system", "official"],
+        tones: ["question", "official"],
+        next: ["ethics_desk", "committee_pearl"],
+        aftermaths: [
+          "门禁记录里确实有人半夜进过你办公室，工号和你一模一样。",
+          "现实被你按住了一角，但另一角开始向人事系统卷过去。"
+        ],
+        logs: [
+          "log: timestamp audit intersected with access logs",
+          "log: duplicate identity now formally suspect"
+        ]
+      },
+      {
+        text: "把硬盘寄给未来的自己，再把已发送邮箱清空",
+        delta: { health: -1, luck: 3 },
+        flags: ["hide", "burnout"],
+        tones: ["hide", "follow"],
+        next: ["phantom_lab", "retirement_party"],
+        aftermaths: [
+          "邮件确实发出去了，收件箱立刻多了一封“谢谢收到”的自动回复。",
+          "你本想把问题转交出去，结果时间线礼貌地回了个已读。"
+        ],
+        logs: [
+          "log: dataset forwarded across temporal mailbox",
+          "log: response received from unresolved recipient"
+        ]
+      }
+    ]
+  },
+  {
+    id: "midnight_revision",
+    minTurn: 4,
+    requiredAnyFlags: ["paper_push", "grant_chase", "burnout"],
+    tag: "00:47",
+    risk: "高",
+    title: "只在午夜接受修改的稿件",
+    text: "文稿白天怎么改都不保存，只有凌晨 00:47 到 01:12 之间会认真接受你的任何句子，哪怕那句子明显不该出现在这里。",
+    choices: [
+      {
+        text: "熬着，把脚注、致谢、标点都修到发亮为止",
+        delta: { paper: 4, health: -3, luck: 1 },
+        flags: ["paper_push", "burnout"],
+        tones: ["paper", "follow"],
+        next: ["phantom_lab", "retirement_party"],
+        aftermaths: [
+          "你修得非常漂亮，漂亮到第二天根本不记得自己为什么同意其中几句。",
+          "凌晨窗口确实高效，只是它似乎也在同时修改你本人。"
+        ],
+        logs: [
+          "log: midnight edit window fully utilized",
+          "log: manuscript polish correlated with user depletion"
+        ]
+      },
+      {
+        text: "趁窗口打开先提交，粗糙一点也比继续耗着强",
+        delta: { paper: 2, health: 1, luck: 2 },
+        flags: ["hide"],
+        tones: ["paper", "hide", "health"],
+        next: ["donor_dinner", "travel_reimbursement"],
+        aftermaths: [
+          "你提交得很果断，系统甚至没有给你反悔的时间。",
+          "稿子飞出去那一刻像卸下一块石头，落地时却在远处敲出新的回声。"
+        ],
+        logs: [
+          "log: manuscript launched during narrow acceptance interval",
+          "log: roughness tolerated by the hour"
+        ]
+      },
+      {
+        text: "把致谢改成警示牌，至少提醒后来人别走太深",
+        delta: { paper: 2, luck: 3 },
+        flags: ["question_system", "follow_echo"],
+        tones: ["paper", "question", "follow"],
+        next: ["sealed_seminar", "duplicate_you"],
+        aftermaths: [
+          "致谢区突然成了全文最真诚的部分，真诚得像地下留言板。",
+          "你写下的提醒也许没人会删，因为系统显然很喜欢收集前车之鉴。"
+        ],
+        logs: [
+          "log: acknowledgments converted to warning channel",
+          "log: manuscript now contains live hazard signage"
+        ]
+      }
+    ]
+  },
+  {
+    id: "sealed_seminar",
+    minTurn: 5,
+    requiredAnyFlags: ["follow_echo", "question_system", "hide"],
+    tag: "邀请函",
+    risk: "高",
+    title: "写着“你已经来过”的研讨会",
+    text: "一封没有寄件人的研讨会邀请函躺在桌上，地点写的是“你已经来过的那个房间”。时间栏则耐心标注：再次参加。",
+    choices: [
+      {
+        text: "按时去，带本子，把所有第二次发生的事都记下来",
+        delta: { paper: 2, luck: 2, health: -1 },
+        flags: ["paper_push", "follow_echo"],
+        tones: ["paper", "follow"],
+        next: ["duplicate_you", "budget_aquarium"],
+        aftermaths: [
+          "会场里每个人都像认识你，只是都默认你已经听过开场白。",
+          "你记下的内容很有价值，唯一问题是纸上墨迹总比主持人的嘴快半句。"
+        ],
+        logs: [
+          "log: repeat seminar attended with written trace",
+          "log: note-taking lagged behind prewritten content"
+        ]
+      },
+      {
+        text: "转发给一个你信得过的同事，看看他会不会也收到“再次参加”",
+        delta: { service: 2, luck: 1 },
+        flags: ["official", "service_more"],
+        tones: ["service", "official"],
+        next: ["coauthor_shadow", "dean_smile"],
+        aftermaths: [
+          "同事回复说他也收到了，只不过抬头写的是“欢迎回来”。",
+          "你终于得到旁证，同时把对方也礼貌地拖进了这层叙事。"
+        ],
+        logs: [
+          "log: seminar invitation propagated to peer",
+          "log: loop verified by independent recipient"
+        ]
+      },
+      {
+        text: "撕掉邀请函，只留下信封和邮戳做纪念",
+        delta: { health: 2, luck: 1 },
+        flags: ["hide", "health_patch"],
+        tones: ["hide", "health"],
+        next: ["office_404", "ghost_postdoc"],
+        aftermaths: [
+          "纸是撕掉了，邮戳却第二天完整出现在你的会议记录页眉里。",
+          "你避免了当晚出席，但并没能阻止邀请函在别的载体上继续上班。"
+        ],
+        logs: [
+          "log: invite destroyed, postage persisted",
+          "log: attendance obligation deferred, not canceled"
+        ]
+      }
+    ]
+  },
+  {
+    id: "budget_aquarium",
+    minTurn: 5,
+    requiredAnyFlags: ["grant_chase", "follow_echo"],
+    tag: "财务玻璃缸",
+    risk: "高",
+    title: "会吐评语的鱼",
+    text: "财务室角落的鱼缸今天很忙。每条鱼张口时，泡泡里都会冒出一小段评审意见，语气比人类评审更平静也更残忍。",
+    choices: [
+      {
+        text: "往缸里投一点预算删减，看看它们偏爱哪种节约方式",
+        delta: { grant: 3, service: 1, health: -1 },
+        flags: ["grant_chase", "official"],
+        tones: ["grant", "official"],
+        next: ["donor_dinner", "dean_smile"],
+        aftermaths: [
+          "鱼群很满意，围着你转了一圈，顺便吐出一句“建议聚焦主线”。",
+          "你摸到了一点它们的口味，代价是自己也开始按鱼的方式理解项目。"
+        ],
+        logs: [
+          "log: budget fish responded to austerity bait",
+          "log: panel language emitted through bubbles"
+        ]
+      },
+      {
+        text: "把泡泡轨迹记下来，尝试从中推算评审排序",
+        delta: { paper: 2, grant: 1, luck: 2 },
+        flags: ["question_system", "paper_push"],
+        tones: ["grant", "paper", "question"],
+        next: ["metrics_fever", "forgotten_dataset"],
+        aftermaths: [
+          "你画出的图比想象中稳定，像一套早就有人用过的水下排序法。",
+          "推算结果很有用，只是最后一条线直接连到了你办公室门口。"
+        ],
+        logs: [
+          "log: bubble paths converted into ranking heuristic",
+          "log: finance aquarium linked to local office"
+        ]
+      },
+      {
+        text: "盯着玻璃看到第二间房间出现，再决定要不要继续申报",
+        delta: { luck: 3, health: -1 },
+        flags: ["hide", "burnout"],
+        tones: ["hide", "follow"],
+        next: ["duplicate_you", "retirement_party"],
+        aftermaths: [
+          "第二间房间里也有一个你，正在很熟练地删预算中的最后一项人力成本。",
+          "你一时忘了自己是在看鱼还是在看未来，于是两边都冲你摆尾。"
+        ],
+        logs: [
+          "log: aquarium reflection revealed secondary office",
+          "log: user observed alternate self under budget stress"
+        ]
+      }
+    ]
+  },
+  {
+    id: "duplicate_you",
+    minTurn: 6,
+    requiredAnyFlags: ["follow_echo", "hide", "question_system"],
+    tag: "会面",
+    risk: "极高",
+    title: "已经上岸又已经离开的你",
+    text: "你终于遇到了那个版本的自己：他像已经上岸，又像早就离开；胸牌上写着你的名字，背面却是另一个部门的章。",
+    choices: [
+      {
+        text: "和他交换日历，看看哪一份更像真正的本周",
+        delta: { luck: 3, service: 1, health: -1 },
+        flags: ["official", "follow_echo"],
+        tones: ["official", "follow"],
+        next: ["retirement_party", "dean_smile"],
+        aftermaths: [
+          "你们的日历只有周三重叠，其余时间像被两套院系借走了。",
+          "交换之后，你手机里立刻多了一场从未报名的答辩。"
+        ],
+        logs: [
+          "log: calendar exchange executed between versions",
+          "log: weekly schedule now partially dual-authored"
+        ]
+      },
+      {
+        text: "直接问他：哪一扇门绝对不要再打开第二次",
+        delta: { paper: 1, luck: 3 },
+        flags: ["question_system", "follow_echo"],
+        tones: ["question", "follow"],
+        next: ["office_404", "phantom_lab"],
+        aftermaths: [
+          "他没回答门牌号，只在你手心写了一个楼层，然后像熟悉流程一样先行离场。",
+          "你得到的不是禁令，而是一种非常具体的犹豫。"
+        ],
+        logs: [
+          "log: alternate self supplied restricted location clue",
+          "log: warning delivered without overt refusal"
+        ]
+      },
+      {
+        text: "假装不认识，看看系统会不会因此把你们分成两个人",
+        delta: { health: 1, luck: 2, paper: 1 },
+        flags: ["hide", "burnout"],
+        tones: ["hide", "health"],
+        next: ["corridor_nameplate", "retirement_party"],
+        aftermaths: [
+          "系统表面上接受了你的装傻，转头就在门禁日志里把你们排成上下两行。",
+          "你暂时避免了正面对话，但那张熟悉的脸开始在更多玻璃里值班。"
+        ],
+        logs: [
+          "log: identity split attempt only partially successful",
+          "log: duplicate presence now distributed through reflections"
+        ]
+      }
+    ]
+  },
+  {
+    id: "retirement_party",
+    minTurn: 6,
+    requiredAnyFlags: ["burnout", "health_patch", "service_more", "hide"],
+    tag: "茶歇区",
+    risk: "极高",
+    title: "为错误版本举办的退休宴",
+    text: "楼里忽然给一位和你履历几乎一致的人办退休茶歇。蛋糕上名字没错，照片却像你在另一个院系里熬出来的脸。",
+    choices: [
+      {
+        text: "先上去致辞，看看在别人的退休宴上道谢会不会更轻松",
+        delta: { service: 2, luck: 2, health: -1 },
+        flags: ["official", "service_more"],
+        tones: ["service", "official"],
+        next: ["dean_smile", "committee_pearl"],
+        aftermaths: [
+          "大家都听得很认真，像你终于说出了他们一直等的那段告别词。",
+          "你致辞完才发现台下有几个人正核对你和照片的皱纹走势。"
+        ],
+        logs: [
+          "log: retirement speech delivered by non-retired matching entity",
+          "log: audience accepted overlap with minimal friction"
+        ]
+      },
+      {
+        text: "顺走一块蛋糕，从服务电梯悄悄撤离现场",
+        delta: { health: 2, luck: 1 },
+        flags: ["hide", "health_patch"],
+        tones: ["hide", "health"],
+        next: ["office_404", "blank_id_card"],
+        aftermaths: [
+          "蛋糕很好吃，奶油里却夹着一张你下周的院务安排。",
+          "你撤得很干净，只在电梯镜面里留下了一句“辛苦了”。"
+        ],
+        logs: [
+          "log: retreat executed with ceremonial dessert",
+          "log: cake contained future administrative insert"
+        ]
+      },
+      {
+        text: "当场问一句：今天退休的究竟是哪一个我",
+        delta: { paper: 1, luck: 3 },
+        flags: ["question_system", "follow_echo"],
+        tones: ["question", "follow"],
+        next: ["duplicate_you", "sealed_seminar"],
+        aftermaths: [
+          "空气安静得像刚被消音，随后有人给你递来了一张补办工牌申请。",
+          "没有人回答，但每个人都表现得像终于等到你问这句。"
+        ],
+        logs: [
+          "log: retirement identity ambiguity raised publicly",
+          "log: event transitioned into archive-tier anomaly"
+        ]
+      }
+    ]
+  },
+  {
+    id: "hallway_kettle",
+    minTurn: 2,
+    weight: 0.8,
+    tag: "公共区",
+    risk: "低",
+    title: "会记住拒稿温度的热水壶",
+    text: "茶水间的热水壶总能精准烧到你上一封拒稿信到达时的温度。今天它比平时更快一些。",
+    choices: [
+      {
+        text: "顺手给所有人都倒一杯，看看共饮能不能把气氛拉回人间",
+        delta: { service: 2, health: 1 },
+        flags: ["service_more", "health_patch"],
+        tones: ["service", "health"],
+        next: ["committee_pearl", "basement_minutes"],
+        aftermaths: [
+          "大家都很感谢，只有热水壶在你转身时自己轻轻补了一壶。",
+          "这一举动确实让房间柔和了一点，也让你在壶的记忆里变得很重要。"
+        ],
+        logs: [
+          "log: communal kettle entered host-recognition mode",
+          "log: morale bump achieved through hydration"
+        ]
+      },
+      {
+        text: "看着蒸汽发散，尝试把它当成对接下来一周的天气预报",
+        delta: { luck: 2, paper: 1 },
+        flags: ["follow_echo"],
+        tones: ["follow", "question"],
+        next: ["funding_oracle", "reviewer_from_tomorrow"],
+        aftermaths: [
+          "蒸汽在窗上画出一个会场平面图，你看懂了一半，另一半像故意留到夜里。",
+          "你本来只是发呆，结果蒸汽极有服务意识地给了你两个楼号。"
+        ],
+        logs: [
+          "log: vapor patterns interpreted as route guidance",
+          "log: kettle joined advisory ecosystem"
+        ]
+      },
+      {
+        text: "把壶抱回办公室，今晚只允许它对着你一个人沸腾",
+        delta: { health: 1, luck: 1 },
+        flags: ["hide"],
+        tones: ["hide", "health"],
+        next: ["office_404", "corridor_nameplate"],
+        aftermaths: [
+          "壶很配合，直到半夜自己发出第二次开水提示音。",
+          "你把它带离公共区后，走廊突然显得像少了一个会说话的人。"
+        ],
+        logs: [
+          "log: kettle relocated to private office",
+          "log: background anomaly density shifted with appliance"
+        ]
+      }
+    ]
+  },
+  {
+    id: "campus_map",
+    minTurn: 3,
+    weight: 0.8,
+    tag: "导航",
+    risk: "低",
+    title: "新增建筑的校园地图",
+    text: "手机地图忽然多出一栋从未见过的楼，楼名恰好是本周学院最爱说的那个指标词。",
+    choices: [
+      {
+        text: "顺着最短路线走过去，看看指标到底想住在哪",
+        delta: { grant: 1, luck: 2 },
+        flags: ["official", "grant_chase"],
+        tones: ["official", "grant"],
+        next: ["donor_dinner", "travel_reimbursement"],
+        aftermaths: [
+          "路线把你带进一条平时从不开放的连廊，尽头挂着一张新楼落成合影。",
+          "你没找到楼，却找到了一套把人送进楼里的交通逻辑。"
+        ],
+        logs: [
+          "log: campus map suggested unverified construction",
+          "log: route intersected with ceremonial infrastructure"
+        ]
+      },
+      {
+        text: "先截屏，再比对昨晚和今早的版本差了什么",
+        delta: { paper: 1, luck: 2, service: 1 },
+        flags: ["question_system", "paper_push"],
+        tones: ["question", "paper"],
+        next: ["forgotten_dataset", "metrics_fever"],
+        aftermaths: [
+          "你比对出多出来的不只是楼，还有一条专门通往你办公室的步行建议。",
+          "截图看似普通，发到电脑上却自动归入“人事变动”文件夹。"
+        ],
+        logs: [
+          "log: navigation diff exposed institutional drift",
+          "log: map screenshots reclassified on desktop"
+        ]
+      },
+      {
+        text: "关掉地图，按旧习惯走，给脚一点自主权",
+        delta: { health: 2, luck: 1 },
+        flags: ["hide", "health_patch"],
+        tones: ["hide", "health"],
+        next: ["silent_lecture", "ghost_postdoc"],
+        aftermaths: [
+          "脚很争气，还是把你带到了那栋并不存在的楼旁边。",
+          "你坚持老路，校园则耐心地把新东西长在老路两侧。"
+        ],
+        logs: [
+          "log: manual navigation failed to avoid anomaly zone",
+          "log: habit trail remains contaminated"
+        ]
+      }
+    ]
+  },
+  {
+    id: "printer_queue",
+    minTurn: 4,
+    weight: 0.7,
+    tag: "打印室",
+    risk: "中",
+    title: "辞职信预览",
+    text: "公共打印队列里排着一个文件：your-resignation-final-final.pdf。提交者显示为你，但时间是下周一清晨。",
+    choices: [
+      {
+        text: "打开预览，至少看看未来自己的排版习惯有没有进步",
+        delta: { luck: 3, paper: 1 },
+        flags: ["question_system", "follow_echo"],
+        tones: ["question", "follow"],
+        next: ["duplicate_you", "corridor_nameplate"],
+        aftermaths: [
+          "辞职信写得非常克制，克制到像一篇已经过审的短通讯。",
+          "你没看完全，因为第二页顶部突然出现了今天的日期。"
+        ],
+        logs: [
+          "log: resignation draft preview opened",
+          "log: print queue contains forward-authored document"
+        ]
+      },
+      {
+        text: "用课程大纲覆盖这条打印任务，让教学先把它压下去",
+        delta: { teaching: 2, service: 1 },
+        flags: ["teaching_mask", "official"],
+        tones: ["teaching", "official"],
+        next: ["student_feedback", "copied_minutes"],
+        aftermaths: [
+          "大纲确实盖住了它，但打印机在边角留下一行极细的“稍后继续”。",
+          "你暂时赢了一手操作顺序，输给了打印室那种慢悠悠的记性。"
+        ],
+        logs: [
+          "log: resignation file pushed down by syllabus print job",
+          "log: printer retained deferred output marker"
+        ]
+      },
+      {
+        text: "取消任务并拔掉打印机，今晚谁都别说重话",
+        delta: { health: 2, luck: 1 },
+        flags: ["hide", "health_patch"],
+        tones: ["hide", "health"],
+        next: ["office_404", "retirement_party"],
+        aftermaths: [
+          "打印机安静了，但出纸口里还卡着一句“敬请理解”。",
+          "你救回了这个晚上，却把那份文件留在了系统的明天。"
+        ],
+        logs: [
+          "log: print queue interrupted by power loss",
+          "log: unresolved document persisted in spool memory"
+        ]
+      }
+    ]
+  }
+];
 
-const els = {
-  profile: document.querySelector("#profile"),
-  mode: document.querySelector("#mode"),
-  profileNote: document.querySelector("#profileNote"),
-  startBtn: document.querySelector("#startBtn"),
-  startHeroBtn: document.querySelector("#startHeroBtn"),
-  restartBtn: document.querySelector("#restartBtn"),
-  dailySeedBtn: document.querySelector("#dailySeedBtn"),
-  seedBtn: document.querySelector("#seedBtn"),
-  seedLabel: document.querySelector("#seedLabel"),
-  rank: document.querySelector("#rank"),
-  crisis: document.querySelector("#crisis"),
-  semester: document.querySelector("#semester"),
-  status: document.querySelector("#status"),
-  mood: document.querySelector("#mood"),
-  combo: document.querySelector("#combo"),
-  actionsLeft: document.querySelector("#actionsLeft"),
-  economy: document.querySelector("#economy"),
-  stats: document.querySelector("#stats"),
-  projectBoard: document.querySelector("#projectBoard"),
-  wheel: document.querySelector("#wheel"),
-  eventTag: document.querySelector("#eventTag"),
-  eventRisk: document.querySelector("#eventRisk"),
-  eventTitle: document.querySelector("#eventTitle"),
-  eventText: document.querySelector("#eventText"),
-  activeRule: document.querySelector("#activeRule"),
-  choices: document.querySelector("#choices"),
-  memoText: document.querySelector("#memoText"),
-  trajectory: document.querySelector("#trajectory"),
-  achievements: document.querySelector("#achievements"),
-  timeline: document.querySelector("#timeline"),
-  bestiary: document.querySelector("#bestiary"),
-  log: document.querySelector("#log"),
-  resultBox: document.querySelector("#resultBox"),
-  endingTitle: document.querySelector("#endingTitle"),
-  endingText: document.querySelector("#endingText"),
-  diagnosisCard: document.querySelector("#diagnosisCard"),
-  shareText: document.querySelector("#shareText"),
-  copyBtn: document.querySelector("#copyBtn")
-};
+const root = typeof window !== "undefined" ? window : globalThis;
 
-function seededRandom() {
-  seed = (seed * 9301 + 49297) % 233280;
-  return seed / 233280;
+function byId(id) {
+  return document.querySelector(`#${id}`);
 }
 
-function reseed() {
-  seed = Math.floor(Math.random() * 99999) + 1;
-  updateSeedLabel();
-  if (!state) {
-    els.log.textContent = `faculty-survival.log\nuniverse reseeded\nseed FR-${String(seed).padStart(5, "0")}`;
+const elements = {
+  profile: byId("profile"),
+  mode: byId("mode"),
+  profileNote: byId("profileNote"),
+  startBtn: byId("startBtn"),
+  startHeroBtn: byId("startHeroBtn"),
+  restartBtn: byId("restartBtn"),
+  dailySeedBtn: byId("dailySeedBtn"),
+  seedBtn: byId("seedBtn"),
+  seedLabel: byId("seedLabel"),
+  rank: byId("rank"),
+  crisis: byId("crisis"),
+  semester: byId("semester"),
+  status: byId("status"),
+  mood: byId("mood"),
+  combo: byId("combo"),
+  stats: byId("stats"),
+  wheel: byId("wheel"),
+  eventTag: byId("eventTag"),
+  eventRisk: byId("eventRisk"),
+  eventTitle: byId("eventTitle"),
+  eventText: byId("eventText"),
+  activeRule: byId("activeRule"),
+  choices: byId("choices"),
+  memoText: byId("memoText"),
+  trajectory: byId("trajectory"),
+  timeline: byId("timeline"),
+  log: byId("log"),
+  resultBox: byId("resultBox"),
+  endingTitle: byId("endingTitle"),
+  endingText: byId("endingText"),
+  diagnosisCard: byId("diagnosisCard"),
+  endingStory: byId("endingStory"),
+  shareText: byId("shareText"),
+  copyBtn: byId("copyBtn")
+};
+
+let seed = 246810;
+
+const state = {
+  profile: "balanced",
+  mode: "standard",
+  turn: 1,
+  maxTurns: modeSettings.standard.turns,
+  stats: cloneStats(profiles.balanced),
+  mood: moods[0],
+  rule: absurdRules[0],
+  current: null,
+  currentChoices: [],
+  storyFlags: new Set(),
+  ghostFlags: new Set(),
+  seenScenes: new Set(),
+  queue: [],
+  history: [],
+  routeWeights: {},
+  routeSignature: [],
+  logLines: ["faculty-survival.log", "system idle", "choose a profile to begin"],
+  latestMemo: "同样的选择，不一定会把你送往同样的地方。",
+  ending: null,
+  started: false,
+  finished: false
+};
+
+function cloneStats(stats) {
+  return JSON.parse(JSON.stringify(stats));
+}
+
+function seededRandom() {
+  seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+  return seed / 4294967296;
+}
+
+function hashString(value) {
+  let hash = 2166136261;
+  for (const char of value) {
+    hash ^= char.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
   }
+  return hash >>> 0;
+}
+
+function reseed(nextSeed) {
+  seed = (Number(nextSeed) >>> 0) || 1;
+  updateSeedLabel();
+}
+
+function randomSeed() {
+  reseed(Math.floor(Math.random() * 0xffffffff));
 }
 
 function useDailySeed() {
-  const today = new Date();
-  const stamp = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-  seed = stamp % 99999;
-  updateSeedLabel();
-  els.log.textContent = `faculty-survival.log\ndaily universe loaded\nseed FR-${String(seed).padStart(5, "0")}`;
+  const now = new Date();
+  const dayKey = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+  reseed(hashString(dayKey));
+}
+
+function formatSeed() {
+  return `FR-${String(seed % 1000000).padStart(6, "0")}`;
 }
 
 function updateSeedLabel() {
-  els.seedLabel.textContent = `FR-${String(seed).padStart(5, "0")}`;
+  if (elements.seedLabel) {
+    elements.seedLabel.textContent = formatSeed();
+  }
 }
 
-function clamp(value) {
-  return Math.max(0, Math.min(100, Math.round(value)));
+function pick(list) {
+  return list[Math.floor(seededRandom() * list.length)];
+}
+
+function addDelta(target, delta) {
+  for (const [key, value] of Object.entries(delta)) {
+    target[key] = (target[key] || 0) + value;
+  }
+}
+
+function mergeDeltas(...parts) {
+  const merged = {};
+  for (const part of parts) {
+    addDelta(merged, part || {});
+  }
+  return merged;
+}
+
+function scaleDelta(delta) {
+  const multiplier = modeSettings[state.mode].multiplier;
+  const scaled = {};
+  for (const [key, value] of Object.entries(delta || {})) {
+    const scaledValue = value > 0
+      ? Math.max(1, Math.round(value * multiplier))
+      : Math.min(-1, Math.round(value * multiplier));
+    scaled[key] = scaledValue;
+  }
+  return scaled;
+}
+
+function clamp(value, min = 0, max = 100) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function hasTone(choice, tone) {
+  return Array.isArray(choice.tones) && choice.tones.includes(tone);
+}
+
+function applyRule(choice) {
+  return state.rule ? state.rule.apply(choice, state) || {} : {};
+}
+
+function moodDelta() {
+  return state.mood ? state.mood.bonus || {} : {};
+}
+
+function applyStats(delta) {
+  for (const [key, value] of Object.entries(delta)) {
+    state.stats[key] = clamp((state.stats[key] || 0) + value);
+  }
+}
+
+function cleanDelta(delta) {
+  const cleaned = {};
+  for (const [key, value] of Object.entries(delta)) {
+    if (value) {
+      cleaned[key] = value;
+    }
+  }
+  return cleaned;
 }
 
 function formatDelta(delta) {
@@ -833,483 +2351,675 @@ function formatDelta(delta) {
     .join(" / ");
 }
 
-function addDelta(target, delta) {
-  Object.entries(delta).forEach(([key, value]) => {
-    target[key] = clamp(target[key] + value);
-  });
+function formatChoicePreview(choice) {
+  const scaled = scaleDelta(choice.delta || {});
+  const summary = cleanDelta(scaled);
+  return Object.keys(summary).length ? formatDelta(summary) : "剧情推进";
 }
 
-function getMaxSemester() {
-  return state?.mode.semesters || defaultMaxSemester;
+function pushLog(line) {
+  state.logLines.push(line);
+  state.logLines = state.logLines.slice(-9);
 }
 
-function scaleDelta(delta) {
-  const multiplier = state?.mode.multiplier || 1;
-  const scaled = Object.fromEntries(Object.entries(delta).map(([key, value]) => {
-    if (value === 0) return [key, 0];
-    const scaled = value < 0 ? value * multiplier : value * (2 - multiplier);
-    return [key, Math.trunc(scaled)];
-  }));
-  return state?.rule ? cleanDelta(state.rule.modify(scaled)) : scaled;
+function routeWeight(tone) {
+  return state.routeWeights[tone] || 0;
 }
 
-function cleanDelta(delta) {
-  return Object.fromEntries(Object.entries(delta).filter(([, value]) => typeof value === "number" && value !== 0));
+function noteRoute(choice) {
+  for (const tone of choice.tones || []) {
+    state.routeWeights[tone] = (state.routeWeights[tone] || 0) + 1;
+  }
+}
+
+function addFlags(flags) {
+  for (const flag of flags || []) {
+    state.storyFlags.add(flag);
+    if (
+      flag.startsWith("ghost.") ||
+      flag.startsWith("echo.") ||
+      flag.startsWith("void_") ||
+      flag.includes("echo") ||
+      flag.includes("future") ||
+      flag.includes("void") ||
+      flag.includes("ghost") ||
+      flag.includes("duplicate")
+    ) {
+      state.ghostFlags.add(flag);
+    }
+  }
+}
+
+function topRouteTones() {
+  return Object.entries(state.routeWeights)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([tone]) => tone);
+}
+
+function getComboLabel() {
+  const leaders = topRouteTones();
+  if (!leaders.length) {
+    return "尚未形成";
+  }
+  const labels = {
+    paper: "论文偏航",
+    grant: "基金过载",
+    teaching: "课堂回声",
+    service: "事务菌丝",
+    health: "求生补丁",
+    luck: "侥幸导航",
+    hide: "低调潜行",
+    follow: "追踪回声",
+    official: "礼貌流程",
+    question: "逆向盘问",
+    care: "善意续命"
+  };
+  return leaders.map((tone) => labels[tone] || tone).join(" / ");
 }
 
 function getCrisisScore() {
-  if (!state) return 0;
-  const lowStats = Object.values(state.stats).filter((value) => value < 35).length * 12;
-  const healthRisk = Math.max(0, 45 - state.stats.health);
-  const luckRisk = Math.max(0, 35 - state.stats.luck) / 2;
-  return clamp(lowStats + healthRisk + luckRisk);
+  let risk = 0;
+  for (const value of Object.values(state.stats)) {
+    if (value < 45) risk += 1;
+    if (value < 30) risk += 1;
+  }
+  risk += Math.floor(state.ghostFlags.size / 2);
+  if (state.storyFlags.has("burnout")) {
+    risk += 2;
+  }
+  return risk;
 }
 
-function profileName() {
-  return els.profile.options[els.profile.selectedIndex].textContent;
+function crisisLabel() {
+  const risk = getCrisisScore();
+  if (risk >= 8) return "红区";
+  if (risk >= 5) return "橙区";
+  if (risk >= 3) return "黄区";
+  return "绿区";
 }
 
-function updateProfileNote() {
-  const mode = modeSettings[els.mode.value];
-  els.profileNote.textContent = `${profileNotes[els.profile.value]} ${mode.rule}`;
+function totalScore() {
+  return Object.values(state.stats).reduce((sum, value) => sum + value, 0);
 }
 
-function startGame() {
-  const mood = moods[Math.floor(seededRandom() * moods.length)];
-  const mode = modeSettings[els.mode.value];
-  const stats = { ...profiles[els.profile.value] };
-  addDelta(stats, mood.bonus);
-  addDelta(stats, mode.bonus);
-  state = {
-    semester: 1,
-    stats,
-    used: [],
-    history: [],
-    achievements: new Set(),
-    myths: new Set(),
-    storyFlags: new Set(),
-    choiceTrace: [],
-    chainSeen: new Set(),
-    hauntSeen: new Set(),
-    ghostFlags: [],
-    projects: projectTemplates.map((project) => ({ ...project, progress: 0, completeDone: false })),
-    actionsLeft: actionBudget[els.mode.value],
-    budget: economyBudget[els.mode.value].budget,
-    energy: economyBudget[els.mode.value].energy,
-    mode,
-    mood,
-    rule: null,
-    spin: mood.spin,
-    log: [
-      `你以“${profileName()}”身份入职，宇宙强度：${mode.label}。`,
-      `本轮宇宙天气：${mood.name}。`
-    ]
-  };
-  els.resultBox.hidden = true;
-  els.copyBtn.textContent = "复制结局文本";
-  render();
+function getRankLabel() {
+  const total = totalScore();
+  const ghost = state.ghostFlags.size;
+  if (!state.started) {
+    return "未入档";
+  }
+  if (state.finished && ghost >= 5) {
+    return "院系传说本人";
+  }
+  if (total >= 350 && ghost <= 2) {
+    return "表面上岸";
+  }
+  if (total >= 310) {
+    return "仍在编制内";
+  }
+  if (getCrisisScore() >= 8) {
+    return "被系统反向引用";
+  }
+  return "在编怪谈";
+}
+
+function statusLabel() {
+  if (!state.started) {
+    return "等待开局";
+  }
+  if (state.finished) {
+    return "档案已封存";
+  }
+  if (state.ghostFlags.size >= 4) {
+    return "学院正在改写你";
+  }
+  if (getCrisisScore() >= 6) {
+    return "风险升高";
+  }
+  return "故事持续推进";
+}
+
+function sceneEligible(scene) {
+  if (state.seenScenes.has(scene.id)) return false;
+  if (scene.kind === "intro") return false;
+  if (scene.profiles && !scene.profiles.includes(state.profile)) return false;
+  if (scene.minTurn && state.turn < scene.minTurn) return false;
+  if (scene.maxTurn && state.turn > scene.maxTurn) return false;
+  if (scene.requiredFlags && !scene.requiredFlags.every((flag) => state.storyFlags.has(flag))) {
+    return false;
+  }
+  if (scene.requiredAnyFlags && !scene.requiredAnyFlags.some((flag) => state.storyFlags.has(flag))) {
+    return false;
+  }
+  if (scene.blockedFlags && scene.blockedFlags.some((flag) => state.storyFlags.has(flag))) {
+    return false;
+  }
+  return true;
+}
+
+function sceneWeight(scene) {
+  let weight = scene.weight || 1;
+  for (const flag of scene.requiredAnyFlags || []) {
+    if (state.storyFlags.has(flag)) {
+      weight += 0.7;
+    }
+  }
+  if (scene.tag.includes("教学") && state.profile === "teaching") weight += 0.8;
+  if (scene.tag.includes("申报") && state.profile === "grant") weight += 0.8;
+  if (scene.tag.includes("投稿") && state.profile === "paper") weight += 0.8;
+  if (scene.tag.includes("B4") && state.profile === "stealth") weight += 0.8;
+  if (scene.tag.includes("档案") && state.profile === "balanced") weight += 0.8;
+  return weight;
+}
+
+function weightedPick(list) {
+  const total = list.reduce((sum, scene) => sum + sceneWeight(scene), 0);
+  let roll = seededRandom() * total;
+  for (const scene of list) {
+    roll -= sceneWeight(scene);
+    if (roll <= 0) {
+      return scene;
+    }
+  }
+  return list[list.length - 1];
+}
+
+function queueScene(choice) {
+  if (!choice.next || !choice.next.length) return;
+  const nextSceneId = pick(choice.next);
+  state.queue.unshift(nextSceneId);
+}
+
+function pullQueuedScene() {
+  while (state.queue.length) {
+    const nextId = state.queue.shift();
+    const scene = scenePool.find((item) => item.id === nextId);
+    if (!scene || state.seenScenes.has(scene.id)) {
+      continue;
+    }
+    if (scene.kind === "intro") {
+      if (!scene.profiles || scene.profiles.includes(state.profile)) {
+        return scene;
+      }
+      continue;
+    }
+    if (sceneEligible(scene)) {
+      return scene;
+    }
+  }
+  return null;
+}
+
+function pickScene() {
+  const queued = pullQueuedScene();
+  if (queued) return queued;
+
+  const eligible = scenePool.filter(sceneEligible);
+  if (eligible.length) {
+    return weightedPick(eligible);
+  }
+
+  const fallback = scenePool.filter((scene) => !state.seenScenes.has(scene.id) && scene.kind !== "intro");
+  return fallback.length ? weightedPick(fallback) : null;
+}
+
+function nextRule() {
+  const pool = absurdRules.filter((rule) => rule.id !== state.rule?.id);
+  state.rule = pick(pool.length ? pool : absurdRules);
+}
+
+function nextMood() {
+  const pool = moods.filter((item) => item.name !== state.mood?.name);
+  state.mood = pick(pool.length ? pool : moods);
+  if (elements.wheel) {
+    elements.wheel.style.setProperty("--spin", `${state.mood.spin}deg`);
+  }
+}
+
+function startGame(profileOverride, modeOverride) {
+  state.profile = profileOverride || elements.profile?.value || "balanced";
+  state.mode = modeOverride || elements.mode?.value || "standard";
+  state.turn = 1;
+  state.maxTurns = modeSettings[state.mode].turns;
+  state.stats = cloneStats(profiles[state.profile]);
+  addDelta(state.stats, modeSettings[state.mode].bonus || {});
+  for (const [key, value] of Object.entries(state.stats)) {
+    state.stats[key] = clamp(value);
+  }
+  state.storyFlags = new Set();
+  state.ghostFlags = new Set();
+  state.seenScenes = new Set();
+  state.queue = [];
+  state.history = [];
+  state.routeWeights = {};
+  state.routeSignature = [];
+  state.logLines = [
+    "faculty-survival.log",
+    `profile: ${profileLabels[state.profile]}`,
+    `mode: ${modeSettings[state.mode].label}`
+  ];
+  state.latestMemo = "同样的选择，不一定会把你送往同样的地方。";
+  state.ending = null;
+  state.started = true;
+  state.finished = false;
+  state.current = null;
+  state.currentChoices = [];
+
+  state.queue.push(introSceneByProfile[state.profile]);
+  nextMood();
+  nextRule();
   drawEvent();
 }
 
-function pickEvent() {
-  const hauntEvent = hauntingEvents.find((event) => event.stage === state.semester && !state.hauntSeen.has(event.id));
-  if (hauntEvent) {
-    state.hauntSeen.add(hauntEvent.id);
-    return hauntEvent;
-  }
-  const unlockedChains = chainEvents.filter((event) => event.unlock(state) && !state.chainSeen.has(event.id));
-  if (unlockedChains.length > 0) {
-    const chainEvent = unlockedChains[Math.floor(seededRandom() * unlockedChains.length)];
-    state.chainSeen.add(chainEvent.id);
-    return chainEvent;
-  }
-  if (state.used.length === events.length) state.used = [];
-  const available = events.map((_, index) => index).filter(index => !state.used.includes(index));
-  const index = available[Math.floor(seededRandom() * available.length)];
-  state.used.push(index);
-  return events[index];
-}
-
 function drawEvent() {
-  if (!state) return;
-  if (state.semester > getMaxSemester() || state.stats.health <= 0) {
+  if (state.finished) {
+    render();
+    return;
+  }
+
+  if (state.turn > state.maxTurns) {
     finishGame();
     return;
   }
 
-  state.actionsLeft = actionBudget[els.mode.value];
-  state.budget = economyBudget[els.mode.value].budget;
-  state.energy = economyBudget[els.mode.value].energy;
-  const event = pickEvent();
-  state.rule = absurdRules[(state.semester + Math.floor(seededRandom() * absurdRules.length)) % absurdRules.length];
-  state.current = event;
-  state.spin += 360 + Math.floor(seededRandom() * 120);
-  els.wheel.style.setProperty("--spin", `${state.spin}deg`);
-  els.eventTag.textContent = event.tag;
-  els.eventRisk.textContent = `risk: ${event.risk}`;
-  els.eventTitle.textContent = event.title;
-  els.eventText.textContent = event.text;
-  els.activeRule.textContent = `本学期特殊规则：${state.rule.name}。${state.rule.text}`;
-  els.choices.innerHTML = "";
-  event.choices.forEach((choice, index) => {
-    const button = document.createElement("button");
-    const label = document.createElement("span");
-    const delta = document.createElement("small");
-    label.textContent = choice.text;
-    delta.textContent = formatDelta(scaleDelta(choice.delta));
-    button.append(label, delta);
-    button.addEventListener("click", () => applyChoice(index));
-    els.choices.appendChild(button);
-  });
+  const scene = pickScene();
+  if (!scene) {
+    finishGame();
+    return;
+  }
+
+  state.current = scene;
+  state.currentChoices = scene.choices || [];
+  state.seenScenes.add(scene.id);
   render();
+}
+
+function pickAftermath(choice) {
+  return pick(choice.aftermaths || ["这一选项很快长出了一层你没要求的后果。"]);
+}
+
+function pickLog(choice) {
+  return pick(choice.logs || ["log: anomaly advanced one step"]);
 }
 
 function applyChoice(index) {
-  const choice = state.current.choices[index];
-  const delta = scaleDelta(choice.delta);
-  const before = { ...state.stats };
-  addDelta(state.stats, delta);
-  if (choice.flag) state.storyFlags.add(choice.flag);
-  if (choice.ghost) state.ghostFlags.push(choice.ghost);
-  state.choiceTrace.push(index);
-  const swing = Object.keys(delta).reduce((sum, key) => sum + Math.abs(state.stats[key] - before[key]), 0);
-  const after = stageAftermaths[state.semester - 1]?.[index] || choice.memo;
-  state.history.push({
-    semester: state.semester,
+  if (!state.current || state.finished) return;
+  const choice = state.currentChoices[index];
+  if (!choice) return;
+
+  const scaledDelta = scaleDelta(choice.delta || {});
+  const ruleDelta = cleanDelta(applyRule(choice));
+  const weatherDelta = cleanDelta(moodDelta());
+  const finalDelta = cleanDelta(mergeDeltas(scaledDelta, ruleDelta, weatherDelta));
+  const aftermath = pickAftermath(choice);
+  const logLine = pickLog(choice);
+
+  applyStats(finalDelta);
+  noteRoute(choice);
+  addFlags(choice.flags);
+  queueScene(choice);
+  pushLog(logLine);
+
+  const historyEntry = {
+    turn: state.turn,
+    sceneId: state.current.id,
+    title: state.current.title,
     tag: state.current.tag,
-    choice: choice.text,
-    swing,
-    delta,
-    beat: storyProgressions[Math.min(state.semester - 1, storyProgressions.length - 1)],
-    after
-  });
-  updateAchievements();
-  state.log.unshift(`S${state.semester} ${state.current.tag}: ${choice.log}`);
-  els.memoText.textContent = after;
-  state.semester += 1;
+    risk: state.current.risk,
+    sceneText: state.current.text,
+    choiceText: choice.text,
+    aftermath,
+    logLine,
+    mood: state.mood.name,
+    ruleLabel: state.rule.label,
+    deltaText: Object.keys(finalDelta).length ? formatDelta(finalDelta) : "无直接数值变化"
+  };
+
+  state.history.push(historyEntry);
+  state.latestMemo = aftermath;
+
+  if (state.history.length >= state.maxTurns) {
+    finishGame();
+    return;
+  }
+
+  state.turn += 1;
+  nextMood();
+  nextRule();
   drawEvent();
 }
 
-function investProject(projectId) {
-  if (!state || state.finished || state.actionsLeft <= 0) return;
-  const project = state.projects.find((item) => item.id === projectId);
-  if (!project || project.completeDone) return;
-  if (state.budget < project.budgetCost || state.energy < project.energyCost) return;
-
-  state.actionsLeft -= 1;
-  state.budget -= project.budgetCost;
-  state.energy -= project.energyCost;
-  project.progress = Math.min(project.target, project.progress + project.perAction);
-  addDelta(state.stats, project.delta);
-  state.log.unshift(`S${state.semester} 项目投入：${project.name}。`);
-
-  if (project.risk > 0 && seededRandom() < project.risk * 0.04) {
-    state.log.unshift(`项目波动：${project.name} 突然返工。`);
-    project.progress = Math.max(0, project.progress - 1);
-    addDelta(state.stats, { health: -2, luck: -1 });
+function routeDigest() {
+  const leaders = topRouteTones();
+  if (!leaders.length) {
+    return ["official", "hide"];
   }
-
-  if (project.progress >= project.target && !project.completeDone) {
-    project.completeDone = true;
-    addDelta(state.stats, project.complete);
-    state.log.unshift(`项目完成：${project.completeText}`);
-  }
-
-  updateAchievements();
-  render();
+  return leaders;
 }
 
-function updateAchievements() {
-  bestiary.forEach((myth) => {
-    if (myth.test(state)) state.myths.add(myth.id);
-  });
-  achievementRules.forEach((achievement) => {
-    if (achievement.test(state)) state.achievements.add(achievement.id);
-  });
-}
-
-function getCombo() {
-  if (!state || state.history.length < 2) return "尚未形成";
-  const recent = state.history.slice(-2);
-  if (recent.every((item) => item.tag === "Grant" || item.delta.grant > 0)) return "基金冲刺";
-  if (recent.every((item) => item.delta.paper > 0)) return "论文连击";
-  if (recent.every((item) => item.delta.health > 0)) return "健康回补";
-  if (recent.every((item) => item.swing >= 16)) return "高波动人生";
-  return `${recent.at(-1).tag} 余波`;
-}
-
-function getTotal() {
-  const s = state.stats;
-  return s.paper + s.grant + s.teaching + s.service + s.health + s.luck;
-}
-
-function getEndingProfile() {
-  const trace = state.choiceTrace.concat(Array(6).fill(0)).slice(0, 6);
-  const familyIndex = ((((trace[0] * 3 + trace[1]) * 3 + trace[2]) * 3 + trace[3]) % endingFamilies.length);
-  const fateIndex = trace[4] * 3 + trace[5];
+function buildEndingProfile() {
+  const digest = routeDigest();
+  const ghost = state.ghostFlags.size;
+  const familyIndex = (
+    hashString(
+      `${state.profile}|${digest.join("-")}|${state.history[0]?.sceneId || ""}|${ghost}`
+    ) % endingFamilies.length
+  );
+  const fateIndex = (
+    hashString(
+      `${totalScore()}|${getCrisisScore()}|${state.history.length}|${digest.join("-")}`
+    ) % endingFates.length
+  );
   const archiveNumber = familyIndex * endingFates.length + fateIndex + 1;
   return {
     family: endingFamilies[familyIndex],
     fate: endingFates[fateIndex],
-    familyIndex,
-    fateIndex,
     archiveNumber
   };
 }
 
-function buildGhostEcho() {
-  const seen = [...new Set(state.ghostFlags.slice(-3))];
-  if (seen.length === 0) return "真正麻烦的是，学院后来把这一切统称为“情况已掌握”，仿佛命运只是一类可以归档的问题。";
-  return seen.map((flag) => ghostEchoes[flag] || "异常继续沿着制度缝隙缓慢发酵。").join("");
-}
+function buildEndingNarrative() {
+  const profile = buildEndingProfile();
+  const digest = routeDigest();
+  const crisis = crisisLabel();
+  const topStat = Object.entries(state.stats).sort((a, b) => b[1] - a[1])[0][0];
+  const topLabel = statLabels[topStat];
+  const intro = `档案 ${String(profile.archiveNumber).padStart(3, "0")} / 108 最终把你归入“${profile.family.name}”。你这一局最明显的路线是 ${digest.join(" / ")}，最后留在纸面上的最高指标是 ${topLabel}。`;
+  const outro = `${profile.family.text}${profile.fate.text} 风险分区目前显示为 ${crisis}，这意味着故事并没有否认你的努力，它只是坚持把努力也写进怪谈。`;
 
-function buildRouteDigest() {
-  return state.history.slice(0, 6).map((item) => item.tag).join(" -> ");
-}
+  const diagnosis = [
+    `<div class="diag-pill">档案号 ${String(profile.archiveNumber).padStart(3, "0")} / 108</div>`,
+    `<div class="diag-pill">开局 ${profileLabels[state.profile]}</div>`,
+    `<div class="diag-pill">宇宙 ${modeSettings[state.mode].label}</div>`,
+    `<div class="diag-pill">主路线 ${getComboLabel()}</div>`,
+    `<div class="diag-pill">怪谈痕迹 ${state.ghostFlags.size}</div>`,
+    `<div class="diag-pill">风险 ${crisis}</div>`
+  ].join("");
 
-function buildHauntingEnding() {
-  const profile = getEndingProfile();
-  const title = `第${String(profile.archiveNumber).padStart(3, "0")}号怪谈：${profile.family.name}·${profile.fate.name}`;
-  const text = `${profile.family.setup}${profile.family.mapping}${profile.fate.turn}${buildGhostEcho()}`;
   return {
-    ...profile,
-    title,
-    text
+    title: `${profile.family.name} · ${profile.fate.name}`,
+    intro,
+    outro,
+    diagnosis,
+    archiveNumber: profile.archiveNumber
   };
-}
-
-function getRank() {
-  if (!state) return "未入职";
-  const total = getTotal();
-  if (state.storyFlags.has("paper_stage") && state.storyFlags.has("grant_people") && state.storyFlags.has("boundary_clean")) {
-    return "学院传说型青椒";
-  }
-  if (state.stats.health < 20) return "濒危 PI";
-  if (state.stats.paper > 78 && state.stats.grant > 68) return "高压上岸型 PI";
-  if (state.stats.teaching > 78 && state.stats.health > 45) return "口碑型老师";
-  if (state.stats.luck > 76) return "宇宙偏爱型青椒";
-  if (state.projects.filter((item) => item.completeDone).length >= 3 && state.stats.health > 35) return "项目管理型幸存者";
-  if (state.mode === modeSettings.publish && total > 390) return "高压驯兽师";
-  if (state.mode === modeSettings.humane && state.stats.health > 70) return "罕见正常人";
-  if (total > 410) return "稀有稳定型青椒";
-  if (total < 275) return "系统维护中";
-  return "勉强优雅型青椒";
 }
 
 function finishGame() {
   state.finished = true;
-  els.choices.innerHTML = "";
-  els.eventTag.textContent = "Final";
-  els.eventRisk.textContent = "risk: archived";
-  els.eventTitle.textContent = "本轮结束";
-  els.eventText.textContent = "你坐在办公室里，看着日程表，决定给自己倒一杯水。";
-
-  const rank = getRank();
-  const total = getTotal();
-  const ending = buildHauntingEnding();
-  let text = ending.text;
-  if (state.storyFlags.has("paper_stage") && state.storyFlags.has("grant_people") && state.storyFlags.has("boundary_clean")) {
-    text = `${text} 与此同时，你没有顺从系统，也没有单纯逃离它。你把研究、学生和边界织成了一条自己的路，于是人们开始用你的名字描述某种罕见姿态。`;
-  } else if (state.stats.health < 20) {
-    text = `${text} 只是到了最后，你已经分不清自己更需要的是休息，还是维护。`;
-  } else if (state.stats.paper > 78 && state.stats.grant > 68) {
-    text = `${text} 论文和基金都站住了，代价是你现在听到 deadline 会自动握拳。`;
-  } else if (state.stats.teaching > 78) {
-    text = `${text} 但学生确实记得你讲过什么，也记得你某次说过“不要让第七层亮灯”。`;
-  } else if (state.stats.luck > 76) {
-    text = `${text} 你在多个不该过关的地方过关了。请谨慎使用这份好运。`;
-  } else if (state.mode === modeSettings.publish && total > 390) {
-    text = `${text} 你没有让高压系统变温柔，但你学会了在它露出牙齿时保持站立。`;
-  } else if (state.mode === modeSettings.humane && state.stats.health > 70) {
-    text = `${text} 传说中存在一种学院：事情仍然很多，但人不会被当成可替换耗材。你短暂抵达过那里。`;
-  } else if (total < 275) {
-    text = `${text} 这不是失败，只是你的学术操作系统需要重启。`;
-  }
-
-  updateAchievements();
-  const unlocked = achievementRules.filter((item) => state.achievements.has(item.id)).map((item) => item.label);
-  const completedProjects = state.projects.filter((item) => item.completeDone).map((item) => item.name);
-  const route = [...state.storyFlags].slice(0, 4).join("、");
-  const routeDigest = buildRouteDigest();
-  const share = `我在《青椒轮盘 Faculty Roulette》里抽到了${ending.title}。\n头衔：${rank}\n论文${state.stats.paper} / 基金${state.stats.grant} / 教学${state.stats.teaching} / 服务${state.stats.service} / 健康${state.stats.health} / 运气${state.stats.luck}\n宇宙：${state.mood.name} / ${state.mode.label}\n前六步：${routeDigest}\n成就：${unlocked.length ? unlocked.join("、") : "暂无，但系统已经记住我"}`;
-  els.endingTitle.textContent = ending.title;
-  els.endingText.textContent = text;
-  const unlockedMyths = bestiary.filter((item) => state.myths.has(item.id)).map((item) => item.name);
-  els.diagnosisCard.innerHTML = `
-    <h3>学术荒诞诊断书</h3>
-    <dl>
-      <dt>病例编号</dt><dd>${els.seedLabel.textContent}</dd>
-      <dt>怪谈档案</dt><dd>${ending.title}</dd>
-      <dt>诊断结果</dt><dd>${rank}</dd>
-      <dt>主要症状</dt><dd>${state.mood.name}，${state.mode.label}</dd>
-      <dt>目击传说</dt><dd>${unlockedMyths.length ? unlockedMyths.join("、") : "暂未目击，但墙里有声音"}</dd>
-      <dt>完成项目</dt><dd>${completedProjects.length ? completedProjects.join("、") : "没有完成项目，但积累了很多解释"}</dd>
-      <dt>剧情路径</dt><dd>${route || "普通幸存路线"}</dd>
-      <dt>前六步轨迹</dt><dd>${routeDigest}</dd>
-      <dt>108档位</dt><dd>${ending.archiveNumber} / 108</dd>
-      <dt>怪谈阶段</dt><dd>${state.ghostFlags.length} / ${hauntingEvents.length}</dd>
-      <dt>建议处方</dt><dd>${state.stats.health < 35 ? "先睡觉，再讨论宏大问题" : "保留边界，谨慎答应“轻量级”任务"}</dd>
-    </dl>
-  `;
-  els.shareText.value = share;
-  els.resultBox.hidden = false;
-  els.rank.textContent = rank;
+  state.current = null;
+  state.currentChoices = [];
+  state.ending = buildEndingNarrative();
+  pushLog(`log: dossier ${String(state.ending.archiveNumber).padStart(3, "0")} sealed`);
   render();
 }
 
 function renderStats() {
-  if (!state) {
-    els.stats.innerHTML = "";
-    return;
-  }
-  els.stats.innerHTML = Object.entries(state.stats).map(([key, value]) => `
-    <div class="stat">
-      <div class="stat-top"><span>${statLabels[key]}</span><strong>${value}</strong></div>
-      <div class="bar"><i style="--value:${value}%; --bar-color:${statColors[key]}"></i></div>
-    </div>
-  `).join("");
-}
-
-function renderProjects() {
-  if (!state) {
-    els.projectBoard.innerHTML = projectTemplates.map((project) => `
-      <div class="project-card">
-        <h3>${project.name}</h3>
-        <p>${project.desc}</p>
-        <div class="progress"><i style="--value:0%"></i></div>
-        <button disabled>等待开局</button>
+  if (!elements.stats) return;
+  elements.stats.innerHTML = Object.entries(state.stats)
+    .map(([key, value]) => `
+      <div class="stat" style="--stat-color:${statColors[key]}">
+        <span>${statLabels[key]}</span>
+        <strong>${value}</strong>
       </div>
-    `).join("");
-    return;
-  }
-
-  els.projectBoard.innerHTML = state.projects.map((project) => {
-    const percent = Math.round((project.progress / project.target) * 100);
-    const disabled = state.actionsLeft <= 0 || project.completeDone || state.finished || state.budget < project.budgetCost || state.energy < project.energyCost;
-    return `
-      <div class="project-card ${project.completeDone ? "complete" : ""}">
-        <h3>${project.name}</h3>
-        <p>${project.completeDone ? project.completeText : project.desc}</p>
-        <div class="project-meta"><span>预算 ${project.budgetCost}</span><span>精力 ${project.energyCost}</span><span>风险 ${project.risk}</span></div>
-        <div class="progress"><i style="--value:${percent}%"></i></div>
-        <button data-project="${project.id}" ${disabled ? "disabled" : ""}>${project.completeDone ? "已完成" : `投入 1 AP · ${project.progress}/${project.target}`}</button>
-      </div>
-    `;
-  }).join("");
-
-  els.projectBoard.querySelectorAll("button[data-project]").forEach((button) => {
-    button.addEventListener("click", () => investProject(button.dataset.project));
-  });
+    `)
+    .join("");
 }
 
 function renderTrajectory() {
-  const current = state ? state.semester : 0;
-  const maxSemester = getMaxSemester();
-  els.trajectory.innerHTML = Array.from({ length: maxSemester }, (_, index) => {
-    const step = index + 1;
-    const done = state && step < current;
-    const isCurrent = state && step === current && current <= maxSemester;
-    const cls = done ? "done" : isCurrent ? "current" : "";
-    return `<div class="dot ${cls}">S${step}</div>`;
-  }).join("");
-}
-
-function renderAchievements() {
-  if (!state) {
-    els.achievements.innerHTML = achievementRules.slice(0, 4).map((item) => `<span class="chip">${item.label}</span>`).join("");
+  if (!elements.trajectory) return;
+  if (!state.history.length && !state.started) {
+    elements.trajectory.innerHTML = `<span class="chip idle">等待故事开始</span>`;
     return;
   }
-  els.achievements.innerHTML = achievementRules.map((item) => {
-    const unlocked = state.achievements.has(item.id);
-    return `<span class="chip ${unlocked ? "unlocked" : ""}">${unlocked ? "✓ " : ""}${item.label}</span>`;
-  }).join("");
+
+  const steps = state.history
+    .map(
+      (entry) => `<span class="chip">S${entry.turn} · ${entry.title}</span>`
+    )
+    .join("");
+
+  const current = state.current
+    ? `<span class="chip active">S${state.turn} · ${state.current.title}</span>`
+    : `<span class="chip final">故事已归档</span>`;
+
+  elements.trajectory.innerHTML = steps + current;
 }
 
 function renderTimeline() {
-  if (!state || state.history.length === 0) {
-    els.timeline.innerHTML = "<li>等待第一张事件卡落地。</li>";
+  if (!elements.timeline) return;
+
+  if (!state.history.length) {
+    elements.timeline.innerHTML = `
+      <li class="timeline-step idle">
+        <div class="timeline-scene">尚未开始</div>
+        <p class="timeline-context">选择一种开局风格。不同的开局会把你带进完全不同的场景链里。</p>
+      </li>
+    `;
     return;
   }
-  els.timeline.innerHTML = state.history.map((item) => `<li>S${item.semester} · ${item.tag} · ${item.choice}<br>${item.beat}<br>${item.after}</li>`).join("");
+
+  elements.timeline.innerHTML = state.history
+    .map(
+      (entry) => `
+        <li class="timeline-step">
+          <div class="timeline-scene">S${entry.turn} · ${entry.title}</div>
+          <p class="timeline-context">${entry.sceneText}</p>
+          <p class="timeline-choice"><strong>你的选择：</strong>${entry.choiceText}</p>
+          <p class="timeline-beat">${entry.aftermath}</p>
+          <p class="timeline-after">${entry.deltaText} · ${entry.ruleLabel}</p>
+        </li>
+      `
+    )
+    .join("");
 }
 
-function renderBestiary() {
-  if (!state) {
-    els.bestiary.innerHTML = bestiary.slice(0, 4).map((item) => `
-      <div class="myth">
-        <strong>？？？</strong>
-        <span>${item.hint}</span>
-      </div>
-    `).join("");
+function renderEndingStory() {
+  if (!elements.endingStory) return;
+  elements.endingStory.innerHTML = state.history
+    .map(
+      (entry) => `
+        <article class="ending-scene">
+          <div class="timeline-scene">S${entry.turn} · ${entry.title}</div>
+          <p class="timeline-context">${entry.sceneText}</p>
+          <p class="timeline-choice-line"><strong>你当时：</strong>${entry.choiceText}</p>
+          <p class="timeline-beat">${entry.aftermath}</p>
+          <p class="timeline-after">${entry.deltaText}</p>
+        </article>
+      `
+    )
+    .join("");
+}
+
+function buildShareText() {
+  if (!state.ending) return "";
+  return [
+    `我在 Faculty Roulette 里走到了档案 ${String(state.ending.archiveNumber).padStart(3, "0")} / 108：${state.ending.title}`,
+    `开局：${profileLabels[state.profile]}`,
+    `宇宙：${modeSettings[state.mode].label}`,
+    `主路线：${getComboLabel()}`,
+    `最后一句：${state.latestMemo}`
+  ].join("\n");
+}
+
+function renderChoices() {
+  if (!elements.choices) return;
+  elements.choices.innerHTML = "";
+
+  if (!state.current || state.finished) {
     return;
   }
-  els.bestiary.innerHTML = bestiary.map((item) => {
-    const unlocked = state.myths.has(item.id);
-    return `
-      <div class="myth ${unlocked ? "unlocked" : ""}">
-        <strong>${unlocked ? item.name : "？？？"}</strong>
-        <span>${unlocked ? "已收录进本局荒诞档案。" : item.hint}</span>
-      </div>
+
+  for (const [index, choice] of state.currentChoices.entries()) {
+    const button = document.createElement("button");
+    button.className = "choice-btn";
+    button.innerHTML = `
+      <strong>${choice.text}</strong>
+      <small>${formatChoicePreview(choice)}</small>
     `;
-  }).join("");
+    button.addEventListener("click", () => applyChoice(index));
+    elements.choices.appendChild(button);
+  }
+}
+
+function renderEvent() {
+  if (state.current && !state.finished) {
+    elements.eventTag.textContent = state.current.tag;
+    elements.eventRisk.textContent = `risk: ${state.current.risk}`;
+    elements.eventTitle.textContent = state.current.title;
+    elements.eventText.textContent = state.current.text;
+    elements.activeRule.textContent = state.rule.label;
+    elements.memoText.textContent = state.latestMemo;
+    return;
+  }
+
+  elements.eventTag.textContent = state.finished ? "档案封存" : "事件卡";
+  elements.eventRisk.textContent = state.finished ? "risk: archived" : "risk: --";
+  elements.eventTitle.textContent = state.finished ? state.ending.title : "尚未抽卡";
+  elements.eventText.textContent = state.finished
+    ? "这一轮的完整经历已经封存到下方档案里。"
+    : "选择开局风格，然后开始你的学术怪谈历程。";
+  elements.activeRule.textContent = state.started
+    ? modeSettings[state.mode].rule
+    : "本学期特殊规则：尚未生成。";
+  elements.memoText.textContent = state.latestMemo;
+}
+
+function renderHeader() {
+  elements.rank.textContent = getRankLabel();
+  elements.crisis.textContent = crisisLabel();
+  elements.semester.textContent = state.started ? `S${state.turn}/${state.maxTurns}` : "-";
+  elements.status.textContent = statusLabel();
+  elements.mood.textContent = state.started ? state.mood.name : "尚未抽取";
+  elements.combo.textContent = getComboLabel();
+}
+
+function renderLog() {
+  if (!elements.log) return;
+  elements.log.textContent = state.logLines.join("\n");
+}
+
+function renderResult() {
+  if (!elements.resultBox) return;
+
+  if (!state.finished || !state.ending) {
+    elements.resultBox.hidden = true;
+    elements.shareText.value = "";
+    return;
+  }
+
+  elements.resultBox.hidden = false;
+  elements.endingTitle.textContent = state.ending.title;
+  elements.endingText.textContent = `${state.ending.intro} ${state.ending.outro}`;
+  elements.diagnosisCard.innerHTML = state.ending.diagnosis;
+  renderEndingStory();
+  elements.shareText.value = buildShareText();
 }
 
 function render() {
-  updateSeedLabel();
-  if (!state) {
-    els.semester.textContent = "-";
-    els.status.textContent = "等待开局";
-    els.mood.textContent = "尚未抽取";
-    els.combo.textContent = "尚未形成";
-    els.actionsLeft.textContent = "-";
-    els.economy.textContent = "-";
-    els.rank.textContent = "未入职";
-    els.crisis.textContent = "--";
-    renderStats();
-    renderProjects();
-    renderTrajectory();
-    renderAchievements();
-    renderTimeline();
-    renderBestiary();
-    return;
-  }
-  const maxSemester = getMaxSemester();
-  const crisis = getCrisisScore();
-  els.semester.textContent = `${Math.min(state.semester, maxSemester)} / ${maxSemester}`;
-  els.status.textContent = state.finished ? "结局生成" : state.stats.health <= 25 ? "健康预警" : state.stats.luck <= 25 ? "运气偏冷" : "勉强运转";
-  els.mood.textContent = state.mood.name;
-  els.combo.textContent = getCombo();
-  els.actionsLeft.textContent = `${state.actionsLeft} AP`;
-  els.economy.textContent = `${state.budget} / ${state.energy}`;
-  els.rank.textContent = getRank();
-  els.crisis.textContent = crisis >= 70 ? "红色" : crisis >= 40 ? "橙色" : "绿色";
+  renderHeader();
   renderStats();
-  renderProjects();
   renderTrajectory();
-  renderAchievements();
   renderTimeline();
-  renderBestiary();
-  els.log.textContent = ["faculty-survival.log", state.mood.memo, ...state.log.slice(0, 8)].join("\n");
+  renderEvent();
+  renderChoices();
+  renderLog();
+  renderResult();
 }
 
-els.profile.addEventListener("change", updateProfileNote);
-els.mode.addEventListener("change", updateProfileNote);
-els.startBtn.addEventListener("click", startGame);
-els.startHeroBtn.addEventListener("click", startGame);
-els.restartBtn.addEventListener("click", startGame);
-els.seedBtn.addEventListener("click", reseed);
-els.dailySeedBtn.addEventListener("click", useDailySeed);
-els.copyBtn.addEventListener("click", async () => {
+function updateProfileNote() {
+  if (!elements.profileNote) return;
+  const profile = elements.profile?.value || "balanced";
+  elements.profileNote.textContent = profileNotes[profile];
+}
+
+async function copyShareText() {
+  if (!elements.shareText?.value) return;
   try {
-    await navigator.clipboard.writeText(els.shareText.value);
-    els.copyBtn.textContent = "已复制";
-    setTimeout(() => { els.copyBtn.textContent = "复制结局文本"; }, 1200);
+    await navigator.clipboard.writeText(elements.shareText.value);
+    state.latestMemo = "结局文本已复制。它现在可以去别人的聊天窗口里继续上班。";
+    renderEvent();
   } catch {
-    els.shareText.select();
+    state.latestMemo = "复制失败，但文本还在下面。今天可能是剪贴板在闹怪谈。";
+    renderEvent();
+  }
+}
+
+function snapshot() {
+  return {
+    profile: state.profile,
+    mode: state.mode,
+    turn: state.turn,
+    maxTurns: state.maxTurns,
+    started: state.started,
+    finished: state.finished,
+    currentSceneId: state.current?.id || null,
+    currentTitle: state.current?.title || null,
+    currentChoices: state.currentChoices.map((choice) => choice.text),
+    memo: state.latestMemo,
+    historyLength: state.history.length,
+    historyTitles: state.history.map((entry) => entry.title),
+    history: state.history.map((entry) => ({
+      turn: entry.turn,
+      sceneId: entry.sceneId,
+      title: entry.title,
+      choiceText: entry.choiceText,
+      aftermath: entry.aftermath
+    })),
+    queue: [...state.queue],
+    flags: [...state.storyFlags],
+    ghostFlags: [...state.ghostFlags],
+    endingTitle: elements.endingTitle?.textContent || "",
+    diagnosisHtml: elements.diagnosisCard?.innerHTML || "",
+    timelineHtml: elements.timeline?.innerHTML || "",
+    endingStoryHtml: elements.endingStory?.innerHTML || "",
+    shareText: elements.shareText?.value || ""
+  };
+}
+
+if (elements.profile) {
+  elements.profile.addEventListener("change", updateProfileNote);
+}
+elements.startBtn?.addEventListener("click", () => startGame());
+elements.startHeroBtn?.addEventListener("click", () => startGame());
+elements.restartBtn?.addEventListener("click", () => startGame());
+elements.seedBtn?.addEventListener("click", () => {
+  randomSeed();
+  if (state.started) {
+    startGame(elements.profile?.value, elements.mode?.value);
   }
 });
+elements.dailySeedBtn?.addEventListener("click", () => {
+  useDailySeed();
+  startGame(elements.profile?.value, elements.mode?.value);
+});
+elements.copyBtn?.addEventListener("click", copyShareText);
 
 updateProfileNote();
 updateSeedLabel();
-renderTrajectory();
 render();
+
+root.__facultyRouletteDebug = {
+  setSeed(nextSeed) {
+    reseed(nextSeed);
+    return formatSeed();
+  },
+  start(profile = "balanced", mode = "standard", nextSeed) {
+    if (elements.profile) elements.profile.value = profile;
+    if (elements.mode) elements.mode.value = mode;
+    updateProfileNote();
+    if (typeof nextSeed === "number") {
+      reseed(nextSeed);
+    }
+    startGame(profile, mode);
+    return snapshot();
+  },
+  choose(index = 0) {
+    applyChoice(index);
+    return snapshot();
+  },
+  getState() {
+    return snapshot();
+  }
+};

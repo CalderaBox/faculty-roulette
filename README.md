@@ -11,19 +11,19 @@ Playable zero-dependency prototype.
 - Five faculty archetypes
 - Three universe intensity modes
 - Daily seed and random seed runs
-- 10-14 story nodes depending on mode
+- Profile-specific opening scenes instead of one shared fixed script
+- A larger branching scene pool where previous choices change which scenes can appear next
+- The same choice can produce different creepy aftermath variants under different seeds
+- Longer story runs with scene-by-scene progression on every choice
 - Roulette-style event draw
-- Action points and long-term project slots
-- Budget and energy economy with project risk
 - Escalating academic horror storyline with branching endings
-- Every choice advances the horror timeline explicitly
-- 108 generated academic horror dossiers based on choice path combinations
-- Post-choice aftermath text that keeps pushing the story forward
+- 108 generated academic horror dossiers based on route combinations
+- Full end-of-run dossier that replays the complete sequence of scenes, choices, and aftermaths
 - Absurd semester rules that mutate choice outcomes
-- Project-specific story arcs and hidden routes
+- Story-focused reading layout with a larger timeline and aftermath record
+- Mid-run story arcs, hidden routes, and profile-dependent branches
 - Six-stat survival model
-- Campus bestiary discoveries
-- Achievements, timeline, crisis radar, diagnosis card, endings, and share text
+- Timeline, crisis radar, diagnosis card, endings, and share text
 
 ## Run
 

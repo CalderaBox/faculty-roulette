@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Faculty Roulette is a small academic survival game about papers, grants, teaching, service work, and the strange weather of early-career life.">
+  <meta name="description" content="Faculty Roulette 是一个带有学术怪谈叙事的高校生存小游戏。">
   <title>青椒轮盘 | Faculty Roulette</title>
   <link rel="stylesheet" href="./styles.css">
 </head>
@@ -13,7 +13,7 @@
       <div class="hero-copy">
         <p class="eyebrow">Faculty Roulette</p>
         <h1 id="title">青椒轮盘</h1>
-        <p class="lead">六个学期，一张日程表，一点点尊严。你要在论文、基金、教学、服务和健康之间做选择，然后看系统怎么优雅地把你推向边缘。</p>
+        <p class="lead">每一局都不是同一条命运线。你会遇到不同的场景、做出不同的决定，然后看学院如何把这些决定慢慢写成一则完整的怪谈。</p>
         <div class="hero-actions">
           <button id="startHeroBtn" class="primary">开始这一轮</button>
           <button id="seedBtn" class="ghost">换一组宇宙</button>
@@ -54,7 +54,7 @@ choose a profile to begin</pre>
           <option value="paper">论文冲刺型</option>
           <option value="grant">基金焦虑型</option>
           <option value="teaching">教学口碑型</option>
-          <option value="stealth">低调摸鱼型</option>
+          <option value="stealth">低调潜行型</option>
         </select>
 
         <label for="mode">宇宙强度</label>
@@ -87,7 +87,7 @@ choose a profile to begin</pre>
       </aside>
 
       <section class="panel board" aria-live="polite">
-        <div class="board-head">
+        <div class="board-head board-head-story">
           <div>
             <span class="label">当前学期</span>
             <strong id="semester">-</strong>
@@ -97,83 +97,59 @@ choose a profile to begin</pre>
             <strong id="status">等待开局</strong>
           </div>
           <div>
-            <span class="label">本轮倾向</span>
+            <span class="label">本轮天气</span>
             <strong id="mood">尚未抽取</strong>
           </div>
           <div>
             <span class="label">当前连锁</span>
             <strong id="combo">尚未形成</strong>
           </div>
-          <div>
-            <span class="label">行动点</span>
-            <strong id="actionsLeft">-</strong>
-          </div>
-          <div>
-            <span class="label">预算 / 精力</span>
-            <strong id="economy">-</strong>
-          </div>
         </div>
 
         <div class="stats" id="stats"></div>
 
-        <section class="strategy-panel" aria-label="strategy layer">
-          <div class="section-head">
-            <span>Strategy Layer</span>
-            <strong>长期项目槽</strong>
-          </div>
-          <p class="strategy-copy">每学期先分配有限行动点，再处理随机事件。长期项目完成后会永久改变你的档案，而不是只改变一回合分数。</p>
-          <div id="projectBoard" class="project-board"></div>
-        </section>
-
-        <article class="event-card" id="eventCard">
+        <article class="event-card event-card-story" id="eventCard">
           <div class="event-meta">
             <span id="eventTag">事件卡</span>
             <span id="eventRisk">risk: --</span>
           </div>
           <h2 id="eventTitle">尚未抽卡</h2>
-          <p id="eventText">选择开局风格，然后开始你的早期学术生存实验。</p>
+          <p id="eventText">选择开局风格，然后开始你的学术怪谈历程。</p>
           <div class="rule-strip" id="activeRule">本学期特殊规则：尚未生成。</div>
           <div id="choices" class="choices"></div>
         </article>
 
-        <section class="after-panel">
-          <div class="memo">
-            <span>系统备忘</span>
-            <p id="memoText">好的选择通常不是最爽的选择，最爽的选择通常会出现在周五 23:41。</p>
+        <section class="after-panel story-focus">
+          <div class="memo story-memo">
+            <span>剧情余波</span>
+            <p id="memoText">同样的选择，不一定会把你送往同样的地方。</p>
           </div>
           <div class="trajectory" id="trajectory" aria-label="semester trajectory"></div>
         </section>
 
-        <section class=" dossier-grid" aria-label="run dossier">
-          <div class="dossier">
-            <div class="section-head">
-              <span>Achievements</span>
-              <strong>本局成就</strong>
-            </div>
-            <div id="achievements" class="chips"></div>
+        <section class="story-panel" aria-label="story timeline">
+          <div class="section-head story-section-head">
+            <span>Story Record</span>
+            <strong>事件时间线</strong>
           </div>
-          <div class="dossier">
-            <div class="section-head">
-              <span>Timeline</span>
-              <strong>事件时间线</strong>
-            </div>
-            <ol id="timeline" class="timeline"></ol>
-          </div>
-        </section>
-
-        <section class="myth-panel" aria-label="campus myth collection">
-          <div class="section-head">
-            <span>Bestiary</span>
-            <strong>校园传说图鉴</strong>
-          </div>
-          <div id="bestiary" class="bestiary"></div>
+          <p class="story-copy">你看到的不只是分数变化，而是每个场景如何被你上一道选择悄悄改写。越往后看，学院越像在主动参与叙事。</p>
+          <ol id="timeline" class="timeline"></ol>
         </section>
 
         <div class="result-box" id="resultBox" hidden>
           <p class="eyebrow">Ending Generated</p>
           <h2 id="endingTitle"></h2>
-          <p id="endingText"></p>
+          <p id="endingText" class="ending-intro"></p>
           <div id="diagnosisCard" class="diagnosis-card"></div>
+
+          <section class="ending-story-wrap" aria-label="full story archive">
+            <div class="section-head story-section-head">
+              <span>Full Dossier</span>
+              <strong>完整历程</strong>
+            </div>
+            <div id="endingStory" class="ending-story"></div>
+          </section>
+
           <textarea id="shareText" readonly></textarea>
           <button id="copyBtn" class="primary">复制结局文本</button>
         </div>
