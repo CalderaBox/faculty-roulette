@@ -187,7 +187,7 @@ snapshot = debug.start("balanced", "publish", 3003);
 let safety = 40;
 while (!snapshot.finished && safety > 0) {
   snapshot = debug.choose(0);
-  if (!snapshot.awaitingContinue) throw new Error("Every selected scene should pause on aftermath.");
+  if (!snapshot.finished && !snapshot.awaitingContinue) throw new Error("Every non-final selected scene should pause on aftermath.");
   if (!snapshot.finished) {
     snapshot = debug.continue();
   }
@@ -198,15 +198,20 @@ if (!snapshot.finished) throw new Error("Game did not reach ending state.");
 if (snapshot.historyLength < 12) throw new Error("A full run should contain a longer branching story.");
 if (!/story-thread/.test(snapshot.timelineHtml)) throw new Error("Story thread did not render.");
 if (!/story-paragraph/.test(snapshot.timelineHtml)) throw new Error("Continuous story paragraphs did not render.");
+if (!/finale-card/.test(snapshot.choicesHtml)) throw new Error("Final result should render in the original choice area.");
+if (!snapshot.choicesHtml.includes(snapshot.endingTitle)) throw new Error("Final choice-area result should include the ending title.");
+if (/story-paragraph finale/.test(snapshot.timelineHtml) || snapshot.timelineHtml.includes(snapshot.endingTitle)) {
+  throw new Error("Final result should not be appended to the bottom of the timeline.");
+}
 if (/你的选择|你当时/.test(snapshot.timelineHtml)) throw new Error("Story should not use explicit choice labels.");
 if (/你第一次注意到学院夜里|共享盘里出现|打印机开始优先输出/.test(snapshot.timelineHtml)) {
   throw new Error("Timeline should not append generic transition beats to each story paragraph.");
 }
 if (!/第\d{3}号怪谈/.test(snapshot.endingTitle)) throw new Error("Deep dossier-style ending title did not render.");
-if (!/档案返修处|预审雨棚|共享盘地下河|指标标本室|会议回声井|预算折叠层|仪器养殖场|引用香火台|伦理镜像库|招聘回廊|署名迁徙带|绩效天象馆/.test(snapshot.timelineHtml)) {
-  throw new Error("Final story should include a deep archive family ending.");
+if (!/档案返修处|预审雨棚|共享盘地下河|指标标本室|会议回声井|预算折叠层|仪器养殖场|引用香火台|伦理镜像库|招聘回廊|署名迁徙带|绩效天象馆/.test(snapshot.choicesHtml)) {
+  throw new Error("Choice-area final story should include a deep archive family ending.");
 }
-if (/diag-pill|diagnosis-card|textarea|Faculty Roulette 里走到了档案/.test(snapshot.timelineHtml)) {
+if (/diag-pill|diagnosis-card|textarea|Faculty Roulette 里走到了档案/.test(snapshot.timelineHtml + snapshot.choicesHtml)) {
   throw new Error("Final story should not render diagnostic chips or share text.");
 }
 

@@ -2900,8 +2900,16 @@ function applyChoice(index) {
 
   state.history.push(historyEntry);
   state.latestMemo = aftermath;
+
+  if (state.history.length >= state.maxTurns) {
+    state.awaitingContinue = false;
+    state.pendingFinish = false;
+    finishGame();
+    return;
+  }
+
   state.awaitingContinue = true;
-  state.pendingFinish = state.history.length >= state.maxTurns;
+  state.pendingFinish = false;
 
   render();
 }
@@ -3032,21 +3040,31 @@ function renderTimeline() {
     </p>
   `);
 
-  if (state.finished && state.ending) {
-    paragraphs.push(`
-      <p class="story-paragraph finale">
-        <span class="story-marker">归档 · ${state.ending.title}</span>
-        ${state.ending.text}
-      </p>
-    `);
-  }
-
   elements.timeline.innerHTML = `<li class="story-thread">${paragraphs.join("")}</li>`;
 }
 
 function renderChoices() {
   if (!elements.choices) return;
   elements.choices.innerHTML = "";
+
+  if (state.finished && state.ending) {
+    const entry = state.history[state.history.length - 1];
+    const card = document.createElement("article");
+    card.className = "finale-card";
+    card.setAttribute("aria-live", "polite");
+    card.innerHTML = `
+      <span class="finale-kicker">最终档案</span>
+      <h3>${state.ending.title}</h3>
+      ${entry ? `<p class="finale-bridge">${entry.aftermath}</p>` : ""}
+      <p class="finale-text">${state.ending.text}</p>
+      <div class="finale-actions">
+        <button type="button" class="finale-restart">再开一局</button>
+      </div>
+    `;
+    card.querySelector?.(".finale-restart")?.addEventListener("click", () => startGame());
+    elements.choices.appendChild(card);
+    return;
+  }
 
   if (state.awaitingContinue) {
     const entry = state.history[state.history.length - 1];
@@ -3064,7 +3082,7 @@ function renderChoices() {
     return;
   }
 
-  if (!state.current || state.finished) {
+  if (!state.current) {
     return;
   }
 
@@ -3093,7 +3111,7 @@ function renderEvent() {
   elements.eventRisk.textContent = state.finished ? "risk: archived" : "risk: --";
   elements.eventTitle.textContent = state.finished ? state.ending.title : "尚未抽卡";
   elements.eventText.textContent = state.finished
-    ? "这一轮的完整经历已经封存到下方档案里。"
+    ? "最后一只档案袋自己滑到桌面中央，封口已经替你拆开。"
     : "选择开局风格，然后开始你的学术怪谈历程。";
 }
 
@@ -3129,6 +3147,13 @@ function updateProfileNote() {
 }
 
 function snapshot() {
+  const choicesHtml = elements.choices
+    ? [
+        elements.choices.innerHTML,
+        ...Array.from(elements.choices.children || []).map((child) => `${child.className || ""} ${child.innerHTML || ""}`)
+      ].join("")
+    : "";
+
   return {
     profile: state.profile,
     mode: state.mode,
@@ -3155,6 +3180,7 @@ function snapshot() {
     flags: [...state.storyFlags],
     ghostFlags: [...state.ghostFlags],
     endingTitle: state.ending?.title || "",
+    choicesHtml,
     timelineHtml: elements.timeline?.innerHTML || ""
   };
 }

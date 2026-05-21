@@ -399,6 +399,62 @@ select {
   line-height: 1.95;
 }
 
+.finale-card {
+  display: grid;
+  gap: 15px;
+  padding: 26px;
+  border: 1px solid rgba(242, 193, 93, .42);
+  border-radius: 10px;
+  background:
+    linear-gradient(140deg, rgba(242, 193, 93, .16), transparent 42%),
+    linear-gradient(315deg, rgba(105, 217, 143, .1), transparent 38%),
+    #151a20;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
+}
+
+.finale-kicker {
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.finale-card h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(22px, 4vw, 34px);
+  line-height: 1.25;
+}
+
+.finale-card p {
+  margin: 0;
+  line-height: 1.95;
+}
+
+.finale-bridge {
+  padding: 14px 16px;
+  border-left: 3px solid rgba(242, 193, 93, .78);
+  background: rgba(255, 255, 255, .035);
+  color: #e7dfd0;
+  font-size: 16px;
+}
+
+.finale-text {
+  color: #fff7df;
+  font-size: 18px;
+}
+
+.finale-actions {
+  display: flex;
+}
+
+.finale-restart {
+  border-color: var(--green);
+  background: var(--green);
+  color: #07120b;
+  font-weight: 900;
+}
+
 .aftermath-cta {
   justify-self: start;
   display: inline-flex;
