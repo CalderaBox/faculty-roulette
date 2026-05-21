@@ -58,6 +58,7 @@ const ids = [
   "mood",
   "combo",
   "actionsLeft",
+  "economy",
   "stats",
   "projectBoard",
   "wheel",
@@ -126,6 +127,7 @@ if (!elements.get("shareText").value.includes("青椒轮盘")) throw new Error("
 if (!/stat/.test(elements.get("stats").innerHTML)) throw new Error("Stats did not render.");
 if (!/S6/.test(elements.get("trajectory").innerHTML)) throw new Error("Trajectory did not render.");
 if (!/project-card/.test(elements.get("projectBoard").innerHTML)) throw new Error("Project board did not render.");
+if (!elements.get("economy").textContent.includes("/")) throw new Error("Economy status did not render.");
 if (!/chip/.test(elements.get("achievements").innerHTML)) throw new Error("Achievements did not render.");
 if (!/S1/.test(elements.get("timeline").innerHTML)) throw new Error("Timeline did not render.");
 if (!/myth/.test(elements.get("bestiary").innerHTML)) throw new Error("Bestiary did not render.");

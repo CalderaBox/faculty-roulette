@@ -13,6 +13,7 @@ Playable zero-dependency prototype.
 - Daily seed and random seed runs
 - Roulette-style event draw
 - Action points and long-term project slots
+- Budget and energy economy with project risk
 - Absurd semester rules that mutate choice outcomes
 - Six-stat survival model
 - Campus bestiary discoveries

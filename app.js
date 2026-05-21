@@ -30,6 +30,12 @@ const actionBudget = {
   humane: 4
 };
 
+const economyBudget = {
+  standard: { budget: 6, energy: 6 },
+  publish: { budget: 5, energy: 5 },
+  humane: { budget: 7, energy: 7 }
+};
+
 const profiles = {
   balanced: { paper: 50, grant: 46, teaching: 52, service: 42, health: 72, luck: 50 },
   paper: { paper: 68, grant: 36, teaching: 42, service: 35, health: 58, luck: 48 },
@@ -125,6 +131,9 @@ const projectTemplates = [
     desc: "把散落的想法压缩成一篇能投稿的东西。",
     target: 9,
     perAction: 3,
+    budgetCost: 1,
+    energyCost: 2,
+    risk: 2,
     delta: { paper: 5, health: -2 },
     complete: { paper: 16, luck: 4 },
     completeText: "代表作形成了清晰轮廓，审稿人暂时还没有发现你。"
@@ -135,6 +144,9 @@ const projectTemplates = [
     desc: "让一个尚未稳定的想法看起来像五年规划。",
     target: 8,
     perAction: 2,
+    budgetCost: 2,
+    energyCost: 1,
+    risk: 3,
     delta: { grant: 5, service: 1, health: -1 },
     complete: { grant: 18, service: 4 },
     completeText: "你的基金故事终于从“想做”变成了“似乎必须做”。"
@@ -145,6 +157,9 @@ const projectTemplates = [
     desc: "把祖传 PPT 改造成学生能听懂的版本。",
     target: 7,
     perAction: 2,
+    budgetCost: 1,
+    energyCost: 1,
+    risk: 1,
     delta: { teaching: 6, paper: -1 },
     complete: { teaching: 15, luck: 3 },
     completeText: "学生第一次主动问了一个不是考试范围的问题。"
@@ -155,6 +170,9 @@ const projectTemplates = [
     desc: "训练自己识别“轻量级任务”的真实体积。",
     target: 6,
     perAction: 2,
+    budgetCost: 0,
+    energyCost: 1,
+    risk: 0,
     delta: { health: 4, service: -2 },
     complete: { health: 14, service: -8, luck: 4 },
     completeText: "你学会了在不燃烧自己的情况下保持礼貌。"
@@ -285,7 +303,8 @@ const achievementRules = [
   { id: "chaos", label: "系统边缘漫游", test: (s) => s.history.some((item) => item.swing >= 22) },
   { id: "bestiary", label: "传说目击者", test: (s) => s.myths.size >= 3 },
   { id: "builder", label: "长期主义者", test: (s) => s.projects.filter((item) => item.completeDone).length >= 2 },
-  { id: "firewall", label: "拒绝轻量级", test: (s) => s.projects.some((item) => item.id === "boundary" && item.completeDone) }
+  { id: "firewall", label: "拒绝轻量级", test: (s) => s.projects.some((item) => item.id === "boundary" && item.completeDone) },
+  { id: "lean", label: "精益存活", test: (s) => s.finished && s.budget >= 3 && s.energy >= 2 }
 ];
 
 const defaultMaxSemester = 6;
@@ -309,6 +328,7 @@ const els = {
   mood: document.querySelector("#mood"),
   combo: document.querySelector("#combo"),
   actionsLeft: document.querySelector("#actionsLeft"),
+  economy: document.querySelector("#economy"),
   stats: document.querySelector("#stats"),
   projectBoard: document.querySelector("#projectBoard"),
   wheel: document.querySelector("#wheel"),
@@ -423,6 +443,8 @@ function startGame() {
     myths: new Set(),
     projects: projectTemplates.map((project) => ({ ...project, progress: 0, completeDone: false })),
     actionsLeft: actionBudget[els.mode.value],
+    budget: economyBudget[els.mode.value].budget,
+    energy: economyBudget[els.mode.value].energy,
     mode,
     mood,
     rule: null,
@@ -454,6 +476,8 @@ function drawEvent() {
   }
 
   state.actionsLeft = actionBudget[els.mode.value];
+  state.budget = economyBudget[els.mode.value].budget;
+  state.energy = economyBudget[els.mode.value].energy;
   const event = pickEvent();
   state.rule = absurdRules[(state.semester + Math.floor(seededRandom() * absurdRules.length)) % absurdRules.length];
   state.current = event;
@@ -502,11 +526,20 @@ function investProject(projectId) {
   if (!state || state.finished || state.actionsLeft <= 0) return;
   const project = state.projects.find((item) => item.id === projectId);
   if (!project || project.completeDone) return;
+  if (state.budget < project.budgetCost || state.energy < project.energyCost) return;
 
   state.actionsLeft -= 1;
+  state.budget -= project.budgetCost;
+  state.energy -= project.energyCost;
   project.progress = Math.min(project.target, project.progress + project.perAction);
   addDelta(state.stats, project.delta);
   state.log.unshift(`S${state.semester} 项目投入：${project.name}。`);
+
+  if (project.risk > 0 && seededRandom() < project.risk * 0.04) {
+    state.log.unshift(`项目波动：${project.name} 突然返工。`);
+    project.progress = Math.max(0, project.progress - 1);
+    addDelta(state.stats, { health: -2, luck: -1 });
+  }
 
   if (project.progress >= project.target && !project.completeDone) {
     project.completeDone = true;
@@ -636,11 +669,12 @@ function renderProjects() {
 
   els.projectBoard.innerHTML = state.projects.map((project) => {
     const percent = Math.round((project.progress / project.target) * 100);
-    const disabled = state.actionsLeft <= 0 || project.completeDone || state.finished;
+    const disabled = state.actionsLeft <= 0 || project.completeDone || state.finished || state.budget < project.budgetCost || state.energy < project.energyCost;
     return `
       <div class="project-card ${project.completeDone ? "complete" : ""}">
         <h3>${project.name}</h3>
         <p>${project.completeDone ? project.completeText : project.desc}</p>
+        <div class="project-meta"><span>预算 ${project.budgetCost}</span><span>精力 ${project.energyCost}</span><span>风险 ${project.risk}</span></div>
         <div class="progress"><i style="--value:${percent}%"></i></div>
         <button data-project="${project.id}" ${disabled ? "disabled" : ""}>${project.completeDone ? "已完成" : `投入 1 AP · ${project.progress}/${project.target}`}</button>
       </div>
@@ -712,6 +746,7 @@ function render() {
     els.mood.textContent = "尚未抽取";
     els.combo.textContent = "尚未形成";
     els.actionsLeft.textContent = "-";
+    els.economy.textContent = "-";
     els.rank.textContent = "未入职";
     els.crisis.textContent = "--";
     renderStats();
@@ -729,6 +764,7 @@ function render() {
   els.mood.textContent = state.mood.name;
   els.combo.textContent = getCombo();
   els.actionsLeft.textContent = `${state.actionsLeft} AP`;
+  els.economy.textContent = `${state.budget} / ${state.energy}`;
   els.rank.textContent = getRank();
   els.crisis.textContent = crisis >= 70 ? "红色" : crisis >= 40 ? "橙色" : "绿色";
   renderStats();
