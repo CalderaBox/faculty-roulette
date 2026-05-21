@@ -163,6 +163,9 @@ const contentReport = debug.getContentReport();
 if (contentReport.sceneCount < 44) throw new Error("Scene pool should include the expanded weird-tale set.");
 if (contentReport.choiceCount < 132) throw new Error("Expanded scene pool should expose more choice variety.");
 if (contentReport.uniqueSceneIds !== contentReport.sceneCount) throw new Error("Scene IDs should be unique.");
+if (contentReport.runLengthRange?.min !== 8 || contentReport.runLengthRange?.max !== 12) {
+  throw new Error("A run should randomly contain 8-12 scene questions.");
+}
 if (!contentReport.randomProfileEnabled) throw new Error("Random profile default should be available.");
 
 const aftermathReport = debug.getAftermathPoolReport();
@@ -191,6 +194,16 @@ if (randomA.profile === "random" || randomB.profile === "random") {
 if (randomA.profile === randomB.profile) {
   throw new Error("Consecutive random profile starts should avoid repeating the same concrete profile.");
 }
+
+const sampledRunLengths = new Set();
+for (const nextSeed of [7101, 7102, 7103, 7104, 7105, 7106, 7107, 7108]) {
+  const run = debug.start("balanced", "standard", nextSeed);
+  if (run.maxTurns < 8 || run.maxTurns > 12) {
+    throw new Error(`Random run length should stay within 8-12 scenes, got ${run.maxTurns}.`);
+  }
+  sampledRunLengths.add(run.maxTurns);
+}
+if (sampledRunLengths.size < 2) throw new Error("Run length should vary across seeds.");
 
 let snapshot = debug.start("paper", "standard", 1111);
 if (snapshot.currentSceneId !== "paper_intro") throw new Error("Paper profile should start from its own intro scene.");
@@ -243,7 +256,8 @@ while (!snapshot.finished && safety > 0) {
 }
 
 if (!snapshot.finished) throw new Error("Game did not reach ending state.");
-if (snapshot.historyLength < 12) throw new Error("A full run should contain a longer branching story.");
+if (snapshot.historyLength !== snapshot.maxTurns) throw new Error("A full run should stop exactly at its sampled scene count.");
+if (snapshot.historyLength < 8 || snapshot.historyLength > 12) throw new Error("A full run should contain 8-12 scene questions.");
 if (!/story-thread/.test(snapshot.timelineHtml)) throw new Error("Story thread did not render.");
 if (!/story-paragraph/.test(snapshot.timelineHtml)) throw new Error("Continuous story paragraphs did not render.");
 if (!/finale-card/.test(snapshot.choicesHtml)) throw new Error("Final result should render in the original choice area.");

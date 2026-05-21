@@ -16,7 +16,7 @@ Playable zero-dependency prototype.
 - 44 weird-tale scenes and 132 choice entries across profile, flag, and route-dependent branches
 - The same choice can produce different creepy aftermath variants under different seeds
 - Every choice now gets a shorter tone-bound aftermath beat for cleaner story flow without cross-scene stitching
-- Longer story runs with scene-by-scene progression on every choice
+- Random-length runs with 8-12 scene questions and scene-by-scene progression on every choice
 - Richer aftermath prose adapted from the earlier haunted-academia version
 - Choices now pause on a prominent aftermath passage before the next scene appears
 - Developer-style log/terminal UI removed so the page stays focused on the story

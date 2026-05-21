@@ -55,22 +55,24 @@ const profileNotes = {
 const modeSettings = {
   standard: {
     label: "标准学术天气",
-    turns: 14,
     multiplier: 1,
     bonus: {}
   },
   publish: {
     label: "非升即走模式",
-    turns: 15,
     multiplier: 1.15,
     bonus: { paper: 4, grant: 4, health: -8, luck: -2 }
   },
   humane: {
     label: "理想学院模式",
-    turns: 13,
     multiplier: 0.88,
     bonus: { health: 10, luck: 6, service: -2 }
   }
+};
+
+const runLengthRange = {
+  min: 8,
+  max: 12
 };
 
 const moods = [
@@ -3240,7 +3242,7 @@ const state = {
   profile: "balanced",
   mode: "standard",
   turn: 1,
-  maxTurns: modeSettings.standard.turns,
+  maxTurns: runLengthRange.max,
   stats: cloneStats(profiles.balanced),
   mood: moods[0],
   current: null,
@@ -3312,6 +3314,11 @@ function pickRandomProfile() {
   const next = pool[Math.floor(Math.random() * pool.length)] || profileKeys[0];
   lastRandomProfile = next;
   return next;
+}
+
+function pickRunLength() {
+  const span = runLengthRange.max - runLengthRange.min + 1;
+  return runLengthRange.min + (hashString(`${seed}|${state.mode}|run-length`) % span);
 }
 
 function resolveProfile(profileValue) {
@@ -3589,7 +3596,7 @@ function startGame(profileOverride, modeOverride) {
   state.profile = resolveProfile(requestedProfile);
   state.mode = modeOverride || elements.mode?.value || "standard";
   state.turn = 1;
-  state.maxTurns = modeSettings[state.mode].turns;
+  state.maxTurns = pickRunLength();
   state.stats = cloneStats(profiles[state.profile]);
   addDelta(state.stats, modeSettings[state.mode].bonus || {});
   for (const [key, value] of Object.entries(state.stats)) {
@@ -4119,6 +4126,7 @@ function contentReport() {
     sceneCount: scenePool.length,
     choiceCount: scenePool.reduce((sum, scene) => sum + (scene.choices || []).length, 0),
     uniqueSceneIds: new Set(sceneIds).size,
+    runLengthRange: { ...runLengthRange },
     randomProfileEnabled: Boolean(profileNotes.random)
   };
 }
