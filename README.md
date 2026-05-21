@@ -14,11 +14,20 @@ Open `index.html` directly in a browser, or serve this folder with a static serv
 python -m http.server 8780
 ```
 
+## Smoke Test
+
+If Node.js is available:
+
+```powershell
+node smoke-test.mjs
+```
+
 ## Files
 
 - `index.html`: app shell
 - `styles.css`: visual design
 - `app.js`: game state, events, endings
+- `smoke-test.mjs`: zero-dependency DOM smoke test
 
 ## Deployment
 

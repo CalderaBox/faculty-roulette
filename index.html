@@ -3,63 +3,115 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Faculty Roulette is a small academic survival game about papers, grants, teaching, service work, and the strange weather of early-career life.">
   <title>青椒轮盘 | Faculty Roulette</title>
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <main class="app">
-    <section class="hero">
-      <div>
+    <section class="hero" aria-labelledby="title">
+      <div class="hero-copy">
         <p class="eyebrow">Faculty Roulette</p>
-        <h1>青椒轮盘</h1>
-        <p class="lead">一款早期学术人生存模拟器。你有六个学期，几篇论文，一点点健康，以及随时会坍塌的日程表。</p>
+        <h1 id="title">青椒轮盘</h1>
+        <p class="lead">六个学期，一张日程表，一点点尊严。你要在论文、基金、教学、服务和健康之间做选择，然后看系统怎么优雅地把你推向边缘。</p>
+        <div class="hero-actions">
+          <button id="startHeroBtn" class="primary">开始这一轮</button>
+          <button id="seedBtn" class="ghost">换一组宇宙</button>
+        </div>
       </div>
-      <div class="console" aria-label="terminal preview">
-        <div class="console-bar"><span></span><span></span><span></span></div>
-        <pre id="log">booting tenure-track survival kernel...
-loading grant anxiety...
-loading reviewer #2...
-ready.</pre>
-      </div>
+
+      <section class="roulette-card" aria-label="faculty roulette wheel">
+        <div class="wheel-wrap">
+          <div class="wheel" id="wheel">
+            <span style="--i:0">Paper</span>
+            <span style="--i:1">Grant</span>
+            <span style="--i:2">Class</span>
+            <span style="--i:3">Service</span>
+            <span style="--i:4">Health</span>
+            <span style="--i:5">Reviewer</span>
+          </div>
+          <div class="needle" aria-hidden="true"></div>
+        </div>
+        <div class="terminal" aria-label="system log">
+          <div class="terminal-bar"><span></span><span></span><span></span></div>
+          <pre id="log">faculty-survival.log
+system idle
+choose a profile to begin</pre>
+        </div>
+      </section>
     </section>
 
     <section class="game-shell">
-      <aside class="panel profile-panel">
-        <h2>角色档案</h2>
+      <aside class="panel control-panel">
+        <div class="panel-title">
+          <span class="panel-icon">ID</span>
+          <h2>角色档案</h2>
+        </div>
+
         <label for="profile">开局风格</label>
         <select id="profile">
           <option value="balanced">均衡型青椒</option>
           <option value="paper">论文冲刺型</option>
           <option value="grant">基金焦虑型</option>
           <option value="teaching">教学口碑型</option>
+          <option value="stealth">低调摸鱼型</option>
         </select>
-        <button id="startBtn" class="primary">开始新一轮</button>
+
+        <div class="profile-note" id="profileNote"></div>
+
+        <button id="startBtn" class="primary">新开一局</button>
         <button id="restartBtn" class="ghost">重开</button>
-        <p class="hint">目标不是赢，是带着一点尊严活到第六学期末。</p>
+
+        <div class="mini-board" aria-label="current identity">
+          <div>
+            <span>头衔</span>
+            <strong id="rank">未入职</strong>
+          </div>
+          <div>
+            <span>宇宙编号</span>
+            <strong id="seedLabel">FR-000</strong>
+          </div>
+        </div>
       </aside>
 
-      <section class="panel board">
+      <section class="panel board" aria-live="polite">
         <div class="board-head">
           <div>
             <span class="label">当前学期</span>
             <strong id="semester">-</strong>
           </div>
           <div>
-            <span class="label">状态</span>
+            <span class="label">系统状态</span>
             <strong id="status">等待开局</strong>
+          </div>
+          <div>
+            <span class="label">本轮倾向</span>
+            <strong id="mood">尚未抽取</strong>
           </div>
         </div>
 
         <div class="stats" id="stats"></div>
 
         <article class="event-card" id="eventCard">
-          <p class="card-kicker">事件卡</p>
+          <div class="event-meta">
+            <span id="eventTag">事件卡</span>
+            <span id="eventRisk">risk: --</span>
+          </div>
           <h2 id="eventTitle">尚未抽卡</h2>
-          <p id="eventText">选择开局风格，然后开始你的青椒生存实验。</p>
+          <p id="eventText">选择开局风格，然后开始你的早期学术生存实验。</p>
           <div id="choices" class="choices"></div>
         </article>
 
+        <section class="after-panel">
+          <div class="memo">
+            <span>系统备忘</span>
+            <p id="memoText">好的选择通常不是最爽的选择，最爽的选择通常会出现在周五 23:41。</p>
+          </div>
+          <div class="trajectory" id="trajectory" aria-label="semester trajectory"></div>
+        </section>
+
         <div class="result-box" id="resultBox" hidden>
+          <p class="eyebrow">Ending Generated</p>
           <h2 id="endingTitle"></h2>
           <p id="endingText"></p>
           <textarea id="shareText" readonly></textarea>
