@@ -65,6 +65,53 @@ const moods = [
   { name: "审稿人二号回流", spin: 325, bonus: { luck: -2, paper: 2 }, memo: "有些意见看起来像意见，其实是天气。" }
 ];
 
+const absurdRules = [
+  {
+    name: "所有邮件默认紧急",
+    text: "本学期服务类损耗加深，但服务收益也更容易被看见。",
+    modify: (delta) => ({ ...delta, service: (delta.service || 0) + 2, health: (delta.health || 0) - 2 })
+  },
+  {
+    name: "审稿意见会繁殖",
+    text: "论文收益更高，但每次推进论文都会额外消耗健康。",
+    modify: (delta) => ({ ...delta, paper: delta.paper ? delta.paper + 3 : delta.paper, health: delta.paper ? (delta.health || 0) - 2 : delta.health })
+  },
+  {
+    name: "预算表具有主观能动性",
+    text: "基金相关选择波动变大，运气会轻微参与评审。",
+    modify: (delta) => ({ ...delta, grant: delta.grant ? delta.grant + 4 : delta.grant, luck: (delta.luck || 0) - 1 })
+  },
+  {
+    name: "评教在暗处凝视",
+    text: "教学收益放大，但服务和健康会被课堂余波牵连。",
+    modify: (delta) => ({ ...delta, teaching: delta.teaching ? delta.teaching + 3 : delta.teaching, service: (delta.service || 0) + 1, health: (delta.health || 0) - 1 })
+  },
+  {
+    name: "今天学院像个人",
+    text: "负面影响减轻。请珍惜这条罕见时间线。",
+    modify: (delta) => Object.fromEntries(Object.entries(delta).map(([key, value]) => [key, value < 0 ? Math.ceil(value / 2) : value]))
+  },
+  {
+    name: "咖啡因通货膨胀",
+    text: "所有高收益选择都会更伤身体，但本轮更容易产出戏剧性结局。",
+    modify: (delta) => {
+      const positive = Object.values(delta).some((value) => value >= 8);
+      return positive ? { ...delta, health: (delta.health || 0) - 4, luck: (delta.luck || 0) + 2 } : delta;
+    }
+  }
+];
+
+const bestiary = [
+  { id: "reviewer-hydra", name: "审稿九头蛇", hint: "连续论文波动后现身", test: (s) => s.history.filter((item) => item.tag === "Reviewer #2" || item.delta.paper > 8).length >= 2 },
+  { id: "budget-wraith", name: "预算表幽灵", hint: "基金值冲高后现身", test: (s) => s.stats.grant >= 78 },
+  { id: "meeting-vine", name: "会议藤蔓", hint: "服务值过高后现身", test: (s) => s.stats.service >= 70 },
+  { id: "coffee-oracle", name: "咖啡占卜师", hint: "健康跌破红线后现身", test: (s) => s.stats.health <= 28 },
+  { id: "silent-class", name: "沉默教室", hint: "教学口碑很高后现身", test: (s) => s.stats.teaching >= 80 },
+  { id: "deadline-comet", name: "截止彗星", hint: "高波动事件后现身", test: (s) => s.history.some((item) => item.swing >= 24) },
+  { id: "lucky-stamp", name: "幸运盖章机", hint: "运气很高后现身", test: (s) => s.stats.luck >= 78 },
+  { id: "normal-human", name: "正常人目击报告", hint: "健康结局后现身", test: (s) => s.finished && s.stats.health >= 70 }
+];
+
 const events = [
   {
     tag: "Reviewer #2",
@@ -186,7 +233,8 @@ const achievementRules = [
   { id: "burnout", label: "咖啡不是睡眠", test: (s) => s.stats.health <= 28 },
   { id: "lucky", label: "宇宙偏心", test: (s) => s.stats.luck >= 78 },
   { id: "balanced", label: "六边形小而稳", test: (s) => Math.min(...Object.values(s.stats)) >= 48 },
-  { id: "chaos", label: "系统边缘漫游", test: (s) => s.history.some((item) => item.swing >= 22) }
+  { id: "chaos", label: "系统边缘漫游", test: (s) => s.history.some((item) => item.swing >= 22) },
+  { id: "bestiary", label: "传说目击者", test: (s) => s.myths.size >= 3 }
 ];
 
 const defaultMaxSemester = 6;
@@ -215,15 +263,18 @@ const els = {
   eventRisk: document.querySelector("#eventRisk"),
   eventTitle: document.querySelector("#eventTitle"),
   eventText: document.querySelector("#eventText"),
+  activeRule: document.querySelector("#activeRule"),
   choices: document.querySelector("#choices"),
   memoText: document.querySelector("#memoText"),
   trajectory: document.querySelector("#trajectory"),
   achievements: document.querySelector("#achievements"),
   timeline: document.querySelector("#timeline"),
+  bestiary: document.querySelector("#bestiary"),
   log: document.querySelector("#log"),
   resultBox: document.querySelector("#resultBox"),
   endingTitle: document.querySelector("#endingTitle"),
   endingText: document.querySelector("#endingText"),
+  diagnosisCard: document.querySelector("#diagnosisCard"),
   shareText: document.querySelector("#shareText"),
   copyBtn: document.querySelector("#copyBtn")
 };
@@ -275,11 +326,16 @@ function getMaxSemester() {
 
 function scaleDelta(delta) {
   const multiplier = state?.mode.multiplier || 1;
-  return Object.fromEntries(Object.entries(delta).map(([key, value]) => {
+  const scaled = Object.fromEntries(Object.entries(delta).map(([key, value]) => {
     if (value === 0) return [key, 0];
     const scaled = value < 0 ? value * multiplier : value * (2 - multiplier);
     return [key, Math.trunc(scaled)];
   }));
+  return state?.rule ? cleanDelta(state.rule.modify(scaled)) : scaled;
+}
+
+function cleanDelta(delta) {
+  return Object.fromEntries(Object.entries(delta).filter(([, value]) => typeof value === "number" && value !== 0));
 }
 
 function getCrisisScore() {
@@ -311,8 +367,10 @@ function startGame() {
     used: [],
     history: [],
     achievements: new Set(),
+    myths: new Set(),
     mode,
     mood,
+    rule: null,
     spin: mood.spin,
     log: [
       `你以“${profileName()}”身份入职，宇宙强度：${mode.label}。`,
@@ -341,6 +399,7 @@ function drawEvent() {
   }
 
   const event = pickEvent();
+  state.rule = absurdRules[(state.semester + Math.floor(seededRandom() * absurdRules.length)) % absurdRules.length];
   state.current = event;
   state.spin += 360 + Math.floor(seededRandom() * 120);
   els.wheel.style.setProperty("--spin", `${state.spin}deg`);
@@ -348,6 +407,7 @@ function drawEvent() {
   els.eventRisk.textContent = `risk: ${event.risk}`;
   els.eventTitle.textContent = event.title;
   els.eventText.textContent = event.text;
+  els.activeRule.textContent = `本学期特殊规则：${state.rule.name}。${state.rule.text}`;
   els.choices.innerHTML = "";
   event.choices.forEach((choice, index) => {
     const button = document.createElement("button");
@@ -383,6 +443,9 @@ function applyChoice(index) {
 }
 
 function updateAchievements() {
+  bestiary.forEach((myth) => {
+    if (myth.test(state)) state.myths.add(myth.id);
+  });
   achievementRules.forEach((achievement) => {
     if (achievement.test(state)) state.achievements.add(achievement.id);
   });
@@ -449,6 +512,17 @@ function finishGame() {
   const share = `我在《青椒轮盘 Faculty Roulette》里获得结局：${rank}。\n论文${state.stats.paper} / 基金${state.stats.grant} / 教学${state.stats.teaching} / 服务${state.stats.service} / 健康${state.stats.health} / 运气${state.stats.luck}\n宇宙：${state.mood.name} / ${state.mode.label}\n成就：${unlocked.length ? unlocked.join("、") : "暂无，但仍然活着"}`;
   els.endingTitle.textContent = rank;
   els.endingText.textContent = text;
+  const unlockedMyths = bestiary.filter((item) => state.myths.has(item.id)).map((item) => item.name);
+  els.diagnosisCard.innerHTML = `
+    <h3>学术荒诞诊断书</h3>
+    <dl>
+      <dt>病例编号</dt><dd>${els.seedLabel.textContent}</dd>
+      <dt>诊断结果</dt><dd>${rank}</dd>
+      <dt>主要症状</dt><dd>${state.mood.name}，${state.mode.label}</dd>
+      <dt>目击传说</dt><dd>${unlockedMyths.length ? unlockedMyths.join("、") : "暂未目击，但墙里有声音"}</dd>
+      <dt>建议处方</dt><dd>${state.stats.health < 35 ? "先睡觉，再讨论宏大问题" : "保留边界，谨慎答应“轻量级”任务"}</dd>
+    </dl>
+  `;
   els.shareText.value = share;
   els.resultBox.hidden = false;
   els.rank.textContent = rank;
@@ -499,6 +573,27 @@ function renderTimeline() {
   els.timeline.innerHTML = state.history.map((item) => `<li>S${item.semester} · ${item.tag} · ${item.choice}</li>`).join("");
 }
 
+function renderBestiary() {
+  if (!state) {
+    els.bestiary.innerHTML = bestiary.slice(0, 4).map((item) => `
+      <div class="myth">
+        <strong>？？？</strong>
+        <span>${item.hint}</span>
+      </div>
+    `).join("");
+    return;
+  }
+  els.bestiary.innerHTML = bestiary.map((item) => {
+    const unlocked = state.myths.has(item.id);
+    return `
+      <div class="myth ${unlocked ? "unlocked" : ""}">
+        <strong>${unlocked ? item.name : "？？？"}</strong>
+        <span>${unlocked ? "已收录进本局荒诞档案。" : item.hint}</span>
+      </div>
+    `;
+  }).join("");
+}
+
 function render() {
   updateSeedLabel();
   if (!state) {
@@ -512,6 +607,7 @@ function render() {
     renderTrajectory();
     renderAchievements();
     renderTimeline();
+    renderBestiary();
     return;
   }
   const maxSemester = getMaxSemester();
@@ -526,6 +622,7 @@ function render() {
   renderTrajectory();
   renderAchievements();
   renderTimeline();
+  renderBestiary();
   els.log.textContent = ["faculty-survival.log", state.mood.memo, ...state.log.slice(0, 8)].join("\n");
 }
 

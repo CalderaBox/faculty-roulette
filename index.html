@@ -115,6 +115,7 @@ choose a profile to begin</pre>
           </div>
           <h2 id="eventTitle">尚未抽卡</h2>
           <p id="eventText">选择开局风格，然后开始你的早期学术生存实验。</p>
+          <div class="rule-strip" id="activeRule">本学期特殊规则：尚未生成。</div>
           <div id="choices" class="choices"></div>
         </article>
 
@@ -143,10 +144,19 @@ choose a profile to begin</pre>
           </div>
         </section>
 
+        <section class="myth-panel" aria-label="campus myth collection">
+          <div class="section-head">
+            <span>Bestiary</span>
+            <strong>校园传说图鉴</strong>
+          </div>
+          <div id="bestiary" class="bestiary"></div>
+        </section>
+
         <div class="result-box" id="resultBox" hidden>
           <p class="eyebrow">Ending Generated</p>
           <h2 id="endingTitle"></h2>
           <p id="endingText"></p>
+          <div id="diagnosisCard" class="diagnosis-card"></div>
           <textarea id="shareText" readonly></textarea>
           <button id="copyBtn" class="primary">复制结局文本</button>
         </div>

@@ -12,8 +12,10 @@ Playable zero-dependency prototype.
 - Three universe intensity modes
 - Daily seed and random seed runs
 - Roulette-style event draw
+- Absurd semester rules that mutate choice outcomes
 - Six-stat survival model
-- Achievements, timeline, crisis radar, endings, and share text
+- Campus bestiary discoveries
+- Achievements, timeline, crisis radar, diagnosis card, endings, and share text
 
 ## Run
 

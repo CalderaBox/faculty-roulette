@@ -59,15 +59,18 @@ const ids = [
   "eventRisk",
   "eventTitle",
   "eventText",
+  "activeRule",
   "choices",
   "memoText",
   "trajectory",
   "achievements",
   "timeline",
+  "bestiary",
   "log",
   "resultBox",
   "endingTitle",
   "endingText",
+  "diagnosisCard",
   "shareText",
   "copyBtn"
 ];
@@ -118,5 +121,7 @@ if (!/stat/.test(elements.get("stats").innerHTML)) throw new Error("Stats did no
 if (!/S6/.test(elements.get("trajectory").innerHTML)) throw new Error("Trajectory did not render.");
 if (!/chip/.test(elements.get("achievements").innerHTML)) throw new Error("Achievements did not render.");
 if (!/S1/.test(elements.get("timeline").innerHTML)) throw new Error("Timeline did not render.");
+if (!/myth/.test(elements.get("bestiary").innerHTML)) throw new Error("Bestiary did not render.");
+if (!elements.get("diagnosisCard").innerHTML.includes("学术荒诞诊断书")) throw new Error("Diagnosis card did not render.");
 
 console.log("Faculty Roulette smoke test passed.");
