@@ -3830,11 +3830,16 @@ function buildWeirdVisual(entry) {
   const theme = selectWeirdVisualTheme(entry);
   const variant = hashString(`${entry.sceneId}|${entry.choiceText}|${entry.aftermath}`);
   const [bgA, bgB, accent, ink] = theme.colors;
-  const ring = 130 + (variant % 70);
-  const tilt = (variant % 17) - 8;
+  const alarm = "#ff4f5f";
+  const shadow = "#050608";
+  const ring = 155 + (variant % 90);
+  const tilt = (variant % 21) - 10;
   const dotX = 120 + (variant % 720);
   const dotY = 80 + ((variant >> 3) % 330);
-  const pulse = 28 + (variant % 45);
+  const pulse = 38 + (variant % 60);
+  const glitchY = 86 + (variant % 300);
+  const slashA = 170 + (variant % 110);
+  const slashB = 680 - (variant % 120);
   const lineA = escapeSvgText(shortText(entry.title, 13));
   const lineB = escapeSvgText(shortText(entry.aftermath, 24));
   const glyph = escapeSvgText(theme.glyph);
@@ -3848,35 +3853,59 @@ function buildWeirdVisual(entry) {
           <stop offset="1" stop-color="${bgB}"/>
         </linearGradient>
         <radialGradient id="flare" cx="50%" cy="48%" r="58%">
-          <stop offset="0" stop-color="${accent}" stop-opacity=".34"/>
-          <stop offset=".48" stop-color="${accent}" stop-opacity=".11"/>
+          <stop offset="0" stop-color="${alarm}" stop-opacity=".42"/>
+          <stop offset=".42" stop-color="${accent}" stop-opacity=".14"/>
           <stop offset="1" stop-color="${bgA}" stop-opacity="0"/>
         </radialGradient>
+        <radialGradient id="vignette" cx="50%" cy="50%" r="72%">
+          <stop offset="0" stop-color="#000" stop-opacity="0"/>
+          <stop offset=".62" stop-color="#000" stop-opacity=".35"/>
+          <stop offset="1" stop-color="#000" stop-opacity=".82"/>
+        </radialGradient>
         <pattern id="grid" width="46" height="46" patternUnits="userSpaceOnUse">
-          <path d="M 46 0 L 0 0 0 46" fill="none" stroke="${ink}" stroke-opacity=".08" stroke-width="1"/>
+          <path d="M 46 0 L 0 0 0 46" fill="none" stroke="${ink}" stroke-opacity=".07" stroke-width="1"/>
+        </pattern>
+        <pattern id="scan" width="8" height="8" patternUnits="userSpaceOnUse">
+          <path d="M0 0 H8" stroke="#ffffff" stroke-opacity=".06" stroke-width="1"/>
         </pattern>
         <filter id="soft">
-          <feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#000" flood-opacity=".38"/>
+          <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="#000" flood-opacity=".72"/>
+          <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="${alarm}" flood-opacity=".32"/>
+        </filter>
+        <filter id="distort">
+          <feTurbulence type="fractalNoise" baseFrequency=".018 .11" numOctaves="2" seed="${variant % 997}" result="noise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="9" xChannelSelector="R" yChannelSelector="G"/>
         </filter>
       </defs>
       <rect width="960" height="540" fill="url(#bg)"/>
       <rect width="960" height="540" fill="url(#grid)"/>
+      <rect width="960" height="540" fill="url(#scan)" opacity=".9"/>
       <circle cx="${dotX}" cy="${dotY}" r="${ring}" fill="url(#flare)"/>
-      <circle cx="${820 - (variant % 180)}" cy="${95 + (variant % 140)}" r="${pulse}" fill="${accent}" opacity=".22"/>
-      <path d="M88 414 C208 310 318 484 456 365 S708 244 868 350" fill="none" stroke="${accent}" stroke-width="6" stroke-opacity=".42"/>
+      <circle cx="${820 - (variant % 180)}" cy="${95 + (variant % 140)}" r="${pulse}" fill="${alarm}" opacity=".32"/>
+      <rect x="-60" y="${glitchY}" width="1100" height="13" fill="${alarm}" opacity=".62" transform="rotate(${(variant % 9) - 4} 480 ${glitchY})"/>
+      <rect x="0" y="${glitchY + 36}" width="960" height="5" fill="${ink}" opacity=".24"/>
+      <path d="M74 ${slashA} L252 ${slashA + 46} L314 ${slashA - 22} L456 ${slashA + 74} L551 ${slashA + 9} L744 ${slashA + 92} L894 ${slashA + 38}" fill="none" stroke="${alarm}" stroke-width="7" stroke-opacity=".72"/>
+      <path d="M92 416 C208 286 312 494 452 342 S704 230 878 356" fill="none" stroke="${accent}" stroke-width="8" stroke-opacity=".34"/>
+      <path d="M106 428 C246 336 330 454 466 384 S702 296 840 388" fill="none" stroke="${alarm}" stroke-width="2" stroke-opacity=".74" stroke-dasharray="22 13"/>
       <g transform="translate(480 260) rotate(${tilt})" filter="url(#soft)">
-        <rect x="-215" y="-150" width="430" height="300" rx="24" fill="#f6f1e8" opacity=".92"/>
-        <rect x="-184" y="-118" width="368" height="236" rx="16" fill="${bgA}" opacity=".92"/>
-        <circle cx="-125" cy="-66" r="8" fill="${accent}"/>
-        <circle cx="-94" cy="-66" r="8" fill="${ink}" opacity=".7"/>
-        <circle cx="-63" cy="-66" r="8" fill="${accent}" opacity=".7"/>
-        <path d="M-138 42 C-82 -36 -20 82 42 10 S138 -16 164 66" fill="none" stroke="${ink}" stroke-width="5" stroke-opacity=".48"/>
-        <text x="0" y="38" text-anchor="middle" font-size="118" font-family="serif" font-weight="800" fill="${accent}" opacity=".9">${glyph}</text>
+        <rect x="-238" y="-166" width="476" height="332" rx="18" fill="${shadow}" opacity=".96" stroke="${alarm}" stroke-opacity=".48" stroke-width="3"/>
+        <rect x="-198" y="-126" width="396" height="252" rx="10" fill="${bgA}" opacity=".9" stroke="${ink}" stroke-opacity=".16"/>
+        <rect x="-198" y="-126" width="396" height="252" rx="10" fill="url(#scan)" opacity=".65"/>
+        <path d="M-188 -64 H-96 M-188 -28 H-36 M-188 8 H-112 M-188 44 H-18" stroke="${ink}" stroke-opacity=".2" stroke-width="5"/>
+        <path d="M-152 86 C-104 -22 -16 108 42 0 S130 -30 168 70" fill="none" stroke="${ink}" stroke-width="5" stroke-opacity=".42"/>
+        <ellipse cx="72" cy="-22" rx="92" ry="38" fill="#000" opacity=".62" stroke="${alarm}" stroke-width="5" stroke-opacity=".62"/>
+        <circle cx="72" cy="-22" r="13" fill="${alarm}" opacity=".84"/>
+        <text x="-10" y="46" text-anchor="middle" font-size="132" font-family="serif" font-weight="900" fill="${alarm}" opacity=".42" filter="url(#distort)">${glyph}</text>
+        <text x="10" y="36" text-anchor="middle" font-size="132" font-family="serif" font-weight="900" fill="${accent}" opacity=".5">${glyph}</text>
+        <text x="0" y="40" text-anchor="middle" font-size="132" font-family="serif" font-weight="900" fill="${ink}" opacity=".92">${glyph}</text>
+        <path d="M-${slashB % 220} -156 L${220 - (variant % 65)} 156" stroke="${alarm}" stroke-width="6" stroke-opacity=".5"/>
       </g>
+      <rect width="960" height="540" fill="url(#vignette)"/>
       <g font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
         <text x="52" y="72" font-size="22" font-weight="800" fill="${accent}" letter-spacing="2">${title}</text>
-        <text x="52" y="464" font-size="28" font-weight="900" fill="${ink}">${lineA}</text>
-        <text x="52" y="502" font-size="18" fill="${ink}" opacity=".78">${lineB}</text>
+        <text x="54" y="466" font-size="30" font-weight="900" fill="${alarm}" opacity=".42">${lineA}</text>
+        <text x="52" y="464" font-size="30" font-weight="900" fill="${ink}">${lineA}</text>
+        <text x="52" y="502" font-size="18" fill="${ink}" opacity=".82">${lineB}</text>
       </g>
     </svg>
   `;
@@ -3885,6 +3914,7 @@ function buildWeirdVisual(entry) {
     title: theme.title,
     alt,
     themeId: theme.id,
+    style: "horror-glitch-v2",
     src: svgDataUri(svg)
   };
 }
@@ -4226,7 +4256,8 @@ function snapshot() {
       choiceText: entry.choiceText,
       aftermath: entry.aftermath,
       visualTitle: entry.visual?.title || "",
-      visualThemeId: entry.visual?.themeId || ""
+      visualThemeId: entry.visual?.themeId || "",
+      visualStyle: entry.visual?.style || ""
     })),
     queue: [...state.queue],
     flags: [...state.storyFlags],
@@ -4235,6 +4266,7 @@ function snapshot() {
     endingText: state.ending?.text || "",
     currentVisualTitle: state.history[state.history.length - 1]?.visual?.title || "",
     currentVisualThemeId: state.history[state.history.length - 1]?.visual?.themeId || "",
+    currentVisualStyle: state.history[state.history.length - 1]?.visual?.style || "",
     choicesHtml,
     timelineHtml: elements.timeline?.innerHTML || ""
   };
@@ -4340,6 +4372,7 @@ function contentReport() {
     uniqueSceneIds: new Set(sceneIds).size,
     runLengthRange: { ...runLengthRange },
     visualThemeCount: weirdVisualThemes.length,
+    visualStyle: "horror-glitch-v2",
     randomProfileEnabled: Boolean(profileNotes.random)
   };
 }

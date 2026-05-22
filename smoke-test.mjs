@@ -167,6 +167,7 @@ if (contentReport.runLengthRange?.min !== 8 || contentReport.runLengthRange?.max
   throw new Error("A run should randomly contain 8-12 scene questions.");
 }
 if (contentReport.visualThemeCount < 8) throw new Error("Post-choice weird images should have multiple contextual visual themes.");
+if (contentReport.visualStyle !== "horror-glitch-v2") throw new Error("Weird images should use the upgraded horror-glitch style.");
 if (!contentReport.randomProfileEnabled) throw new Error("Random profile default should be available.");
 
 const aftermathReport = debug.getAftermathPoolReport();
@@ -227,6 +228,9 @@ if (!/weird-image-card/.test(elements.get("choices").children[0]?.className || "
 const visualCardHtml = elements.get("choices").children[0]?._innerHTML || "";
 if (!/data:image\/svg\+xml/.test(visualCardHtml) || !afterChoice.currentVisualTitle) {
   throw new Error("Weird image card should render a contextual SVG image.");
+}
+if (afterChoice.currentVisualStyle !== "horror-glitch-v2") {
+  throw new Error("Weird image card should use the horror-glitch visual treatment.");
 }
 if (afterChoice.timelineHtml.includes(afterChoice.memo)) {
   throw new Error("Story timeline should not reveal the aftermath before the weird image is opened.");
