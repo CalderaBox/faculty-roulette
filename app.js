@@ -765,6 +765,81 @@ const endingRouteNotes = {
   ]
 };
 
+const weirdVisualThemes = [
+  {
+    id: "calendar",
+    title: "日历折叠影像",
+    glyph: "历",
+    keywords: ["日历", "时间", "星期", "周三", "未来", "预言", "明天", "延期"],
+    tones: ["follow"],
+    colors: ["#141d29", "#28364f", "#f2c15d", "#7ab8ff"]
+  },
+  {
+    id: "paper",
+    title: "稿件返魂影像",
+    glyph: "稿",
+    keywords: ["论文", "审稿", "投稿", "文档", "引用", "返修", "期刊", "脚注", "摘要"],
+    tones: ["paper"],
+    colors: ["#171820", "#2f3042", "#fff7df", "#69d98f"]
+  },
+  {
+    id: "budget",
+    title: "预算回声影像",
+    glyph: "账",
+    keywords: ["预算", "经费", "财务", "报销", "小数点", "发票", "科目", "到账"],
+    tones: ["grant"],
+    colors: ["#161b19", "#243327", "#69d98f", "#f2c15d"]
+  },
+  {
+    id: "teaching",
+    title: "课堂显影影像",
+    glyph: "课",
+    keywords: ["课堂", "学生", "讲台", "点名", "课件", "教学", "评教", "签到"],
+    tones: ["teaching", "care"],
+    colors: ["#111b1d", "#203337", "#7ab8ff", "#fff7df"]
+  },
+  {
+    id: "archive",
+    title: "档案走廊影像",
+    glyph: "档",
+    keywords: ["档案", "手册", "门牌", "走廊", "纪要", "流程", "会议", "公章", "材料"],
+    tones: ["service", "official"],
+    colors: ["#1d1815", "#342720", "#f2c15d", "#e7dfd0"]
+  },
+  {
+    id: "lab",
+    title: "实验冷光影像",
+    glyph: "仪",
+    keywords: ["实验", "仪器", "数据", "试剂", "冰箱", "样品", "谱图", "机器"],
+    tones: [],
+    colors: ["#101a20", "#203440", "#7ab8ff", "#69d98f"]
+  },
+  {
+    id: "mirror",
+    title: "合规镜面影像",
+    glyph: "镜",
+    keywords: ["伦理", "镜", "合规", "同意", "影子", "盆栽", "说明", "透明"],
+    tones: ["question"],
+    colors: ["#181724", "#2e2945", "#c7a6ff", "#7ab8ff"]
+  },
+  {
+    id: "void",
+    title: "空位备案影像",
+    glyph: "空",
+    keywords: ["空白", "消失", "低调", "另一个", "影子", "无人", "隐身", "缺页"],
+    tones: ["hide"],
+    colors: ["#111317", "#252a31", "#d9e0e8", "#f2c15d"]
+  },
+  {
+    id: "health",
+    title: "身体批注影像",
+    glyph: "息",
+    keywords: ["睡眠", "健康", "休息", "午睡", "疲惫", "呼吸", "身体", "保鲜"],
+    tones: ["health"],
+    colors: ["#151d18", "#27352c", "#69d98f", "#fff7df"]
+  }
+];
+
 function endingDossierAt(familyIndex, fateIndex) {
   const index = familyIndex * deepEndingFates.length + fateIndex;
   return diverseEndingDossiers[index] || endingDossierCases[familyIndex]?.[fateIndex];
@@ -3255,6 +3330,7 @@ const state = {
   routeWeights: {},
   routeSignature: [],
   latestMemo: "同样的选择，不一定会把你送往同样的地方。",
+  awaitingVisual: false,
   awaitingContinue: false,
   pendingFinish: false,
   ending: null,
@@ -3610,6 +3686,7 @@ function startGame(profileOverride, modeOverride) {
   state.routeWeights = {};
   state.routeSignature = [];
   state.latestMemo = "同样的选择，不一定会把你送往同样的地方。";
+  state.awaitingVisual = false;
   state.awaitingContinue = false;
   state.pendingFinish = false;
   state.ending = null;
@@ -3631,6 +3708,7 @@ function drawEvent() {
   }
 
   state.awaitingContinue = false;
+  state.awaitingVisual = false;
   state.pendingFinish = false;
 
   if (state.turn > state.maxTurns) {
@@ -3704,8 +3782,115 @@ function buildAftermathPool(choice, scene = state.current) {
     .map((item, index) => deepenAftermath(item, choice, context, index));
 }
 
+function escapeSvgText(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function svgDataUri(svg) {
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+function selectWeirdVisualTheme(entry) {
+  const text = [
+    entry.title,
+    entry.tag,
+    entry.sceneText,
+    entry.choiceText,
+    entry.aftermath
+  ].join(" ");
+  const tones = entry.tones || [];
+  let best = weirdVisualThemes[0];
+  let bestScore = -1;
+
+  for (const theme of weirdVisualThemes) {
+    const keywordScore = theme.keywords.reduce((score, keyword) => (
+      text.includes(keyword) ? score + 2 : score
+    ), 0);
+    const toneScore = theme.tones.reduce((score, tone) => (
+      tones.includes(tone) ? score + 3 : score
+    ), 0);
+    const score = keywordScore + toneScore;
+    if (score > bestScore) {
+      best = theme;
+      bestScore = score;
+    }
+  }
+
+  if (bestScore <= 0) {
+    return weirdVisualThemes[hashString(text) % weirdVisualThemes.length];
+  }
+  return best;
+}
+
+function buildWeirdVisual(entry) {
+  const theme = selectWeirdVisualTheme(entry);
+  const variant = hashString(`${entry.sceneId}|${entry.choiceText}|${entry.aftermath}`);
+  const [bgA, bgB, accent, ink] = theme.colors;
+  const ring = 130 + (variant % 70);
+  const tilt = (variant % 17) - 8;
+  const dotX = 120 + (variant % 720);
+  const dotY = 80 + ((variant >> 3) % 330);
+  const pulse = 28 + (variant % 45);
+  const lineA = escapeSvgText(shortText(entry.title, 13));
+  const lineB = escapeSvgText(shortText(entry.aftermath, 24));
+  const glyph = escapeSvgText(theme.glyph);
+  const title = escapeSvgText(theme.title);
+  const alt = `${theme.title}：${entry.title}之后出现的异常影像`;
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="${escapeSvgText(alt)}">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="${bgA}"/>
+          <stop offset="1" stop-color="${bgB}"/>
+        </linearGradient>
+        <radialGradient id="flare" cx="50%" cy="48%" r="58%">
+          <stop offset="0" stop-color="${accent}" stop-opacity=".34"/>
+          <stop offset=".48" stop-color="${accent}" stop-opacity=".11"/>
+          <stop offset="1" stop-color="${bgA}" stop-opacity="0"/>
+        </radialGradient>
+        <pattern id="grid" width="46" height="46" patternUnits="userSpaceOnUse">
+          <path d="M 46 0 L 0 0 0 46" fill="none" stroke="${ink}" stroke-opacity=".08" stroke-width="1"/>
+        </pattern>
+        <filter id="soft">
+          <feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#000" flood-opacity=".38"/>
+        </filter>
+      </defs>
+      <rect width="960" height="540" fill="url(#bg)"/>
+      <rect width="960" height="540" fill="url(#grid)"/>
+      <circle cx="${dotX}" cy="${dotY}" r="${ring}" fill="url(#flare)"/>
+      <circle cx="${820 - (variant % 180)}" cy="${95 + (variant % 140)}" r="${pulse}" fill="${accent}" opacity=".22"/>
+      <path d="M88 414 C208 310 318 484 456 365 S708 244 868 350" fill="none" stroke="${accent}" stroke-width="6" stroke-opacity=".42"/>
+      <g transform="translate(480 260) rotate(${tilt})" filter="url(#soft)">
+        <rect x="-215" y="-150" width="430" height="300" rx="24" fill="#f6f1e8" opacity=".92"/>
+        <rect x="-184" y="-118" width="368" height="236" rx="16" fill="${bgA}" opacity=".92"/>
+        <circle cx="-125" cy="-66" r="8" fill="${accent}"/>
+        <circle cx="-94" cy="-66" r="8" fill="${ink}" opacity=".7"/>
+        <circle cx="-63" cy="-66" r="8" fill="${accent}" opacity=".7"/>
+        <path d="M-138 42 C-82 -36 -20 82 42 10 S138 -16 164 66" fill="none" stroke="${ink}" stroke-width="5" stroke-opacity=".48"/>
+        <text x="0" y="38" text-anchor="middle" font-size="118" font-family="serif" font-weight="800" fill="${accent}" opacity=".9">${glyph}</text>
+      </g>
+      <g font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+        <text x="52" y="72" font-size="22" font-weight="800" fill="${accent}" letter-spacing="2">${title}</text>
+        <text x="52" y="464" font-size="28" font-weight="900" fill="${ink}">${lineA}</text>
+        <text x="52" y="502" font-size="18" fill="${ink}" opacity=".78">${lineB}</text>
+      </g>
+    </svg>
+  `;
+
+  return {
+    title: theme.title,
+    alt,
+    themeId: theme.id,
+    src: svgDataUri(svg)
+  };
+}
+
 function applyChoice(index) {
-  if (!state.current || state.finished || state.awaitingContinue) return;
+  if (!state.current || state.finished || state.awaitingVisual || state.awaitingContinue) return;
   const choice = state.currentChoices[index];
   if (!choice) return;
 
@@ -3728,23 +3913,25 @@ function applyChoice(index) {
     sceneText: state.current.text,
     choiceText: choice.text,
     aftermath,
+    tones: [...(choice.tones || [])],
     mood: state.mood.name,
     deltaText: Object.keys(finalDelta).length ? formatDelta(finalDelta) : "无直接数值变化"
   };
 
+  historyEntry.visual = buildWeirdVisual(historyEntry);
   state.history.push(historyEntry);
   state.latestMemo = aftermath;
+  state.awaitingVisual = true;
+  state.awaitingContinue = false;
+  state.pendingFinish = state.history.length >= state.maxTurns;
 
-  if (state.history.length >= state.maxTurns) {
-    state.awaitingContinue = false;
-    state.pendingFinish = false;
-    finishGame();
-    return;
-  }
+  render();
+}
 
+function revealAftermath() {
+  if (!state.awaitingVisual || state.finished) return;
+  state.awaitingVisual = false;
   state.awaitingContinue = true;
-  state.pendingFinish = false;
-
   render();
 }
 
@@ -3837,14 +4024,15 @@ function cleanSentence(text) {
   return String(text || "").trim().replace(/[。！？.!?]+$/, "");
 }
 
-function buildStoryTurn(entry) {
+function buildStoryTurn(entry, options = {}) {
   const sceneText = cleanSentence(entry.sceneText);
   const action = cleanSentence(entry.choiceText);
-  const aftermath = cleanSentence(entry.aftermath);
+  const aftermath = options.includeAftermath === false ? "" : cleanSentence(entry.aftermath);
   const actionSentence = action
     ? `随后，${action.startsWith("你") ? action : `你${action}`}。`
     : "";
-  return `${sceneText}。${actionSentence}${aftermath}。`;
+  const aftermathSentence = aftermath ? `${aftermath}。` : "";
+  return `${sceneText}。${actionSentence}${aftermathSentence}`;
 }
 
 function renderStats() {
@@ -3871,10 +4059,10 @@ function renderTimeline() {
     return;
   }
 
-  const paragraphs = state.history.map((entry) => `
+  const paragraphs = state.history.map((entry, index) => `
     <p class="story-paragraph">
       <span class="story-marker">S${entry.turn} · ${entry.title}</span>
-      ${buildStoryTurn(entry)}
+      ${buildStoryTurn(entry, { includeAftermath: !(state.awaitingVisual && index === state.history.length - 1) })}
     </p>
   `);
 
@@ -3899,6 +4087,25 @@ function renderChoices() {
     `;
     card.querySelector?.(".finale-restart")?.addEventListener("click", () => startGame());
     elements.choices.appendChild(card);
+    return;
+  }
+
+  if (state.awaitingVisual) {
+    const entry = state.history[state.history.length - 1];
+    if (!entry?.visual) return;
+
+    const button = document.createElement("button");
+    button.className = "weird-image-card";
+    button.setAttribute("aria-label", "揭开这张异常影像之后的余波");
+    button.innerHTML = `
+      <span class="weird-image-kicker">${escapeSvgText(entry.visual.title)}</span>
+      <span class="weird-image-frame">
+        <img src="${entry.visual.src}" alt="${escapeSvgText(entry.visual.alt)}">
+      </span>
+      <span class="weird-image-cta">揭开余波</span>
+    `;
+    button.addEventListener("click", revealAftermath);
+    elements.choices.appendChild(button);
     return;
   }
 
@@ -4006,6 +4213,7 @@ function snapshot() {
     currentTitle: state.current?.title || null,
     currentChoices: state.currentChoices.map((choice) => choice.text),
     memo: state.latestMemo,
+    awaitingVisual: state.awaitingVisual,
     awaitingContinue: state.awaitingContinue,
     pendingFinish: state.pendingFinish,
     historyLength: state.history.length,
@@ -4016,13 +4224,17 @@ function snapshot() {
       title: entry.title,
       sceneText: entry.sceneText,
       choiceText: entry.choiceText,
-      aftermath: entry.aftermath
+      aftermath: entry.aftermath,
+      visualTitle: entry.visual?.title || "",
+      visualThemeId: entry.visual?.themeId || ""
     })),
     queue: [...state.queue],
     flags: [...state.storyFlags],
     ghostFlags: [...state.ghostFlags],
     endingTitle: state.ending?.title || "",
     endingText: state.ending?.text || "",
+    currentVisualTitle: state.history[state.history.length - 1]?.visual?.title || "",
+    currentVisualThemeId: state.history[state.history.length - 1]?.visual?.themeId || "",
     choicesHtml,
     timelineHtml: elements.timeline?.innerHTML || ""
   };
@@ -4127,6 +4339,7 @@ function contentReport() {
     choiceCount: scenePool.reduce((sum, scene) => sum + (scene.choices || []).length, 0),
     uniqueSceneIds: new Set(sceneIds).size,
     runLengthRange: { ...runLengthRange },
+    visualThemeCount: weirdVisualThemes.length,
     randomProfileEnabled: Boolean(profileNotes.random)
   };
 }
@@ -4169,6 +4382,10 @@ root.__facultyRouletteDebug = {
   },
   choose(index = 0) {
     applyChoice(index);
+    return snapshot();
+  },
+  revealVisual() {
+    revealAftermath();
     return snapshot();
   },
   continue() {

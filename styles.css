@@ -392,6 +392,71 @@ select {
   line-height: 1.95;
 }
 
+.choices .weird-image-card {
+  grid-template-columns: 1fr;
+  gap: 14px;
+  padding: 18px;
+  overflow: hidden;
+  border-color: rgba(122, 184, 255, .42);
+  background:
+    linear-gradient(135deg, rgba(122, 184, 255, .14), transparent 48%),
+    linear-gradient(315deg, rgba(242, 193, 93, .12), transparent 42%),
+    #111820;
+  animation: imagePulseIn .34s ease-out both;
+}
+
+.choices .weird-image-card:hover {
+  border-color: rgba(122, 184, 255, .72);
+  transform: translateY(-1px);
+}
+
+.weird-image-kicker {
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.weird-image-frame {
+  display: block;
+  overflow: hidden;
+  border: 1px solid rgba(246, 241, 232, .14);
+  border-radius: 10px;
+  background: #090d11;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .03);
+}
+
+.weird-image-frame img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.weird-image-cta {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 13px;
+  border-radius: 999px;
+  background: var(--blue);
+  color: #071019;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+@keyframes imagePulseIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .finale-card {
   display: grid;
   gap: 15px;

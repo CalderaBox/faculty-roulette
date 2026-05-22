@@ -166,6 +166,7 @@ if (contentReport.uniqueSceneIds !== contentReport.sceneCount) throw new Error("
 if (contentReport.runLengthRange?.min !== 8 || contentReport.runLengthRange?.max !== 12) {
   throw new Error("A run should randomly contain 8-12 scene questions.");
 }
+if (contentReport.visualThemeCount < 8) throw new Error("Post-choice weird images should have multiple contextual visual themes.");
 if (!contentReport.randomProfileEnabled) throw new Error("Random profile default should be available.");
 
 const aftermathReport = debug.getAftermathPoolReport();
@@ -217,7 +218,24 @@ if (/<small>|[+-]\d/.test(firstBranch.choicesHtml)) {
   throw new Error("Choice buttons should not show stat preview annotations.");
 }
 let afterChoice = debug.choose(0);
-if (!afterChoice.awaitingContinue) throw new Error("Choice should first render an aftermath continuation state.");
+if (!afterChoice.awaitingVisual || afterChoice.awaitingContinue) {
+  throw new Error("Choice should first render a weird image reveal state.");
+}
+if (!/weird-image-card/.test(elements.get("choices").children[0]?.className || "")) {
+  throw new Error("Weird image should replace the original choice area before aftermath.");
+}
+const visualCardHtml = elements.get("choices").children[0]?._innerHTML || "";
+if (!/data:image\/svg\+xml/.test(visualCardHtml) || !afterChoice.currentVisualTitle) {
+  throw new Error("Weird image card should render a contextual SVG image.");
+}
+if (afterChoice.timelineHtml.includes(afterChoice.memo)) {
+  throw new Error("Story timeline should not reveal the aftermath before the weird image is opened.");
+}
+afterChoice = debug.revealVisual();
+if (!afterChoice.awaitingContinue || afterChoice.awaitingVisual) throw new Error("Image reveal should advance to aftermath continuation state.");
+if (!afterChoice.timelineHtml.includes(afterChoice.memo)) {
+  throw new Error("Story timeline should reveal the aftermath after the weird image is opened.");
+}
 if (!/aftermath-card/.test(elements.get("choices").children[0]?.className || "")) {
   throw new Error("Aftermath should replace the original choice area.");
 }
@@ -234,6 +252,7 @@ if (!/aftermath-cta/.test(aftermathCardHtml)) {
 const branchA = debug.continue().currentSceneId;
 debug.start("paper", "standard", 1200);
 debug.choose(1);
+debug.revealVisual();
 const branchB = debug.continue().currentSceneId;
 if (branchA === branchB) throw new Error("Different first choices should lead to different next scenes.");
 
@@ -248,6 +267,10 @@ snapshot = debug.start("balanced", "publish", 3003);
 let safety = 40;
 while (!snapshot.finished && safety > 0) {
   snapshot = debug.choose(0);
+  if (!snapshot.finished && !snapshot.awaitingVisual) throw new Error("Every selected scene should pause on a weird image first.");
+  if (!snapshot.finished) {
+    snapshot = debug.revealVisual();
+  }
   if (!snapshot.finished && !snapshot.awaitingContinue) throw new Error("Every non-final selected scene should pause on aftermath.");
   if (!snapshot.finished) {
     snapshot = debug.continue();
@@ -296,6 +319,7 @@ for (const [profile, mode, nextSeed] of [
   let trialSafety = 50;
   while (!trial.finished && trialSafety > 0) {
     trial = debug.choose(trialSafety % Math.max(1, trial.currentChoices.length));
+    if (!trial.finished) trial = debug.revealVisual();
     if (!trial.finished) trial = debug.continue();
     trialSafety -= 1;
   }
